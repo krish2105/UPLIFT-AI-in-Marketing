@@ -38,7 +38,12 @@ dev = [
 pythonpath = ["services", "."]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-filterwarnings = ["ignore::DeprecationWarning"]
+filterwarnings = [
+  "ignore::DeprecationWarning",
+  # starlette nags about httpx2 on every TestClient construction. Not ours to fix.
+  "ignore::UserWarning:starlette.testclient",
+  "ignore:Using `httpx` with `starlette.testclient`:",
+]
 
 [tool.ruff]
 line-length = 100
