@@ -1,7 +1,7 @@
 {
   "task": "B1-forecast",
   "generated_by": "scripts/run_phase_b.py",
-  "generated_at": "2026-09-07T08:17:28+00:00",
+  "generated_at": "2026-09-07T09:00:49+00:00",
   "method": "GradientBoostingRegressor with absolute-error loss for the median and pinball loss at the 10th and 90th percentiles for the interval. Chronological holdout of 56 days; the baseline is seasonal naive — the same hour, same weekday, last week.",
   "target_win_rate": 0.7,
   "win_rate": 1.0,

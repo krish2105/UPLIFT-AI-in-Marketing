@@ -29,7 +29,7 @@ from services.api.deps import db
 from services.api.marketing import allocator as alloc
 from services.api.marketing import segments as seg
 from services.api.marketing import uplift as up
-from services.api.marketing.forecast import HORIZON_DAYS, forward
+from services.api.marketing.forecast import HORIZON_DAYS
 
 router = APIRouter(prefix="/marketing", tags=["marketing"])
 RESULTS = Path(__file__).resolve().parents[3] / "docs" / "results"
@@ -46,14 +46,17 @@ def _results(task: str) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-@lru_cache(maxsize=8)
-def _forward_cached(zone: str, days: int, stamp: str) -> str:
-    """`stamp` is the latest loaded hour: it makes the cache key move when the
-    data does, so a refreshed pipeline is not served a stale horizon."""
-    from services.api.core.db import connect
+@lru_cache(maxsize=1)
+def _forward_all() -> dict:
+    """The precomputed horizon, read from docs/results/B1-forward.json.
 
-    df = forward(connect(), zone, days)
-    return df.to_json(orient="records", date_format="iso")
+    Fitting four sites takes about ninety seconds, so it happens in
+    scripts/run_phase_b.py at build time and is served here as data. Fitting
+    lazily on first request would charge the first visitor ninety seconds and
+    would time out on a free instance; the horizon being as fresh as the last
+    build is exactly right, because the series only moves when a pipeline runs.
+    """
+    return _results("B1-forward")["forward"]
 
 
 @router.get("/forecast", summary="Evaluation against the baseline, and the forward horizon")
@@ -82,9 +85,11 @@ def get_forecast(
     }
 
     if include_forward:
-        stamp = conn.execute("SELECT MAX(ts_local) FROM footfall_hourly").fetchone()[0]
+        precomputed = _forward_all()
         wanted = [zone] if zone else sorted(zones)
-        out["forward"] = {z: json.loads(_forward_cached(z, horizon, stamp)) for z in wanted}
+        # `horizon` trims the precomputed 56 days rather than refitting for a
+        # shorter one — the same model, fewer rows returned.
+        out["forward"] = {z: precomputed.get(z, [])[: horizon * 24] for z in wanted}
         out["horizon_days"] = horizon
     return out
 

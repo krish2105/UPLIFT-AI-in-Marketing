@@ -22,7 +22,7 @@ from services.api.brand import load_brand  # noqa: E402
 from services.api.core.db import connect  # noqa: E402
 from services.api.marketing import allocator, segments, uplift  # noqa: E402
 from services.api.marketing.features import load_frame  # noqa: E402
-from services.api.marketing.forecast import evaluate  # noqa: E402
+from services.api.marketing.forecast import HORIZON_DAYS, evaluate, forward  # noqa: E402
 
 RESULTS = ROOT / "docs" / "results"
 WIN_RATE_TARGET = 0.70
@@ -179,6 +179,39 @@ def b3_allocator(conn) -> dict:
     }
 
 
+def b1_forward(conn) -> dict:
+    """Precompute the forward horizon so nothing fits at request time.
+
+    Fitting four sites takes about ninety seconds. Doing that inside a request
+    on a 512 MB free instance is a timeout at best; doing it lazily and caching
+    means the FIRST visitor pays for it, which is the worst possible person to
+    charge. So the horizon is computed here, written to docs/results/, and
+    served as data.
+
+    The cost is that the horizon is as fresh as the last build. That is exactly
+    right for this application: the underlying series is seeded and only moves
+    when a pipeline runs, which on the deployed instance is at build time.
+    """
+    print("B1 forward — precomputing the 56-day horizon for four sites")
+    out = {}
+    for zone in [z.code for z in load_brand().zones]:
+        df = forward(conn, zone, HORIZON_DAYS)
+        out[zone] = json.loads(df.to_json(orient="records", date_format="iso"))
+        print(f"    {zone}  {len(out[zone])} hourly points")
+    return {
+        "task": "B1-forward",
+        "generated_by": "scripts/run_phase_b.py",
+        "generated_at": now_iso(),
+        "horizon_days": HORIZON_DAYS,
+        "note": (
+            "Precomputed rather than fitted per request. Ninety seconds of model "
+            "fitting inside a request would time out on a free instance, and doing it "
+            "lazily would charge the first visitor for it."
+        ),
+        "forward": out,
+    }
+
+
 def b4_uplift(conn) -> dict:
     print("B4 uplift — synthetic control, CUPED, and a recovery check")
     df = pd.read_sql_query(
@@ -244,11 +277,17 @@ def b4_uplift(conn) -> dict:
 
 def main() -> int:
     conn = connect()
-    payloads = [b1_forecast(conn), b2_segments(conn), b3_allocator(conn), b4_uplift(conn)]
+    payloads = [
+        b1_forecast(conn),
+        b1_forward(conn),
+        b2_segments(conn),
+        b3_allocator(conn),
+        b4_uplift(conn),
+    ]
     for p in payloads:
         write(p["task"], p)
 
-    forecast, _, _, lift = payloads
+    forecast, _, _, _, lift = payloads
     ok = forecast["meets_target"] and lift["all_within_tolerance"]
     print()
     print(

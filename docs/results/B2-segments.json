@@ -1,7 +1,7 @@
 {
   "task": "B2-segments",
   "generated_by": "scripts/run_phase_b.py",
-  "generated_at": "2026-09-07T08:17:29+00:00",
+  "generated_at": "2026-09-07T09:01:53+00:00",
   "method": "RFM quintiles over the point-of-sale sample, assigned by a decision list so the rules read in order rather than as overlapping sets. Stability is the share of customers keeping their segment across 25 bootstrap resamples.",
   "as_of": "2026-09-07",
   "customers": 1854,
