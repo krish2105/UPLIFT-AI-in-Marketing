@@ -55,3 +55,18 @@ test("the deployed shell still has all fifteen tabs", async ({ page }) => {
   const nav = page.getByRole("navigation", { name: /sections/i });
   await expect(nav.getByRole("link")).toHaveCount(15);
 });
+
+test("the deployed instance carries the red-team result, not just the scorecard", async ({
+  page,
+}) => {
+  /* A deployment property, not a behavioural one: docs/results/E1-red-team.json
+     is read from disk by the API, so it is exactly the kind of file a build can
+     leave behind. If it is missing the section vanishes silently and the page
+     falls back to a scorecard of assurances — which is what this project is
+     trying not to ship. */
+  await page.goto("/security");
+  await expect(page.getByRole("heading", { name: /when the claims were attacked/i })).toBeVisible();
+  await expect(
+    page.locator("table.data tbody tr").filter({ hasText: "case and whitespace" }).first(),
+  ).toContainText(/broke/i);
+});

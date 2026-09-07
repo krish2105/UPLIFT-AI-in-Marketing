@@ -63,9 +63,10 @@ rules the system applies cannot drift apart.</td>
 | **API** | **https://mawsim-api.onrender.com** — [`/docs`](https://mawsim-api.onrender.com/docs) · [`/healthz`](https://mawsim-api.onrender.com/healthz) |
 | **Verify it** | `LIVE_API_URL=https://mawsim-api.onrender.com LIVE_WEB_URL=https://uplift-mawsim.vercel.app make smoke-live` |
 
-All fifteen tabs serve measured data. The five live checks pass: the API
+All fifteen tabs serve measured data. The six live checks pass: the API
 answers, no dataset is empty, the page carries the disclaimer, the web app
-reaches the API across origins, and every tab is present.
+reaches the API across origins, every tab is present, and the Security tab
+carries the red-team result rather than the scorecard alone.
 
 **The API sleeps after fifteen minutes idle**, so the first request after a
 quiet period takes about fifty seconds while the free instance wakes. For a
