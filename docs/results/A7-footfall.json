@@ -2,7 +2,7 @@
   "task": "A7-footfall",
   "dataset": "footfall_hourly",
   "generated_by": "pipeline/footfall.py --verify",
-  "generated_at": "2026-09-07T07:23:38+00:00",
+  "generated_at": "2026-09-07T08:00:12+00:00",
   "pass": true,
   "stats": {
     "rows": 72192,

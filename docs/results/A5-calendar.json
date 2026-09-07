@@ -2,7 +2,7 @@
   "task": "A5-calendar",
   "dataset": "calendar_days",
   "generated_by": "pipeline/calendar.py --verify",
-  "generated_at": "2026-09-07T07:11:57+00:00",
+  "generated_at": "2026-09-07T08:00:11+00:00",
   "pass": true,
   "stats": {
     "rows": 1161,

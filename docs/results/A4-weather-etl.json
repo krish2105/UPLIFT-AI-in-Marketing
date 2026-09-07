@@ -2,7 +2,7 @@
   "task": "A4-weather-etl",
   "dataset": "weather_hourly",
   "generated_by": "pipeline/weather.py --verify",
-  "generated_at": "2026-09-07T07:05:49+00:00",
+  "generated_at": "2026-09-07T08:00:11+00:00",
   "pass": true,
   "stats": {
     "rows_total": 72192,

@@ -56,6 +56,18 @@ rules the system applies cannot drift apart.</td>
 > Captured from a local run against a built database. Regenerate with
 > `cd apps/web && node scripts/screenshots.mjs`.
 
+## Live
+
+Not deployed yet — deployment needs account actions that belong to the owner,
+not to the build. [`docs/deploy.md`](docs/deploy.md) lists them: a GitHub push,
+a Render blueprint with its secrets, a Vercel import rooted at `apps/web`, and
+closing the CORS loop between the two. This section carries the two URLs and the
+live smoke-test result once that is done.
+
+```bash
+LIVE_API_URL=... LIVE_WEB_URL=... make smoke-live
+```
+
 ## Standing constraints
 
 - **Zero paid inference.** Ollama (local) → Gemini free tier → Groq free tier →

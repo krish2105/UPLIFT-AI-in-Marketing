@@ -21,7 +21,7 @@
       "note": "Local. 8192-token context, which is what matters for reading a page of a PDF.",
       "available": true,
       "dim": 1024,
-      "seconds_for_12_texts": 2.14,
+      "seconds_for_12_texts": 0.81,
       "probes": [
         {
           "probe": "weather-elasticity",
@@ -59,7 +59,7 @@
       "note": "Local. English-first; included to test whether it is usable here at all.",
       "available": true,
       "dim": 768,
-      "seconds_for_12_texts": 1.01,
+      "seconds_for_12_texts": 0.3,
       "probes": [
         {
           "probe": "weather-elasticity",
@@ -97,7 +97,7 @@
       "note": "ONNX, 0.22 GB. The only candidate small enough to consider on a free dyno.",
       "available": true,
       "dim": 384,
-      "seconds_for_12_texts": 0.57,
+      "seconds_for_12_texts": 0.56,
       "probes": [
         {
           "probe": "weather-elasticity",
@@ -135,7 +135,7 @@
       "note": "ONNX, 1.0 GB. Will not fit a 512 MB instance; measured for comparison.",
       "available": true,
       "dim": 768,
-      "seconds_for_12_texts": 84.56,
+      "seconds_for_12_texts": 2.79,
       "probes": [
         {
           "probe": "weather-elasticity",

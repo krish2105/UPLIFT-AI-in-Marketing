@@ -2,7 +2,7 @@
   "task": "A6-events",
   "dataset": "events",
   "generated_by": "pipeline/events.py --verify",
-  "generated_at": "2026-09-07T07:18:11+00:00",
+  "generated_at": "2026-09-07T08:00:11+00:00",
   "pass": true,
   "stats": {
     "events": 245,
