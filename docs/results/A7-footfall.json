@@ -1,0 +1,93 @@
+{
+  "task": "A7-footfall",
+  "dataset": "footfall_hourly",
+  "generated_by": "pipeline/footfall.py --verify",
+  "generated_at": "2026-09-07T07:23:38+00:00",
+  "pass": true,
+  "stats": {
+    "rows": 72192,
+    "rows_per_zone": {
+      "DXB-DEI": 18048,
+      "DXB-DTN": 18048,
+      "DXB-MAR": 18048,
+      "DXB-MOE": 18048
+    },
+    "baskets": 8737,
+    "customers": 1854,
+    "outdoor_share": {
+      "DXB-DTN": 0.0,
+      "DXB-MOE": 0.0,
+      "DXB-MAR": 0.535,
+      "DXB-DEI": 0.273
+    },
+    "evening_temperature_slope_per_degree": {
+      "DXB-DTN": -0.01064,
+      "DXB-MOE": -0.00958,
+      "DXB-MAR": -0.02332,
+      "DXB-DEI": -0.01707
+    },
+    "note": "slope is the fractional change in footfall per degree of apparent temperature, evening hours only",
+    "ramadan_deira": {
+      "daytime_avg": 13.9,
+      "evening_avg": 68.1,
+      "non_ramadan_daytime_avg": 39.8
+    },
+    "baskets_by_daypart": {
+      "evening": 4161,
+      "morning": 2608,
+      "midday": 1968
+    }
+  },
+  "checks": [
+    {
+      "name": "all four zones present",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "every row is labelled simulated",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "transactions never exceed footfall",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "the outdoor site is more temperature-sensitive than the enclosed one",
+      "pass": true,
+      "detail": "Marina -0.02332/degree vs Al Barsha -0.00958/degree"
+    },
+    {
+      "name": "temperature sensitivity orders by outdoor share",
+      "pass": true,
+      "detail": "slope order ['DXB-MAR', 'DXB-DEI', 'DXB-DTN', 'DXB-MOE'] vs outdoor order ['DXB-MAR', 'DXB-DEI', 'DXB-DTN', 'DXB-MOE']"
+    },
+    {
+      "name": "Ramadan collapses daytime trade at Deira",
+      "pass": true,
+      "detail": "14 vs 40 normally"
+    },
+    {
+      "name": "Ramadan evenings exceed Ramadan daytime at Deira",
+      "pass": true,
+      "detail": "68 after iftar vs 14 in the day"
+    },
+    {
+      "name": "the POS sample has a customer base with a tail",
+      "pass": true,
+      "detail": "1854 customers"
+    },
+    {
+      "name": "no basket falls outside trading hours",
+      "pass": true,
+      "detail": "0 closed-hour baskets"
+    },
+    {
+      "name": "the evening daypart is the largest, as the brand kit claims",
+      "pass": true,
+      "detail": "{'evening': 4161, 'morning': 2608, 'midday': 1968}"
+    }
+  ]
+}

@@ -25,3 +25,6 @@ data/processed/*.db-*
 # Next generates these for AI agents on every dev run.
 apps/web/AGENTS.md
 apps/web/CLAUDE.md
+
+# The POS sample is a committed deliverable; the footfall series is rebuilt.
+!data/pos_sample.csv

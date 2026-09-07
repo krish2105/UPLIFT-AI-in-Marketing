@@ -117,6 +117,35 @@ MIGRATIONS: list[tuple[str, str]] = [
         );
         """,
     ),
+    (
+        "0004_footfall",
+        """
+        CREATE TABLE IF NOT EXISTS footfall_hourly (
+            zone_code    TEXT    NOT NULL,
+            ts_local     TEXT    NOT NULL,
+            footfall     INTEGER NOT NULL,
+            transactions INTEGER NOT NULL,
+            -- Always 1, and NOT NULL, so no query can return this series
+            -- without the column that says it is not observed.
+            simulated    INTEGER NOT NULL CHECK (simulated = 1),
+            PRIMARY KEY (zone_code, ts_local)
+        );
+        CREATE INDEX IF NOT EXISTS ix_footfall_ts ON footfall_hourly (ts_local);
+
+        CREATE TABLE IF NOT EXISTS pos_baskets (
+            basket_id   TEXT PRIMARY KEY,
+            customer_id TEXT NOT NULL,
+            zone_code   TEXT NOT NULL,
+            ts_local    TEXT NOT NULL,
+            items       INTEGER NOT NULL,
+            amount_aed  REAL NOT NULL,
+            daypart     TEXT NOT NULL,
+            sample      INTEGER NOT NULL CHECK (sample = 1)
+        );
+        CREATE INDEX IF NOT EXISTS ix_pos_customer ON pos_baskets (customer_id);
+        CREATE INDEX IF NOT EXISTS ix_pos_ts ON pos_baskets (ts_local);
+        """,
+    ),
 ]
 
 
