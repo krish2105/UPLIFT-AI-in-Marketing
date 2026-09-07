@@ -1,12 +1,12 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 
-.PHONY: check lint test web-check contrast placeholders owasp artefacts api web e2e etl
+.PHONY: check lint test web-check contrast palette placeholders owasp artefacts api web e2e etl
 
 UV := uv run
 
 # The single green bar. Every task must leave this passing.
-check: lint test contrast placeholders web-check
+check: lint test contrast palette placeholders web-check
 
 # e2e is deliberately outside `check`: it needs the API and the web server
 # running, so folding it in would make the default bar depend on two processes
@@ -23,6 +23,9 @@ test:
 
 contrast:
 	cd apps/web && node scripts/check-contrast.mjs
+
+palette:
+	cd apps/web && node scripts/check-palette.mjs
 
 placeholders:
 	$(UV) python scripts/placeholder_scan.py

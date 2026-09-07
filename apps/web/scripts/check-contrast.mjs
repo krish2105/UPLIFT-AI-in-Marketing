@@ -17,12 +17,13 @@
  * from what a browser will draw.
  */
 
-import { readFileSync, writeFileSync, readdirSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseRegisters } from "./tokens.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const STYLES = join(HERE, "..", "styles");
+const TOKENS = join(HERE, "..", "styles", "tokens.css");
 const RESULTS = join(HERE, "..", "..", "..", "docs", "results");
 
 /* ── colour maths ───────────────────────────────────────────────────────── */
@@ -66,34 +67,6 @@ function contrast(a, b) {
 
 /* ── token parsing ──────────────────────────────────────────────────────── */
 
-const OKLCH = /oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*(?:\/\s*[\d.]+\s*)?\)/;
-
-/** Split a token file into register blocks marked by `@register <name>`. */
-function parseDirection(css) {
-  // Before the direction was chosen this parsed an `@direction` marker per
-  // file. One direction now ships, so the file name is the identity.
-  const direction = css.match(/@direction\s+([a-z-]+)/)?.[1] ?? "mawsim";
-
-  const registers = {};
-  // A register runs from its marker to the next marker or end of file.
-  const marks = [...css.matchAll(/@register\s+([a-z]+)/g)];
-  if (marks.length === 0) throw new Error(`${direction}: no @register markers`);
-
-  marks.forEach((mark, i) => {
-    const start = mark.index;
-    const end = i + 1 < marks.length ? marks[i + 1].index : css.length;
-    const block = css.slice(start, end);
-    const tokens = registers[mark[1]] ?? (registers[mark[1]] = {});
-    for (const line of block.split("\n")) {
-      const decl = line.match(/^\s*(--[a-z0-9-]+)\s*:\s*(.+?);/);
-      if (!decl) continue;
-      const c = decl[2].match(OKLCH);
-      // Later declarations win, exactly as the cascade would resolve them.
-      if (c) tokens[decl[1]] = [+c[1], +c[2], +c[3]];
-    }
-  });
-  return { direction, registers };
-}
 
 /* ── what must be legible against what ──────────────────────────────────── */
 
@@ -120,56 +93,46 @@ const PAIRS = [
 
 /* ── run ────────────────────────────────────────────────────────────────── */
 
-const files = readdirSync(STYLES).filter((f) => /^tokens(\..+)?\.css$/.test(f));
-if (files.length === 0) {
-  console.error("contrast gate FAILED: no tokens.css found in styles/");
-  process.exit(1);
-}
-
-const report = { generated_by: "apps/web/scripts/check-contrast.mjs", directions: {} };
+const registers = parseRegisters(readFileSync(TOKENS, "utf8"));
+const report = { generated_by: "apps/web/scripts/check-contrast.mjs", registers: {} };
 const failures = [];
 let measured = 0;
 
-for (const file of files.sort()) {
-  const { direction, registers } = parseDirection(readFileSync(join(STYLES, file), "utf8"));
-  report.directions[direction] = { file: `apps/web/styles/${file}`, registers: {} };
-
-  for (const [register, tokens] of Object.entries(registers)) {
-    const rows = [];
-    for (const [fgName, bgName, floor, why] of PAIRS) {
-      const fg = tokens[fgName];
-      const bg = tokens[bgName];
-      if (!fg || !bg) {
-        failures.push(`${direction}/${register}: missing ${!fg ? fgName : bgName}`);
-        continue;
-      }
-      const f = relativeLuminance(...fg);
-      const b = relativeLuminance(...bg);
-      const ratio = contrast(f.lum, b.lum);
-      const pass = ratio >= floor;
-      measured++;
-      rows.push({
-        foreground: fgName,
-        background: bgName,
-        ratio: Math.round(ratio * 100) / 100,
-        floor,
-        pass,
-        out_of_gamut: f.outOfGamut || b.outOfGamut,
-        why,
-      });
-      if (!pass) {
-        failures.push(
-          `${direction}/${register}: ${fgName} on ${bgName} = ${ratio.toFixed(2)}:1, needs ${floor}:1 — ${why}`,
-        );
-      }
-      if (f.outOfGamut || b.outOfGamut) {
-        failures.push(
-          `${direction}/${register}: ${fgName} on ${bgName} uses a colour outside sRGB; the browser will draw something other than what this measured`,
-        );
-      }
+for (const [register, tokens] of Object.entries(registers)) {
+  const rows = [];
+  for (const [fgName, bgName, floor, why] of PAIRS) {
+    const fg = tokens[fgName];
+    const bg = tokens[bgName];
+    if (!fg || !bg) {
+      failures.push(`${register}: missing ${!fg ? fgName : bgName}`);
+      continue;
     }
-    report.directions[direction].registers[register] = rows;
+    const f = relativeLuminance(...fg);
+    const b = relativeLuminance(...bg);
+    const ratio = contrast(f.lum, b.lum);
+    const pass = ratio >= floor;
+    measured++;
+    rows.push({
+      foreground: fgName,
+      background: bgName,
+      ratio: Math.round(ratio * 100) / 100,
+      floor,
+      pass,
+      out_of_gamut: f.outOfGamut || b.outOfGamut,
+      why,
+    });
+    if (!pass) {
+      failures.push(
+        `${register}: ${fgName} on ${bgName} = ${ratio.toFixed(2)}:1, needs ${floor}:1 — ${why}`,
+      );
+    }
+    if (f.outOfGamut || b.outOfGamut) {
+      failures.push(
+        `${register}: ${fgName} on ${bgName} uses a colour outside sRGB; the browser will draw something other than what this measured`,
+      );
+    }
   }
+  report.registers[register] = rows;
 }
 
 report.pairs_measured = measured;
@@ -187,7 +150,6 @@ if (failures.length) {
 }
 
 console.log(
-  `contrast gate passed — ${measured} pairs measured across ` +
-    `${Object.keys(report.directions).length} direction(s), both registers. ` +
+  `contrast gate passed — ${measured} pairs measured across both registers. ` +
     `docs/results/A2-contrast.json written.`,
 );
