@@ -19,6 +19,15 @@ const KIND_LABEL: Record<string, string> = {
   brand: "brand kit",
 };
 
+/* Said in the reader's terms, not the retriever's. "Vector" and "BM25" describe
+   how this was built; "words" and "meaning" describe what happened to their
+   question. */
+const MATCH_LABEL: Record<string, string> = {
+  both: "words and meaning agree",
+  lexical: "matched on words",
+  vector: "matched on meaning",
+};
+
 export function AskView() {
   const [q, setQ] = useState("");
   const [res, setRes] = useState<AskResponse | null>(null);
@@ -84,7 +93,7 @@ export function AskView() {
                   <span className="chip">{KIND_LABEL[c.kind] ?? c.kind}</span>
                   <span className="code">{c.id}</span>
                 </div>
-                <span className="faint num">score {c.score.toFixed(1)}</span>
+                <span className="faint">{MATCH_LABEL[c.matched_by] ?? c.matched_by}</span>
               </div>
               <p className="body ltr" style={{ margin: 0, fontSize: "var(--step--1)" }}>{c.text}</p>
               <p className="faint ltr" style={{ margin: 0 }}>{c.source}</p>

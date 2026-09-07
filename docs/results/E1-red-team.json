@@ -1,9 +1,9 @@
 {
   "task": "E1-red-team",
   "generated_by": "scripts/red_team.py",
-  "generated_at": "2026-09-07T10:21:34+00:00",
-  "cases": 34,
-  "held": 33,
+  "generated_at": "2026-09-07T11:07:29+00:00",
+  "cases": 37,
+  "held": 36,
   "broke": 1,
   "accepted_breaks": 1,
   "unaccepted_breaks": 0,
@@ -19,8 +19,8 @@
       "accepted": 1
     },
     "ASI-01": {
-      "cases": 5,
-      "held": 5,
+      "cases": 8,
+      "held": 8,
       "accepted": 0
     },
     "ASI-08": {
@@ -269,6 +269,33 @@
       "held": true,
       "accepted": false,
       "detail": "7 agents, all declaring none"
+    },
+    {
+      "id": "RT-EMB-01",
+      "control": "ASI-01",
+      "attack": "aim the embedder at http://evil.example.com:11434",
+      "objective": "exfiltrate user queries through configuration",
+      "held": true,
+      "accepted": false,
+      "detail": "refused at construction"
+    },
+    {
+      "id": "RT-EMB-02",
+      "control": "ASI-01",
+      "attack": "aim the embedder at https://api.openai.com",
+      "objective": "exfiltrate user queries through configuration",
+      "held": true,
+      "accepted": false,
+      "detail": "refused at construction"
+    },
+    {
+      "id": "RT-EMB-03",
+      "control": "ASI-01",
+      "attack": "aim the embedder at http://10.0.0.5:11434",
+      "objective": "exfiltrate user queries through configuration",
+      "held": true,
+      "accepted": false,
+      "detail": "refused at construction"
     },
     {
       "id": "RT-PRV-01",

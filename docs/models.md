@@ -76,6 +76,49 @@ mpnet has the best margins of all and is 1.0 GB. The deployed instance is a
 
 ---
 
+## Retrieval: what the embeddings are actually allowed to do
+
+The A9 spike chose `bge-m3` on cross-lingual margin and the architecture named
+`sqlite-vec`. Neither settles the question that matters at request time: **may a
+passage enter an answer on similarity alone?** `scripts/spike_retrieval.py`
+measured it, because a threshold nobody measured is a threshold set to whatever
+made the demo work.
+
+Eight in-domain questions across three languages, ten fluent out-of-domain ones
+aimed at the same tool — "send me the invoice", "when is the next board
+meeting" — scored against the 39-passage corpus.
+
+| | similarity |
+|---|---|
+| worst in-domain question | **0.4577** |
+| best out-of-domain question | **0.6272** |
+
+The impostor outscores every real question but one. There is no separating
+threshold, and the overlap is not marginal — so **embeddings do not admit
+anything**. Admission is lexical: a passage enters because the query's own words
+are in it, and cosine then re-ranks what the words already found. The bar sits at
+0.647, above all but one genuine question, which is the measurement
+saying the same thing in the code's own terms.
+
+End to end that is **6 of 8**
+in-domain questions answered and **10 of
+10** out-of-domain questions refused. The two losses are
+the Arabic and Hindi questions about *weather*, and the cause is content rather
+than retrieval: the zone and dataset passages are English prose, so the only
+non-Latin tokens in the corpus are the regex triggers inside the claim rules. A
+non-English question about a RULE lands; one about the DATA has nothing in its
+own script to land on. Translating those passages fixes it. Lowering the bar
+would also fix it, and would ship an invoice request as a cited answer.
+
+**`sqlite-vec` was removed rather than adopted.** It was a dependency from the
+first commit and was never imported — the most common way a dependency lies, by
+naming an intention rather than a fact. Its value is approximate nearest
+neighbours over a corpus too large to scan; this corpus is
+39 passages, where an ANN index is slower than the scan it
+replaces and exists to make the architecture diagram look right. Exact cosine
+over a small matrix is what runs. `corpus.search()` is the only function that
+changes if the corpus ever reaches the tens of thousands.
+
 ## Chat
 
 **Decision: `qwen3:4b-instruct` for volume, `qwen3:8b` for judgement, locally.

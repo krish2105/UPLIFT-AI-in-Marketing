@@ -83,6 +83,18 @@ class TestNothingWritesOutward:
     REQUEST_PATH = ("routers", "creative", "marketing", "rag", "security", "data")
     FORBIDDEN_CALLS = {"post", "put", "patch", "delete", "sendmail", "urlopen"}
 
+    # One module on a request path makes an outbound write, and it is allowed
+    # only because it cannot reach anything but this machine.
+    #
+    # rag/vectors.py POSTs a query to Ollama to embed it. Embedding a query
+    # MEANS SENDING THE QUERY, which is why the first version of that module —
+    # with a hosted embedding endpoint as the deployed fallback — failed this
+    # test and was rewritten rather than exempted. What remains is a call whose
+    # host is checked against a loopback list at construction, so the exemption
+    # is paired with `test_the_local_embedder_refuses_a_remote_host` below. An
+    # allowlist entry without that test would be a comment, not a control.
+    LOOPBACK_ONLY = {"rag/vectors.py"}
+
     def _modules(self):
         for path in API.rglob("*.py"):
             rel = path.relative_to(API)
@@ -103,8 +115,44 @@ class TestNothingWritesOutward:
                     and isinstance(node.func.value, ast.Name)
                     and node.func.value.id in {"httpx", "requests", "urllib", "session", "client"}
                 ):
+                    rel_api = path.relative_to(API).as_posix()
+                    if rel_api in self.LOOPBACK_ONLY:
+                        continue
                     offenders.append(f"{path.relative_to(ROOT)}:{node.lineno}")
         assert not offenders, f"outbound write calls on a request path: {offenders}"
+
+    def test_the_local_embedder_refuses_a_remote_host(self, monkeypatch):
+        """The price of the allowlist entry above.
+
+        If OLLAMA_HOST can point off-box, then every question a user types can
+        leave the instance, and ASI-01's claim that nothing acts outside this
+        process is no longer true — quietly, through an environment variable.
+        """
+        from services.api.rag import vectors
+
+        for host in ("http://evil.example.com:11434", "https://api.openai.com", "http://10.0.0.5"):
+            monkeypatch.setenv("OLLAMA_HOST", host)
+            with pytest.raises(vectors.NotLoopbackError):
+                vectors._Ollama()
+
+        monkeypatch.setenv("OLLAMA_HOST", "http://127.0.0.1:11434")
+        assert vectors._Ollama().host == "http://127.0.0.1:11434"
+
+    def test_no_hosted_embedding_endpoint_is_reachable_from_the_rag_package(self):
+        """The removed provider, asserted gone.
+
+        A deleted class comes back easily — as a "temporary" fallback, or in a
+        merge. The names below are the ones that would carry a user's query to a
+        third party, and none of them belongs in a module that serves requests.
+        """
+        text = (API / "rag" / "vectors.py").read_text(encoding="utf-8")
+        code = "\n".join(ln for ln in text.splitlines() if not ln.lstrip().startswith("#")).split(
+            '"""'
+        )
+        # Odd indices are docstrings; the prose there DISCUSSES the removal.
+        body = "".join(part for i, part in enumerate(code) if i % 2 == 0)
+        for name in ("generativelanguage", "openai", "cohere", "voyageai", "GEMINI_API_KEY"):
+            assert name not in body, f"{name} is reachable from rag/vectors.py again"
 
     def test_no_request_path_module_writes_to_the_database(self):
         offenders = []

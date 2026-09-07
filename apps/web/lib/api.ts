@@ -379,7 +379,21 @@ export type SecurityResponse = {
 export type AskResponse = {
   query: string;
   answered: boolean;
-  citations: { rank: number; id: string; score: number; text: string; source: string; source_url: string; kind: string }[];
+  citations: {
+    rank: number;
+    id: string;
+    /** Reciprocal-rank-fusion score. Tiny by construction (~1/60) and not
+     *  comparable across queries, so it is not shown to a reader. */
+    score: number;
+    lexical_score: number;
+    /** Which half of the retriever found this: the query's words, its meaning,
+     *  or both agreeing. */
+    matched_by: "both" | "lexical" | "vector";
+    text: string;
+    source: string;
+    source_url: string;
+    kind: string;
+  }[];
   note: string;
   corpus_size: number;
 };

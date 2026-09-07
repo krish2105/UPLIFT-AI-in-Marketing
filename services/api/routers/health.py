@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends
 from services.api import APP, BRAND, BRAND_IS_FICTIONAL, COURSE
 from services.api.data.registry import REGISTRY
 from services.api.deps import db
+from services.api.rag import vectors
 
 router = APIRouter(tags=["health"])
 
@@ -30,8 +31,13 @@ def healthz(conn: sqlite3.Connection = Depends(db)) -> dict:
         except sqlite3.OperationalError:
             loaded[d.key] = 0
 
+    # Retrieval quality changes silently with the environment: the same code
+    # answers an Arabic question differently on a laptop with Ollama than on a
+    # free instance with neither a model nor a key. Saying which mode is live is
+    # the difference between a reader judging the retriever and guessing at it.
     return {
         "status": "ok" if all(loaded.values()) else "degraded",
+        "retrieval": vectors.describe(),
         "app": APP,
         "course": COURSE,
         "brand": {"name": BRAND, "fictional": BRAND_IS_FICTIONAL},

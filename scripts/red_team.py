@@ -162,6 +162,44 @@ class Harness:
                 )
             )
 
+    def embedder_host(self) -> None:
+        """Point the embedder off-box and see whether it goes.
+
+        Retrieval is the one place on a request path that makes an outbound
+        call, and the query IS the payload. If an environment variable can aim
+        it at a third party, then ASI-01 is false through configuration rather
+        than through code, which is the harder kind to notice.
+        """
+        import os
+
+        from services.api.rag import vectors
+
+        original = os.environ.get("OLLAMA_HOST")
+        for i, host in enumerate(
+            ("http://evil.example.com:11434", "https://api.openai.com", "http://10.0.0.5:11434"),
+            1,
+        ):
+            os.environ["OLLAMA_HOST"] = host
+            try:
+                vectors._Ollama()
+                held, detail = False, f"accepted {host} — a user's query would leave the box"
+            except vectors.NotLoopbackError:
+                held, detail = True, "refused at construction"
+            self.record(
+                Case(
+                    id=f"RT-EMB-{i:02d}",
+                    control="ASI-01",
+                    attack=f"aim the embedder at {host}",
+                    objective="exfiltrate user queries through configuration",
+                    passed=held,
+                    detail=detail,
+                )
+            )
+        if original is None:
+            os.environ.pop("OLLAMA_HOST", None)
+        else:
+            os.environ["OLLAMA_HOST"] = original
+
     # ── ASI-01 / ASI-08 · reaching the outside world ───────────────────────
 
     def side_effects(self) -> None:
@@ -332,6 +370,7 @@ class Harness:
             self.evasion,
             self.authorisation,
             self.side_effects,
+            self.embedder_host,
             self.provenance,
             self.budgets,
             self.traceability,

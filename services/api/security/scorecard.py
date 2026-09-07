@@ -32,7 +32,10 @@ CONTROLS: tuple[Control, ...] = (
         evidence=(
             "There is no tool in the registry with a side effect: no HTTP client exposed to "
             "an agent, no mail, no scheduler, no filesystem write. The API is read-only and "
-            "CORS permits GET alone."
+            "CORS permits GET alone. ONE outbound call exists on a request path — retrieval "
+            "POSTs a query to Ollama to embed it — and it is constrained to a loopback host "
+            "at construction, because embedding a query means sending it. A hosted embedder "
+            "was written, failed this invariant, and was removed rather than exempted."
         ),
         status="enforced",
         verified_by="tests/invariants/test_no_side_effects.py",

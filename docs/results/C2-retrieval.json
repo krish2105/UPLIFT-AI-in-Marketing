@@ -1,0 +1,228 @@
+{
+  "task": "C2-retrieval",
+  "generated_by": "scripts/spike_retrieval.py",
+  "generated_at": "2026-09-07T11:00:33+00:00",
+  "embedder": {
+    "backend": "ollama",
+    "model": "bge-m3:567m"
+  },
+  "corpus_passages": 39,
+  "in_domain": [
+    {
+      "lang": "en",
+      "query": "sugar-free claim rule",
+      "max": 0.6625,
+      "median": 0.3873,
+      "gap": 0.2752,
+      "top": "SID-N-001"
+    },
+    {
+      "lang": "en",
+      "query": "detox",
+      "max": 0.4683,
+      "median": 0.3713,
+      "gap": 0.097,
+      "top": "SID-H-003"
+    },
+    {
+      "lang": "en",
+      "query": "does weather affect demand",
+      "max": 0.5086,
+      "median": 0.3713,
+      "gap": 0.1373,
+      "top": "zone-DXB-MAR"
+    },
+    {
+      "lang": "en",
+      "query": "which site has the most outdoor seating",
+      "max": 0.5239,
+      "median": 0.2664,
+      "gap": 0.2575,
+      "top": "zone-DXB-MAR"
+    },
+    {
+      "lang": "ar",
+      "query": "ما هي قاعدة السكر",
+      "max": 0.4577,
+      "median": 0.3034,
+      "gap": 0.1544,
+      "top": "SID-N-001"
+    },
+    {
+      "lang": "ar",
+      "query": "هل يؤثر الطقس على الطلب",
+      "max": 0.5263,
+      "median": 0.4091,
+      "gap": 0.1172,
+      "top": "zone-DXB-MAR"
+    },
+    {
+      "lang": "hi",
+      "query": "क्या मौसम मांग को प्रभावित करता है",
+      "max": 0.5114,
+      "median": 0.4094,
+      "gap": 0.1021,
+      "top": "voice-16"
+    },
+    {
+      "lang": "hi",
+      "query": "शुगर फ्री दावे का नियम",
+      "max": 0.6009,
+      "median": 0.3821,
+      "gap": 0.2188,
+      "top": "SID-N-001"
+    }
+  ],
+  "out_of_domain": [
+    {
+      "lang": "en",
+      "query": "who wrote this report",
+      "max": 0.3957,
+      "median": 0.3167,
+      "gap": 0.079,
+      "top": "dataset-footfall_hourly"
+    },
+    {
+      "lang": "en",
+      "query": "what is the capital of Peru",
+      "max": 0.3095,
+      "median": 0.2162,
+      "gap": 0.0933,
+      "top": "voice-11"
+    },
+    {
+      "lang": "en",
+      "query": "how do I reset my password",
+      "max": 0.4879,
+      "median": 0.3722,
+      "gap": 0.1157,
+      "top": "voice-10"
+    },
+    {
+      "lang": "en",
+      "query": "what were quarterly earnings per share",
+      "max": 0.4101,
+      "median": 0.3097,
+      "gap": 0.1004,
+      "top": "result-B1-forecast"
+    },
+    {
+      "lang": "ar",
+      "query": "ما هو عدد سكان القاهرة",
+      "max": 0.3252,
+      "median": 0.2276,
+      "gap": 0.0976,
+      "top": "voice-15"
+    },
+    {
+      "lang": "hi",
+      "query": "भारत की राजधानी क्या है",
+      "max": 0.3791,
+      "median": 0.281,
+      "gap": 0.0981,
+      "top": "voice-11"
+    },
+    {
+      "lang": "en",
+      "query": "when is the next board meeting",
+      "max": 0.4236,
+      "median": 0.346,
+      "gap": 0.0776,
+      "top": "zone-DXB-MOE"
+    },
+    {
+      "lang": "en",
+      "query": "send me the invoice",
+      "max": 0.6272,
+      "median": 0.3891,
+      "gap": 0.2381,
+      "top": "voice-11"
+    },
+    {
+      "lang": "en",
+      "query": "book a table for four at seven",
+      "max": 0.5811,
+      "median": 0.4082,
+      "gap": 0.173,
+      "top": "voice-11"
+    },
+    {
+      "lang": "en",
+      "query": "what is our refund policy",
+      "max": 0.4382,
+      "median": 0.3544,
+      "gap": 0.0838,
+      "top": "result-C1-compliance"
+    }
+  ],
+  "worst_in_domain_max": 0.4577,
+  "best_out_of_domain_max": 0.6272,
+  "separable_by_a_single_threshold": false,
+  "threshold": null,
+  "high_bar": 0.647,
+  "queries_clearing_the_high_bar": [
+    "sugar-free claim rule"
+  ],
+  "decision": "NO single similarity threshold separates them, and the overlap is not marginal: the best out-of-domain probe outscores every in-domain question but one. A short query has almost nothing to embed, and an office-shaped request like 'send me the invoice' reads as close to a brand-voice rule about being concrete. The bar lands at 0.647, above all but one real question, so in practice the vector half no longer ADMITS anything: it re-ranks what the lexical half has already vouched for. That is a smaller retriever than the one the A9 spike seemed to promise, and it is the one the refusal contract permits. A cross-lingual answer that arrives alongside an invoice request is not a feature.",
+  "end_to_end": {
+    "in_domain_answered": 6,
+    "in_domain_total": 8,
+    "out_of_domain_refused": 10,
+    "out_of_domain_total": 10,
+    "answered": [
+      {
+        "lang": "en",
+        "query": "sugar-free claim rule",
+        "top": "SID-N-001",
+        "matched_by": "both"
+      },
+      {
+        "lang": "en",
+        "query": "detox",
+        "top": "SID-H-003",
+        "matched_by": "lexical"
+      },
+      {
+        "lang": "en",
+        "query": "does weather affect demand",
+        "top": "zone-DXB-MAR",
+        "matched_by": "lexical"
+      },
+      {
+        "lang": "en",
+        "query": "which site has the most outdoor seating",
+        "top": "zone-DXB-MAR",
+        "matched_by": "lexical"
+      },
+      {
+        "lang": "ar",
+        "query": "ما هي قاعدة السكر",
+        "top": "SID-N-001",
+        "matched_by": "lexical"
+      },
+      {
+        "lang": "hi",
+        "query": "शुगर फ्री दावे का नियम",
+        "top": "SID-N-001",
+        "matched_by": "lexical"
+      }
+    ],
+    "unanswered_in_domain": [
+      {
+        "lang": "ar",
+        "query": "هل يؤثر الطقس على الطلب",
+        "top": null,
+        "matched_by": null
+      },
+      {
+        "lang": "hi",
+        "query": "क्या मौसम मांग को प्रभावित करता है",
+        "top": null,
+        "matched_by": null
+      }
+    ],
+    "leaked_out_of_domain": []
+  },
+  "what_the_losses_are": "The in-domain questions that go unanswered are the non-English ones about WEATHER and DEMAND, and the reason is structural rather than a tuning miss: the zone and dataset passages are English prose, while the only Arabic and Devanagari tokens in the corpus are the regex triggers inside the claim rules. So a non-English question about a RULE lands, and a non-English question about the DATA has nothing in its own script to land on. Vectors could bridge exactly that gap, and the measurement above is why they are not allowed to: the bar that admits those two also admits 'send me the invoice'. Translating the zone and dataset passages is the fix, and it is a content job rather than a retrieval one.",
+  "why_this_is_not_a_failure": "Cosine over 39 passages was never going to be a domain classifier. The spike's job was to find out before the design depended on it, and the design now depends on the lexical half for admission and the vector half for reach — which is what a hybrid retriever is supposed to be."
+}
