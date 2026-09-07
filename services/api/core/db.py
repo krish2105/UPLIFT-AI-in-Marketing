@@ -78,6 +78,45 @@ MIGRATIONS: list[tuple[str, str]] = [
         CREATE INDEX IF NOT EXISTS ix_calendar_holiday ON calendar_days (is_public_holiday);
         """,
     ),
+    (
+        "0003_events",
+        """
+        CREATE TABLE IF NOT EXISTS events (
+            event_id        TEXT PRIMARY KEY,
+            series_key      TEXT NOT NULL,
+            title           TEXT NOT NULL,
+            category        TEXT NOT NULL,
+            venue_key       TEXT NOT NULL,
+            venue_name      TEXT NOT NULL,
+            lat             REAL NOT NULL,
+            lon             REAL NOT NULL,
+            start_date      TEXT NOT NULL,
+            end_date        TEXT NOT NULL,
+            days            INTEGER NOT NULL,
+            scale           TEXT NOT NULL,
+            scale_weight    REAL NOT NULL,
+            -- Always 1. Present as a column rather than as documentation so a
+            -- query cannot return an event without seeing how it was sourced.
+            curated         INTEGER NOT NULL,
+            date_confidence TEXT NOT NULL,
+            source_url      TEXT NOT NULL,
+            licence         TEXT NOT NULL,
+            wikipedia_title TEXT,
+            wikipedia_extract TEXT,
+            wikipedia_url   TEXT,
+            segment_of      TEXT
+        );
+        CREATE INDEX IF NOT EXISTS ix_events_start ON events (start_date);
+        CREATE INDEX IF NOT EXISTS ix_events_series ON events (series_key);
+
+        CREATE TABLE IF NOT EXISTS event_zone_distance (
+            event_id    TEXT NOT NULL,
+            zone_code   TEXT NOT NULL,
+            distance_km REAL NOT NULL,
+            PRIMARY KEY (event_id, zone_code)
+        );
+        """,
+    ),
 ]
 
 

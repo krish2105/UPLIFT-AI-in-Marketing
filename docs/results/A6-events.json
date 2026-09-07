@@ -1,0 +1,82 @@
+{
+  "task": "A6-events",
+  "dataset": "events",
+  "generated_by": "pipeline/events.py --verify",
+  "generated_at": "2026-09-07T07:18:11+00:00",
+  "pass": true,
+  "stats": {
+    "events": 245,
+    "series": 55,
+    "span": [
+      "2024-08-01",
+      "2027-10-31"
+    ],
+    "by_category": {
+      "exhibition": 60,
+      "retail": 53,
+      "festival": 51,
+      "sport": 30,
+      "cultural": 27,
+      "national": 12,
+      "conference": 6,
+      "concert": 6
+    },
+    "by_scale": {
+      "large": 52,
+      "major": 48,
+      "medium": 58,
+      "small": 87
+    },
+    "date_confidence": {
+      "annual_window": 236,
+      "calculated": 9
+    },
+    "with_wikipedia": 48,
+    "distance_km_range": [
+      0.0,
+      103.462
+    ]
+  },
+  "checks": [
+    {
+      "name": "at least 150 events over the window",
+      "pass": true,
+      "detail": "245 events"
+    },
+    {
+      "name": "every row is labelled curated",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no row claims a verified date",
+      "pass": true,
+      "detail": "annual_window or calculated only"
+    },
+    {
+      "name": "every row carries a source URL and a licence",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no event ends before it starts",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no run longer than 45 days survives segmentation",
+      "pass": true,
+      "detail": "long seasons split into calendar months"
+    },
+    {
+      "name": "every event has a distance to all four zones",
+      "pass": true,
+      "detail": "0 incomplete"
+    },
+    {
+      "name": "distances are plausible for Dubai",
+      "pass": true,
+      "detail": "max 103.462 km"
+    }
+  ]
+}
