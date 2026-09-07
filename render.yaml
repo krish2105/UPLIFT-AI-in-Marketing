@@ -63,8 +63,13 @@ services:
       # even when this is set, and a test asserts the refusal.
       - key: ANTHROPIC_API_KEY
         sync: false
+      # The Vercel origins. Set here rather than left to the dashboard because
+      # the web app fetches from the BROWSER — the station strip most visibly —
+      # so a mismatch renders the app's honest "API unreachable" state, which
+      # reads as a design decision rather than as a misconfiguration. The live
+      # smoke test checks for exactly that string for the same reason.
       - key: CORS_ORIGINS
-        sync: false              # the Vercel URL, once it exists
+        value: https://uplift-mawsim.vercel.app,https://uplift-mawsim-krishnamathur008-1499s-projects.vercel.app,https://uplift-mawsim-git-main-krishnamathur008-1499s-projects.vercel.app
       # Requests, not tokens. Free tiers do not return trustworthy token
       # accounting, and a number the project cannot verify has no business in a
       # report.
