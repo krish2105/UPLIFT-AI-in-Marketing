@@ -1,0 +1,83 @@
+{
+  "task": "A5-calendar",
+  "dataset": "calendar_days",
+  "generated_by": "pipeline/calendar.py --verify",
+  "generated_at": "2026-09-07T07:11:57+00:00",
+  "pass": true,
+  "stats": {
+    "rows": 1161,
+    "span": [
+      "2024-08-08",
+      "2027-10-12"
+    ],
+    "holiday_days_by_name": {
+      "Arafah Day": 3,
+      "Eid al-Adha": 9,
+      "Eid al-Fitr": 9,
+      "Islamic New Year": 3,
+      "New Year's Day": 3,
+      "Prophet Muhammad's birthday": 4,
+      "UAE National Day": 6
+    },
+    "confidence_mix": {
+      "calculated": 28,
+      "observed": 1133
+    },
+    "ramadan_days": 88,
+    "calibration_2025": {
+      "2025-03-01": {
+        "expected": "Ramadan began in the UAE",
+        "computed": "Ramadan day 1"
+      },
+      "2025-03-30": {
+        "expected": "Eid al-Fitr",
+        "computed": "Eid al-Fitr"
+      },
+      "2025-06-05": {
+        "expected": "Arafah Day",
+        "computed": "Arafah Day"
+      },
+      "2025-06-06": {
+        "expected": "Eid al-Adha",
+        "computed": "Eid al-Adha"
+      }
+    }
+  },
+  "checks": [
+    {
+      "name": "covers at least 24 months of history plus a year ahead",
+      "pass": true,
+      "detail": "1161 days"
+    },
+    {
+      "name": "no missing days in the range",
+      "pass": true,
+      "detail": "consecutive dates"
+    },
+    {
+      "name": "computed dates agree with the 2025 UAE observances",
+      "pass": true,
+      "detail": "{'2025-03-01': 'Ramadan day 1', '2025-03-30': 'Eid al-Fitr', '2025-06-05': 'Arafah Day', '2025-06-06': 'Eid al-Adha'}"
+    },
+    {
+      "name": "every Islamic holiday carries its moon-sighting uncertainty",
+      "pass": true,
+      "detail": "date_uncertainty_days = 1 on all Islamic rows"
+    },
+    {
+      "name": "Ramadan is flagged separately from Eid",
+      "pass": true,
+      "detail": "no day is both"
+    },
+    {
+      "name": "every school break is labelled approximate",
+      "pass": true,
+      "detail": "KHDA's calendar is not machine-readable; see docs/datasets.md"
+    },
+    {
+      "name": "a certain holiday inside an approximate window stays certain",
+      "pass": true,
+      "detail": "New Year's Day sits inside the winter break and is still a fixed date"
+    }
+  ]
+}

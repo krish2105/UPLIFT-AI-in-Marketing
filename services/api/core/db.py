@@ -51,6 +51,33 @@ MIGRATIONS: list[tuple[str, str]] = [
         CREATE INDEX IF NOT EXISTS ix_weather_ts ON weather_hourly (ts_local);
         """,
     ),
+    (
+        "0002_calendar",
+        """
+        CREATE TABLE IF NOT EXISTS calendar_days (
+            date_local        TEXT PRIMARY KEY,   -- ISO date, Asia/Dubai
+            weekday           INTEGER NOT NULL,   -- Monday=0 .. Sunday=6
+            is_weekend        INTEGER NOT NULL,   -- UAE weekend is Sat+Sun
+            is_public_holiday INTEGER NOT NULL,
+            holiday_name      TEXT,
+            holiday_kind      TEXT,               -- 'gregorian' | 'islamic'
+            -- Islamic dates are set by moon sighting, so a calculated date can
+            -- be a day out. Carried per row rather than assumed downstream.
+            date_uncertainty_days INTEGER NOT NULL DEFAULT 0,
+            is_ramadan        INTEGER NOT NULL,
+            ramadan_day       INTEGER,
+            is_school_break   INTEGER NOT NULL,
+            school_break_name TEXT,
+            -- Two different claims, deliberately not one column. A Gregorian
+            -- holiday falling inside an approximate school-break window is
+            -- still a certain date, and collapsing these made New Year's Day
+            -- read as approximate.
+            confidence            TEXT NOT NULL,  -- the holiday: observed | calculated
+            school_break_confidence TEXT          -- the break window: approximate
+        );
+        CREATE INDEX IF NOT EXISTS ix_calendar_holiday ON calendar_days (is_public_holiday);
+        """,
+    ),
 ]
 
 
