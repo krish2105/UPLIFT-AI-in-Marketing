@@ -1,0 +1,177 @@
+{
+  "task": "A9-embedding-spike",
+  "generated_by": "scripts/spike_embeddings.py",
+  "margin_bar": 0.25,
+  "method": "Cosine similarity between an English sentence and its Hindi and Arabic translations, minus the similarity to the closest of three unrelated controls drawn from the same business. The margin is what matters; a raw similarity is high for almost any model and means nothing alone.",
+  "probes": [
+    "weather-elasticity",
+    "nutrition-claim",
+    "ramadan-shape"
+  ],
+  "controls": [
+    "Depreciation on the espresso machines is charged on a straight-line basis over five years.",
+    "The compliance agent recorded two citations against the brand guidelines section on superlatives.",
+    "Delivery aggregator commission is settled on the fifteenth of the following month."
+  ],
+  "candidates": [
+    {
+      "name": "bge-m3:567m",
+      "backend": "ollama",
+      "deployable": false,
+      "note": "Local. 8192-token context, which is what matters for reading a page of a PDF.",
+      "available": true,
+      "dim": 1024,
+      "seconds_for_12_texts": 2.14,
+      "probes": [
+        {
+          "probe": "weather-elasticity",
+          "en_hi": 0.8273,
+          "en_ar": 0.6859,
+          "hardest_control": 0.368,
+          "margin_hi": 0.4593,
+          "margin_ar": 0.3179
+        },
+        {
+          "probe": "nutrition-claim",
+          "en_hi": 0.874,
+          "en_ar": 0.8521,
+          "hardest_control": 0.3597,
+          "margin_hi": 0.5144,
+          "margin_ar": 0.4924
+        },
+        {
+          "probe": "ramadan-shape",
+          "en_hi": 0.852,
+          "en_ar": 0.7848,
+          "hardest_control": 0.405,
+          "margin_hi": 0.4471,
+          "margin_ar": 0.3799
+        }
+      ],
+      "worst_margin_hi": 0.4471,
+      "worst_margin_ar": 0.3179,
+      "clears_bar": true
+    },
+    {
+      "name": "nomic-embed-text",
+      "backend": "ollama",
+      "deployable": false,
+      "note": "Local. English-first; included to test whether it is usable here at all.",
+      "available": true,
+      "dim": 768,
+      "seconds_for_12_texts": 1.01,
+      "probes": [
+        {
+          "probe": "weather-elasticity",
+          "en_hi": 0.4035,
+          "en_ar": 0.4661,
+          "hardest_control": 0.3802,
+          "margin_hi": 0.0233,
+          "margin_ar": 0.0858
+        },
+        {
+          "probe": "nutrition-claim",
+          "en_hi": 0.4521,
+          "en_ar": 0.4009,
+          "hardest_control": 0.5281,
+          "margin_hi": -0.076,
+          "margin_ar": -0.1272
+        },
+        {
+          "probe": "ramadan-shape",
+          "en_hi": 0.5082,
+          "en_ar": 0.4963,
+          "hardest_control": 0.4714,
+          "margin_hi": 0.0368,
+          "margin_ar": 0.0249
+        }
+      ],
+      "worst_margin_hi": -0.076,
+      "worst_margin_ar": -0.1272,
+      "clears_bar": false
+    },
+    {
+      "name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "backend": "fastembed",
+      "deployable": true,
+      "note": "ONNX, 0.22 GB. The only candidate small enough to consider on a free dyno.",
+      "available": true,
+      "dim": 384,
+      "seconds_for_12_texts": 0.57,
+      "probes": [
+        {
+          "probe": "weather-elasticity",
+          "en_hi": 0.6997,
+          "en_ar": 0.6101,
+          "hardest_control": 0.0211,
+          "margin_hi": 0.6786,
+          "margin_ar": 0.589
+        },
+        {
+          "probe": "nutrition-claim",
+          "en_hi": 0.9066,
+          "en_ar": 0.8808,
+          "hardest_control": 0.3021,
+          "margin_hi": 0.6045,
+          "margin_ar": 0.5787
+        },
+        {
+          "probe": "ramadan-shape",
+          "en_hi": 0.7296,
+          "en_ar": 0.8282,
+          "hardest_control": 0.1649,
+          "margin_hi": 0.5647,
+          "margin_ar": 0.6632
+        }
+      ],
+      "worst_margin_hi": 0.5647,
+      "worst_margin_ar": 0.5787,
+      "clears_bar": true
+    },
+    {
+      "name": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+      "backend": "fastembed",
+      "deployable": true,
+      "note": "ONNX, 1.0 GB. Will not fit a 512 MB instance; measured for comparison.",
+      "available": true,
+      "dim": 768,
+      "seconds_for_12_texts": 84.56,
+      "probes": [
+        {
+          "probe": "weather-elasticity",
+          "en_hi": 0.8583,
+          "en_ar": 0.7585,
+          "hardest_control": 0.176,
+          "margin_hi": 0.6823,
+          "margin_ar": 0.5825
+        },
+        {
+          "probe": "nutrition-claim",
+          "en_hi": 0.9284,
+          "en_ar": 0.92,
+          "hardest_control": 0.2448,
+          "margin_hi": 0.6836,
+          "margin_ar": 0.6751
+        },
+        {
+          "probe": "ramadan-shape",
+          "en_hi": 0.8478,
+          "en_ar": 0.7994,
+          "hardest_control": 0.2212,
+          "margin_hi": 0.6266,
+          "margin_ar": 0.5781
+        }
+      ],
+      "worst_margin_hi": 0.6266,
+      "worst_margin_ar": 0.5781,
+      "clears_bar": true
+    }
+  ],
+  "decision": {
+    "local": "bge-m3:567m",
+    "deployed": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "disqualified": [
+      "nomic-embed-text"
+    ]
+  }
+}
