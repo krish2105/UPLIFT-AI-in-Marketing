@@ -69,16 +69,21 @@ CONTROLS: tuple[Control, ...] = (
             "with the reason recorded. Never tokens: the free tiers do not return "
             "trustworthy token accounting."
         ),
-        status="phase-e",
-        verified_by="services/api/core/quota.py",
+        status="enforced",
+        verified_by="tests/core/test_llm.py::TestBudgetsAreRequestsNotTokens",
     ),
     Control(
         id="ASI-05",
         risk="Cascading failure across agents",
         claim="A provider failure is degradation with a recorded reason.",
-        evidence="The provider chain ends in a deterministic stub, so completion is total.",
-        status="phase-e",
-        verified_by="services/api/core/llm.py",
+        evidence=(
+            "The provider chain ends in a deterministic stub, so completion is total. "
+            "The stub is never metered: an earlier version budgeted it and a caller that "
+            "forgot to fund the fallback got a chain that raised, which is totality "
+            "depending on the caller — not totality."
+        ),
+        status="enforced",
+        verified_by="tests/core/test_llm.py::TestTheChainDegrades",
     ),
     Control(
         id="ASI-06",
@@ -119,11 +124,15 @@ CONTROLS: tuple[Control, ...] = (
         risk="Identity and authorisation",
         claim="Role is currently a request header, and that is stated rather than hidden.",
         evidence=(
-            "Authorisation, not authentication. Adequate for a single-operator coursework "
-            "tool and trivially forgeable; binding roles to real identity is Phase E."
+            "Authorisation, not authentication, and stated as such at /admin/roles. The "
+            "role is a request header and therefore forgeable. Adequate here because the "
+            "entire API is read-only and cannot act in the world: the worst a forged "
+            "Admin header achieves is stopping a demo. Scopes are strictly nested and "
+            "least privilege is the default — an unrecognised role is a Viewer, not an "
+            "error. Binding roles to real identity is what a private deployment needs."
         ),
         status="partial",
-        verified_by="services/api/core/rbac.py",
+        verified_by="tests/core/test_llm.py::TestRoles",
     ),
     Control(
         id="ASI-10",

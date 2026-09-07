@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from services.api import APP, BRAND_DISCLAIMER, COURSE
-from services.api.routers import creative, data, health, marketing, series, system
+from services.api.routers import admin, creative, data, health, marketing, series, system
 
 app = FastAPI(
     title=f"{APP} — demand-aware promo planning",
@@ -44,6 +44,7 @@ app.include_router(marketing.router)
 app.include_router(creative.router)
 app.include_router(creative.compliance_router)
 app.include_router(system.router)
+app.include_router(admin.router)
 
 
 @app.get("/", include_in_schema=False)
