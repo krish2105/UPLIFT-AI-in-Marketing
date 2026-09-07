@@ -158,11 +158,13 @@ a:focus-visible,
 }
 .badge-pass { color: var(--pass-text); }
 .badge-fail { color: var(--fail-text); }
+.badge-warn { color: var(--warn-text); }
 /* The glyph carries the verdict as well as the colour, so the badge survives
    a monochrome print and a red-green colour deficiency. */
 .badge::before { font-weight: 700; }
 .badge-pass::before { content: "✓"; }
 .badge-fail::before { content: "✕"; }
+.badge-warn::before { content: "!"; }
 
 table.data { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
 table.data th {

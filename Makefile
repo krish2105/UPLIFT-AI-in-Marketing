@@ -1,12 +1,12 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 
-.PHONY: check lint test web-check contrast palette placeholders owasp artefacts api web e2e smoke-live etl
+.PHONY: check lint test web-check contrast palette redteam placeholders artefacts api web e2e smoke-live etl
 
 UV := uv run
 
 # The single green bar. Every task must leave this passing.
-check: lint test contrast palette placeholders web-check
+check: lint test contrast palette redteam placeholders web-check
 
 # e2e is deliberately outside `check`: it needs the API and the web server
 # running, so folding it in would make the default bar depend on two processes
@@ -34,8 +34,10 @@ palette:
 placeholders:
 	$(UV) python scripts/placeholder_scan.py
 
-owasp:
-	$(UV) python scripts/owasp_scorecard.py
+# The red team runs inside `check`. A security claim is worth what the
+# attempt to break it is worth, and an attempt nobody runs is worth nothing.
+redteam:
+	$(UV) python scripts/red_team.py
 
 artefacts:
 	$(UV) python scripts/build_report.py

@@ -98,6 +98,11 @@
      glyph and the word; these only tune the wording's legibility. */
   --pass-text:       light-dark(oklch(0.440 0.096 158), oklch(0.840 0.080 158));
   --fail-text:       light-dark(oklch(0.470 0.180 25),  oklch(0.800 0.106 25));
+  /* A third verdict, for a check that failed and is carried knowingly. It needs
+     its own hue because "broke" and "broke, and we said so" are different
+     claims, and it is placed between the two on the hue circle rather than
+     borrowing the heat ramp — a ramp step used as text measures 3.64:1. */
+  --warn-text:       light-dark(oklch(0.480 0.098 85),  oklch(0.640 0.130 85));
 
   /* A station report is drawn on a grid, not on rounded cards. */
   --radius:    3px;

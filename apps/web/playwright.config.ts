@@ -28,7 +28,14 @@ export default defineConfig({
     {
       command: `cd ../.. && uv run uvicorn services.api.main:app --port ${API_PORT}`,
       url: `http://localhost:${API_PORT}/healthz`,
-      reuseExistingServer: !process.env.CI,
+      /* Never reused, even locally. A uvicorn process left over from an earlier
+         run holds the port and answers every request from the code it was
+         started with, so the suite goes green against an API that no longer
+         exists in the working tree — which is how a Security page test passed
+         while the section it asserts was missing. Refusing to reuse turns that
+         into a loud "port in use" instead of a quiet false pass. The web server
+         below is safe to reuse: the dev server recompiles from these files. */
+      reuseExistingServer: false,
       timeout: 120_000,
       env: { CORS_ORIGINS: `http://localhost:${WEB_PORT}` },
     },

@@ -346,10 +346,34 @@ export type CrewResponse = {
   publishing: string;
 };
 
+export type RedTeamCase = {
+  id: string;
+  control: string;
+  attack: string;
+  objective: string;
+  held: boolean;
+  /* An attack that succeeded and is carried as a stated limitation. It is still
+     a break; `held` stays false. */
+  accepted: boolean;
+  detail: string;
+};
+
 export type SecurityResponse = {
   summary: { controls: number; by_status: Record<string, number>; enforced: number; coverage: number };
   controls: { id: string; risk: string; claim: string; evidence: string; status: string; verified_by: string }[];
   note: string;
+  red_team?: {
+    cases: number;
+    held: number;
+    broke: number;
+    accepted_breaks: number;
+    unaccepted_breaks: number;
+    by_control: Record<string, { cases: number; held: number; accepted: number }>;
+    generated_at: string;
+    what_a_pass_means: string;
+    known_limitation: string;
+    results: RedTeamCase[];
+  };
 };
 
 export type AskResponse = {

@@ -143,9 +143,34 @@ def get_crew() -> dict:
     }
 
 
-@router.get("/security", summary="The OWASP ASI scorecard")
+@router.get("/security", summary="The OWASP ASI scorecard and the red-team result")
 def get_security() -> dict:
-    return Scorecard().as_dict()
+    """The claims, and what happened when they were attacked.
+
+    A scorecard on its own is a list of assurances. The harness result beside it
+    is the evidence, and the two are served together so a reader never sees one
+    without the other.
+    """
+    import json
+    from pathlib import Path
+
+    payload = Scorecard().as_dict()
+    result = Path(__file__).resolve().parents[3] / "docs" / "results" / "E1-red-team.json"
+    if result.exists():
+        red = json.loads(result.read_text(encoding="utf-8"))
+        payload["red_team"] = {
+            "cases": red["cases"],
+            "held": red["held"],
+            "broke": red["broke"],
+            "accepted_breaks": red["accepted_breaks"],
+            "unaccepted_breaks": red["unaccepted_breaks"],
+            "by_control": red["by_control"],
+            "generated_at": red["generated_at"],
+            "what_a_pass_means": red["what_a_pass_means"],
+            "known_limitation": red["known_limitation"],
+            "results": red["results"],
+        }
+    return payload
 
 
 @router.get("/ask", summary="Cited retrieval over the project's own corpus")

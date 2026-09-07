@@ -25,6 +25,20 @@
           "separated_by": "hue"
         }
       ],
+      "verdicts": [
+        {
+          "pair": "--pass-text/--fail-text",
+          "cvd_dE": 31.5
+        },
+        {
+          "pair": "--pass-text/--warn-text",
+          "cvd_dE": 20.4
+        },
+        {
+          "pair": "--fail-text/--warn-text",
+          "cvd_dE": 11.2
+        }
+      ],
       "ramp_lightness": [
         0.88,
         0.79,
@@ -38,6 +52,11 @@
           "name": "signal separation",
           "pass": true,
           "detail": "--sig-forecast/--sig-actual by hue, --sig-forecast/--accent by hue, --sig-actual/--accent by hue"
+        },
+        {
+          "name": "verdict separation",
+          "pass": true,
+          "detail": "--pass-text/--fail-text deutan 31.5, --pass-text/--warn-text deutan 20.4, --fail-text/--warn-text deutan 11.2"
         },
         {
           "name": "chroma floor",
@@ -85,6 +104,20 @@
           "separated_by": "hue"
         }
       ],
+      "verdicts": [
+        {
+          "pair": "--pass-text/--fail-text",
+          "cvd_dE": 16.8
+        },
+        {
+          "pair": "--pass-text/--warn-text",
+          "cvd_dE": 15.5
+        },
+        {
+          "pair": "--fail-text/--warn-text",
+          "cvd_dE": 20.2
+        }
+      ],
       "ramp_lightness": [
         0.4,
         0.48,
@@ -98,6 +131,11 @@
           "name": "signal separation",
           "pass": true,
           "detail": "--sig-forecast/--sig-actual by hue, --sig-forecast/--accent by hue, --sig-actual/--accent by hue"
+        },
+        {
+          "name": "verdict separation",
+          "pass": true,
+          "detail": "--pass-text/--fail-text deutan 16.8, --pass-text/--warn-text deutan 15.5, --fail-text/--warn-text deutan 20.2"
         },
         {
           "name": "chroma floor",

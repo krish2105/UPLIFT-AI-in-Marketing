@@ -138,6 +138,15 @@
         "why": "compliance FAIL wording"
       },
       {
+        "foreground": "--warn-text",
+        "background": "--bg",
+        "ratio": 6.07,
+        "floor": 4.5,
+        "pass": true,
+        "out_of_gamut": false,
+        "why": "accepted-break wording"
+      },
+      {
         "foreground": "--sig-forecast",
         "background": "--bg",
         "ratio": 3.27,
@@ -293,6 +302,15 @@
         "why": "compliance FAIL wording"
       },
       {
+        "foreground": "--warn-text",
+        "background": "--bg",
+        "ratio": 5.61,
+        "floor": 4.5,
+        "pass": true,
+        "out_of_gamut": false,
+        "why": "accepted-break wording"
+      },
+      {
         "foreground": "--sig-forecast",
         "background": "--bg",
         "ratio": 5.84,
@@ -312,7 +330,7 @@
       }
     ]
   },
-  "pairs_measured": 34,
+  "pairs_measured": 36,
   "failures": [],
   "pass": true
 }

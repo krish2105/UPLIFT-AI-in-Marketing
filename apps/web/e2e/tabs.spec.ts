@@ -72,6 +72,29 @@ test.describe("the safety claim is on screen", () => {
     await page.goto("/security");
     await expect(page.getByText(/tests\/invariants\/test_no_side_effects\.py/).first()).toBeVisible();
   });
+
+  test("the page shows the attacks, not only the assurances", async ({ page }) => {
+    /* A scorecard alone is a list of things someone believes. The harness result
+       beside it is what happened when they were attacked, so the page has to
+       carry the attempts themselves — including the one that succeeded. */
+    await page.goto("/security");
+    await expect(page.getByRole("heading", { name: /when the claims were attacked/i })).toBeVisible();
+
+    const rows = page.locator("table.data tbody tr");
+    await expect.poll(() => rows.count()).toBeGreaterThanOrEqual(30);
+
+    // The classic injection is present and recorded as held.
+    const injected = rows.filter({ hasText: "Ignore all previous instructions" }).first();
+    await expect(injected.locator(".badge-pass")).toHaveText("held");
+
+    // And the attack that WORKED is shown as a break, not as an expected pass.
+    // Reporting every case as held while a forged header still engages the kill
+    // switch is the reassurance this whole section exists to withhold, so the
+    // test asserts the badge rather than the prose around it.
+    const forged = rows.filter({ hasText: "case and whitespace" }).first();
+    await expect(forged.locator(".badge-warn")).toHaveText(/broke/);
+    await expect(forged.locator(".badge-pass")).toHaveCount(0);
+  });
 });
 
 test.describe("compliance actually catches things", () => {

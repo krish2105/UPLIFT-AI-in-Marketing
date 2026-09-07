@@ -13,11 +13,14 @@
  *                          monochrome print, and the gate accepts that and says
  *                          which mechanism carries each pair
  *   2. CVD separation      the same pairs under deuteranopia
- *   3. chroma floor        the promo signal does not read as grey
- *   4. contrast vs surface every mark reaches 3:1 against its own ground
- *   5. ramp monotone       lightness climbs or falls without turning back
- *   6. ramp is a scale     no two steps collide
- *   7. zones are unhued    there is no per-site colour token, because sites are
+ *   3. verdict separation  held / broke / broke-and-accepted stay apart under
+ *                          deuteranopia — three states in one table column, and
+ *                          the third arrived after the first two were set
+ *   4. chroma floor        the promo signal does not read as grey
+ *   5. contrast vs surface every mark reaches 3:1 against its own ground
+ *   6. ramp monotone       lightness climbs or falls without turning back
+ *   7. ramp is a scale     no two steps collide
+ *   8. zones are unhued    there is no per-site colour token, because sites are
  *                          shown as small multiples rather than as overlaid
  *                          series — asserting the design rule, not just holding it
  *
@@ -146,6 +149,8 @@ const REGISTERS = parseRegisters(readFileSync(TOKENS, "utf8"));
 
 /** The three marks that can share one chart. */
 const SIGNALS = ["--sig-forecast", "--sig-actual", "--accent"];
+/** The three verdicts that can share one table cell. */
+const VERDICTS = ["--pass-text", "--fail-text", "--warn-text"];
 const RAMP = ["--heat-0", "--heat-1", "--heat-2", "--heat-3", "--heat-4", "--heat-5"];
 
 const report = { generated_by: "apps/web/scripts/check-palette.mjs", registers: {} };
@@ -194,21 +199,43 @@ for (const register of ["light", "dark"]) {
     : pass("signal separation",
         separation.map((s) => `${s.pair} by ${s.separated_by}`).join(", "));
 
-  /* 3. The promo signal is the one that must never read as grey — it is the
+  /* 3. The three verdicts. "held", "broke" and "broke, and we said so" appear
+     in the same column of the same table, and the third was added to the
+     palette later — which is exactly when a colour quietly lands on top of one
+     already in use. Each carries a glyph and a word too, so this gate is the
+     second line of defence rather than the only one. */
+  const verdicts = VERDICTS.map((name) => ({ name, oklch: tokens[name], linear: oklchToLinear(...tokens[name]) }));
+  const vPairs = [];
+  for (let i = 0; i < verdicts.length; i++)
+    for (let j = i + 1; j < verdicts.length; j++) {
+      const [a, b] = [verdicts[i], verdicts[j]];
+      vPairs.push({
+        pair: `${a.name}/${b.name}`,
+        cvd_dE: +deltaE(simulate(a.linear, "deutan"), simulate(b.linear, "deutan")).toFixed(1),
+      });
+    }
+  report.registers[register] = { ...report.registers[register], verdicts: vPairs };
+  const collided = vPairs.filter((v) => v.cvd_dE < CVD_FLOOR);
+  collided.length
+    ? fail("verdict separation",
+        collided.map((v) => `${v.pair} deutan dE ${v.cvd_dE} < ${CVD_FLOOR}`).join("; "))
+    : pass("verdict separation", vPairs.map((v) => `${v.pair} deutan ${v.cvd_dE}`).join(", "));
+
+  /* 4. The promo signal is the one that must never read as grey — it is the
      only mark that means "a human decided something". */
   const promo = tokens["--accent"];
   promo[1] < CHROMA_FLOOR
     ? fail("chroma floor", `--accent C=${promo[1]} reads grey`)
     : pass("chroma floor", `--accent C=${promo[1]}`);
 
-  /* 4. Every mark against its own ground. */
+  /* 5. Every mark against its own ground. */
   const low = marks.filter((m) => contrast(m.linear, surface) < CONTRAST_FLOOR);
   low.length
     ? fail("contrast vs surface", low.map((m) => `${m.name} ${contrast(m.linear, surface).toFixed(2)}:1`).join(", "))
     : pass("contrast vs surface",
         marks.map((m) => `${m.name} ${contrast(m.linear, surface).toFixed(2)}:1`).join(", "));
 
-  /* 5 + 6. The ramp reads as a scale. */
+  /* 6 + 7. The ramp reads as a scale. */
   const rampL = RAMP.map((n) => tokens[n]?.[0]);
   if (rampL.some((v) => v === undefined)) {
     fail("ramp monotone", "a --heat-* step is missing");
@@ -253,7 +280,9 @@ if (failures.length) {
   for (const f of failures) console.error(`  ${f}`);
   process.exit(1);
 }
+const perRegister = report.registers.light.checks.length;
 console.log(
-  "palette gate passed — three signal marks and a six-step thermal ramp, " +
-    "seven checks, both registers. docs/results/A10-palette.json written.",
+  `palette gate passed — three signal marks, three verdict colours and a six-step ` +
+    `thermal ramp: ${perRegister} checks in each register plus the zone rule. ` +
+    `docs/results/A10-palette.json written.`,
 );

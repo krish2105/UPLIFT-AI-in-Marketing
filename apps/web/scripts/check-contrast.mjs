@@ -87,6 +87,7 @@ const PAIRS = [
   ["--sig-actual-text", "--bg", 4.5, "measured series label"],
   ["--pass-text", "--bg", 4.5, "compliance PASS wording"],
   ["--fail-text", "--bg", 4.5, "compliance FAIL wording"],
+  ["--warn-text", "--bg", 4.5, "accepted-break wording"],
   ["--sig-forecast", "--bg", 3.0, "forecast line against the plot ground"],
   ["--sig-actual", "--bg", 3.0, "measured line against the plot ground"],
 ];
