@@ -120,7 +120,7 @@ Every tab renders measured output. None is a scaffold.
 
 | Group | Tabs |
 |---|---|
-| **Plan** | Season (3D in Phase D) · Forecast · Plan · Segments |
+| **Plan** | Season (3D terrain + map) · Forecast · Plan · Segments |
 | **Make** | Creatives · Brand · Compliance · Panel |
 | **Prove** | Measure · Experiments · Report |
 | **System** | Ask · Crew · Data · Security |
@@ -156,10 +156,13 @@ the rules on purpose.</td>
 | Events are curated and say so | `python -m pipeline.events --verify` | 245 instances, no row claiming a verified date — [`A6`](docs/results/A6-events.json) |
 | Sites respond differently to weather | `python -m pipeline.footfall --verify` | slope ordering matches outdoor-share ordering — [`A7`](docs/results/A7-footfall.json) |
 | The embedding model is fit for trilingual retrieval | `python scripts/spike_embeddings.py` | bge-m3 +0.447/+0.318 margin; nomic-embed-text disqualified — [`A9`](docs/results/A9-embedding-spike.json) |
-| Text and UI meet WCAG in both registers | `node apps/web/scripts/check-contrast.mjs` | 34 pairs measured — [`A2`](docs/results/A2-contrast.json) |
-| Chart series are distinguishable | `node apps/web/scripts/check-palette.mjs` | six checks, both registers — [`A10`](docs/results/A10-palette.json) |
-| The shell is responsive, accessible and RTL-correct | `make e2e` | **68 Playwright tests**, no serious axe violation on any tab in either register |
+| Text and UI meet WCAG in both registers | `node apps/web/scripts/check-contrast.mjs` | 36 pairs measured — [`A2`](docs/results/A2-contrast.json) |
+| Chart series and verdicts are distinguishable | `node apps/web/scripts/check-palette.mjs` | six checks per register plus the zone rule, deuteranopia included — [`A10`](docs/results/A10-palette.json) |
+| The shell is responsive, accessible and RTL-correct | `make e2e` | **78 Playwright tests**, no serious axe violation on any tab in either register |
 | No agent can reach the outside world | `pytest tests/invariants` | every route is a GET; the crew's side-effects column is `none` on every row |
+| The safety claims survive being attacked | `python scripts/red_team.py` | 34 attacks, 7 controls, **33 held** — and the one that works is scored as a break — [`E1`](docs/results/E1-red-team.json) |
+| Provider spend stays at zero | `pytest tests/core/test_llm.py` | Anthropic reports itself unavailable with a key set; the chain ends in a deterministic stub |
+| Every artefact still matches its builder | `pytest tests/test_artefacts_are_current.py` | report, deck, viva, demo and notebook regenerate byte-identically from `docs/results/` |
 
 ## Running it
 
@@ -170,7 +173,8 @@ make etl        # build the datasets — weather and events reach the network, c
 uv run python scripts/run_phase_b.py   # forecast, segments, allocator, uplift
 uv run python scripts/run_phase_c.py   # compliance and panel
 uv run python scripts/build_report.py  # the AI 208 artefact, from docs/results/
-make check      # the green bar: ruff, pytest, contrast, palette, placeholders, typecheck
+uv run python scripts/red_team.py      # 34 attacks against the safety claims
+make check      # the green bar: ruff, pytest, contrast, palette, red team, placeholders, typecheck
 make e2e        # Playwright; starts both servers itself
 make api        # http://localhost:8000/docs
 make web        # http://localhost:3000
@@ -187,7 +191,8 @@ make web        # http://localhost:3000
 | `docs/results/` | Every measured number, written by a script |
 | `docs/datasets.md` · `docs/models.md` | What the data is, what the models are, and why |
 | `docs/directions.md` | The three design directions that were built, and which one was chosen |
-| `docs/artefacts/` | The generated AI 208 report, in markdown and docx |
+| `docs/artefacts/` | The AI 208 report (markdown + docx), deck outline, 15 viva answers, three-minute demo script, and a notebook that re-runs the numbers |
+| `scripts/red_team.py` | The 34 attacks, run inside `make check` |
 
 ## Limitations
 
@@ -217,6 +222,11 @@ Stated here rather than discovered by a reader.
   and one uniquely weather-elastic, the treated unit is inside the donors' hull
   on level and outside it on elasticity. The residual bias is measured on a
   placebo-in-time window and reported rather than absorbed.
+- **Roles are a request header, not an identity.** `X-Mawsim-Role` is
+  unauthenticated, so anyone can send `admin`. The red-team harness scores that
+  as a break rather than as an expected result, and the Security tab shows the
+  row. It is adequate here only because the entire API is read-only: the worst a
+  forged header achieves is stopping a demo.
 - **The persona panel is not customer research.** It applies a rubric; it does
   not observe a reaction.
 - **Ask retrieves, it does not generate.** BM25 over the project's own corpus,
