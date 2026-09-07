@@ -392,9 +392,21 @@ class Harness:
 def main() -> int:
     payload = Harness().run()
     RESULTS.mkdir(parents=True, exist_ok=True)
-    (RESULTS / "E1-red-team.json").write_text(
-        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    out = RESULTS / "E1-red-team.json"
+
+    # The harness runs inside `make check`, so it runs several times a day. If it
+    # rewrote its timestamp every time, the working tree would be dirty after
+    # every green bar and the diff would carry no information — which is how a
+    # real change to the result learns to look like noise. The stamp moves when
+    # the OUTCOME moves.
+    if out.exists():
+        previous = json.loads(out.read_text(encoding="utf-8"))
+        if {k: v for k, v in previous.items() if k != "generated_at"} == {
+            k: v for k, v in payload.items() if k != "generated_at"
+        }:
+            payload["generated_at"] = previous["generated_at"]
+
+    out.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"\n{payload['held']}/{payload['cases']} attacks held")
     if payload["accepted_breaks"]:
         print(f"  {payload['accepted_breaks']} accepted break(s), stated in the results file")

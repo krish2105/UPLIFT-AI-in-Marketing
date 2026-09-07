@@ -814,8 +814,16 @@ def main() -> int:
         return 1
 
     path = ARTEFACTS / "AI208_MAWSIM_report.md"
+    unchanged = path.exists() and path.read_text(encoding="utf-8") == md
     path.write_text(md, encoding="utf-8")
     print(f"wrote {path.relative_to(ROOT)} ({len(md):,} chars)")
+
+    # A .docx is a zip, and python-docx stamps each entry with the moment it was
+    # written, so rebuilding an unchanged report produces 42 KB of different
+    # bytes and an unreadable binary diff. Rebuild it only when the prose moved.
+    if unchanged and (ARTEFACTS / "AI208_MAWSIM_report.docx").exists():
+        print("  docx unchanged; not rewritten")
+        return _write_side_artefacts()
 
     try:
         from docx import Document
@@ -848,6 +856,10 @@ def main() -> int:
     except ImportError:
         print("python-docx not installed; the markdown report is the artefact")
 
+    return _write_side_artefacts()
+
+
+def _write_side_artefacts() -> int:
     for name, builder in (
         ("AI208_deck_outline.md", build_deck),
         ("AI208_viva_15.md", build_viva),
