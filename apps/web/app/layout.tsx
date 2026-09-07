@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Providers } from "@/components/Providers";
+import { LocaleProvider } from "@/components/LocaleProvider";
+import { Masthead } from "@/components/Masthead";
+import { Disclaimer } from "@/components/Disclaimer";
 import "@/styles/globals.css";
 import "@/styles/tokens.css";
 import "@/styles/kit.css";
@@ -19,7 +22,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Instrument+Sans:wght@400..700&family=Martian+Mono:wght@200..700&family=Marcellus&family=Karla:wght@300..700&family=DM+Mono:wght@300;400;500&family=Archivo:wdth,wght@62..125,100..900&family=Figtree:wght@300..900&family=Geist+Mono:wght@200..700&family=Noto+Kufi+Arabic:wght@300..700&family=Noto+Naskh+Arabic:wght@400..700&family=Noto+Sans+Arabic:wght@300..700&family=Noto+Sans+Devanagari:wght@300..700&display=swap" />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <LocaleProvider>
+            <Masthead />
+            <main id="content">{children}</main>
+            <Disclaimer />
+          </LocaleProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -28,3 +28,6 @@ apps/web/CLAUDE.md
 
 # The POS sample is a committed deliverable; the footfall series is rebuilt.
 !data/pos_sample.csv
+
+apps/web/test-results/
+apps/web/playwright-report/
