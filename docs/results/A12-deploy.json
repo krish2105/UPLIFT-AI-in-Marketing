@@ -1,0 +1,52 @@
+{
+  "task": "A12-deploy",
+  "generated_by": "scripts/verify_deploy.py",
+  "generated_at": "2026-09-07T10:46:17+00:00",
+  "api": "https://mawsim-api.onrender.com",
+  "web": "https://uplift-mawsim.vercel.app",
+  "host_api": "Render free web service, region singapore",
+  "host_web": "Vercel",
+  "checks": [
+    {
+      "check": "the API answers",
+      "held": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "no dataset is empty on the deployed instance",
+      "held": true,
+      "detail": "empty: none"
+    },
+    {
+      "check": "the brand is declared fictional by the API",
+      "held": true,
+      "detail": "True"
+    },
+    {
+      "check": "every dataset carries a licence and a label",
+      "held": true,
+      "detail": "5 datasets, 0 missing provenance"
+    },
+    {
+      "check": "the red-team result reached the deployed instance",
+      "held": true,
+      "detail": "33/34 held"
+    },
+    {
+      "check": "the web app answers",
+      "held": true,
+      "detail": "HTTP 200"
+    }
+  ],
+  "held": 6,
+  "total": 6,
+  "datasets_loaded": {
+    "weather_hourly": 72192,
+    "calendar_days": 1161,
+    "events": 245,
+    "footfall_hourly": 72192,
+    "pos_baskets": 8737
+  },
+  "note_on_sleep": "The free instance sleeps after fifteen minutes idle, so the first request after a quiet period takes about fifty seconds. That is not an outage and the timeout here is set above it; a shorter one would record a nap as a failure.",
+  "note_on_scope": "This records the API half. The browser half — CORS, the disclaimer, the fifteen tabs, the Security tab's attack table — is asserted by apps/web/e2e-live/live.spec.ts, which drives a real browser."
+}
