@@ -1,4 +1,4 @@
-/* @direction daypart
+/* MAWSIM design tokens.
  *
  * DAYPART — "the interface keeps the café's hours"
  *
@@ -26,8 +26,8 @@
  */
 
 /* @register dark */
-[data-direction="daypart"],
-[data-direction="daypart"][data-register="dark"] {
+:root,
+:root[data-theme="dark"] {
   color-scheme: dark;
 
   /* Night: deep petrol blue, cold, with the city's sodium glow held back for
@@ -84,7 +84,7 @@
 }
 
 /* @register light */
-[data-direction="daypart"][data-register="light"] {
+:root[data-theme="light"] {
   color-scheme: light;
 
   /* Day: bleached, high-key, the light off pale stone at noon. */
@@ -135,12 +135,67 @@
   --shadow-2:  0 16px 44px oklch(0.238 0.030 252 / 0.12);
 }
 
+/* System preference. An explicit choice wins in both directions, which is why
+   this is scoped away from [data-theme="dark"] rather than left to order. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+
+    /* Day: bleached, high-key, the light off pale stone at noon. */
+    --bg:             oklch(0.975 0.008 240);
+    --bg-inset:       oklch(0.948 0.011 240);
+    --surface:        oklch(0.990 0.004 240);
+    --surface-raised: oklch(1.000 0.000 240);
+    --surface-hover:  oklch(0.960 0.012 240);
+
+    --border:         oklch(0.852 0.014 240);
+    --border-strong:  oklch(0.588 0.024 240);
+    --rule:           oklch(0.752 0.018 240);
+
+    --text:           oklch(0.238 0.030 252);
+    --text-muted:     oklch(0.428 0.028 252);
+    --text-faint:     oklch(0.516 0.026 252);
+    --text-on-accent: oklch(0.990 0.003 45);
+
+    --dp-morning:      oklch(0.545 0.135 245);
+    --dp-morning-text: oklch(0.480 0.140 250);
+    --dp-midday:       oklch(0.620 0.105 82);
+    --dp-midday-text:  oklch(0.470 0.095 78);
+    --dp-evening:      oklch(0.560 0.155 42);
+    --dp-evening-text: oklch(0.490 0.150 38);
+
+    --accent:         oklch(0.530 0.160 40);
+    --accent-text:    oklch(0.485 0.150 38);
+
+    --sig-forecast:      oklch(0.615 0.070 252);
+    --sig-forecast-text: oklch(0.440 0.070 252);
+    --sig-actual:        oklch(0.325 0.045 252);
+    --sig-actual-text:   oklch(0.285 0.040 252);
+    --sig-promo:         oklch(0.530 0.160 40);
+
+    --heat-0:         oklch(0.800 0.020 240);
+    --heat-1:         oklch(0.660 0.100 245);
+    --heat-2:         oklch(0.640 0.080 178);
+    --heat-3:         oklch(0.640 0.100 88);
+    --heat-4:         oklch(0.570 0.140 52);
+    --heat-5:         oklch(0.490 0.165 32);
+
+    --pass-text:      oklch(0.430 0.080 168);
+    --fail-text:      oklch(0.460 0.165 22);
+
+    --radius:    10px;
+    --radius-lg: 18px;
+    --shadow-1:  0 1px 3px oklch(0.238 0.030 252 / 0.07);
+    --shadow-2:  0 16px 44px oklch(0.238 0.030 252 / 0.12);
+  }
+}
+
 /* Type. Archivo carries a variable WIDTH axis: expanded at display sizes so a
    headline has real presence, normal in the interface so nothing gets shouty.
    That single family doing two jobs is the type idea here. Figtree sets the
    prose — a humanist grotesque with an open aperture that stays readable in
    the bleached light register. Geist Mono carries numerals and zone codes. */
-[data-direction="daypart"] {
+:root {
   --font-display: "Archivo", "Noto Sans Arabic", system-ui, sans-serif;
   --font-body:    "Figtree", "Noto Sans Arabic", "Noto Sans Devanagari", system-ui, sans-serif;
   --font-mono:    "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;

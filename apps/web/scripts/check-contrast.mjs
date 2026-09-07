@@ -70,8 +70,9 @@ const OKLCH = /oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*(?:\/\s*[\d.]+\s*)?\)/
 
 /** Split a token file into register blocks marked by `@register <name>`. */
 function parseDirection(css) {
-  const direction = css.match(/@direction\s+([a-z-]+)/)?.[1];
-  if (!direction) throw new Error("token file has no `@direction <name>` marker");
+  // Before the direction was chosen this parsed an `@direction` marker per
+  // file. One direction now ships, so the file name is the identity.
+  const direction = css.match(/@direction\s+([a-z-]+)/)?.[1] ?? "mawsim";
 
   const registers = {};
   // A register runs from its marker to the next marker or end of file.
@@ -119,9 +120,9 @@ const PAIRS = [
 
 /* ── run ────────────────────────────────────────────────────────────────── */
 
-const files = readdirSync(STYLES).filter((f) => /^tokens\..+\.css$/.test(f));
+const files = readdirSync(STYLES).filter((f) => /^tokens(\..+)?\.css$/.test(f));
 if (files.length === 0) {
-  console.error("contrast gate FAILED: no tokens.*.css files found in styles/");
+  console.error("contrast gate FAILED: no tokens.css found in styles/");
   process.exit(1);
 }
 

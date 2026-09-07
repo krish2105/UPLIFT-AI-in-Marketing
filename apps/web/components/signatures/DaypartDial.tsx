@@ -25,8 +25,10 @@ function tokenForHour(h: number) {
 export function DaypartDial({ shape, size = 210 }: { shape: number[]; size?: number }) {
   const cx = size / 2;
   const cy = size / 2;
-  const rInner = size * 0.26;
-  const rOuter = size * 0.46;
+  const rInner = size * 0.25;
+  // 0.42 rather than 0.46 so the hour labels at rOuter + 12 stay inside the
+  // viewBox. At 0.46 they were clipped by the SVG edge.
+  const rOuter = size * 0.42;
 
   return (
     <svg
@@ -63,8 +65,8 @@ export function DaypartDial({ shape, size = 210 }: { shape: number[]; size?: num
         return (
           <text
             key={h}
-            x={cx + Math.cos(a) * (rOuter + 11)}
-            y={cy + Math.sin(a) * (rOuter + 11) + 3.5}
+            x={cx + Math.cos(a) * (rOuter + 12)}
+            y={cy + Math.sin(a) * (rOuter + 12) + 3.5}
             textAnchor="middle"
             fontSize="9"
             fontFamily="var(--font-mono)"

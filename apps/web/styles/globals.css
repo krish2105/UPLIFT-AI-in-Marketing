@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
-/* Task A2 replaces this with the selected design direction's tokens.
-   Until then: enough to render, nothing that pretends to be a design. */
-:root { color-scheme: light dark; }
+/* Colour, type and spacing live in styles/tokens.css. This file carries only
+   what must be true before any token is read. */
 html, body { margin: 0; padding: 0; }
-body { font-family: ui-sans-serif, system-ui, sans-serif; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); }

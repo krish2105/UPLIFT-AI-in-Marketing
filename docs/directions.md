@@ -63,8 +63,26 @@ between them, and doubling as the filter that scopes every other tab.
 
 *Type:* Archivo (variable width) · Figtree · Geist Mono · Noto Sans Arabic.
 
-## What happens to the two that lose
+## The decision — 2026-09-07
 
-They are deleted, along with the `/design` route that compares them. Carrying
-unused token systems forward would leave three ways to style every future
-component and no way to tell which one is current.
+**Daypart, carrying Night Souk's mashrabiya veil.** Chosen by the owner from
+the live comparison, not from a description.
+
+The veil ports because it never names a colour: it reads `--sig-forecast` for
+its light and `--border`/`--rule` for its structure, so it renders in Daypart's
+palette without touching Daypart's chroma rule. The two signatures answer
+different questions and are kept in different sections rather than side by
+side — the **dial** answers *when*, the **veil** answers *how confident*.
+
+Almanac and Night Souk's token files, Almanac's station strip, and the
+`/design` route were deleted in the same commit. Carrying unused token systems
+forward would leave three ways to style every future component and no way to
+tell which one is current. They remain in git history and in the screenshots
+under `docs/images/directions/`.
+
+`tokens.daypart.css` became `tokens.css`, its registers rebound from
+`data-register` to **`data-theme`** so `next-themes` drives them directly, and
+a `prefers-color-scheme` block was added so **Auto** is a genuine third state
+rather than a synonym for one of the other two. The toggle is labelled
+**Auto / Day / Night**, because in this direction the register is not a
+brightness preference — it is which half of the café's day you are looking at.
