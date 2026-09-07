@@ -161,6 +161,9 @@ the rules on purpose.</td>
 | Chart series and verdicts are distinguishable | `node apps/web/scripts/check-palette.mjs` | six checks per register plus the zone rule, deuteranopia included — [`A10`](docs/results/A10-palette.json) |
 | The shell is responsive, accessible and RTL-correct | `make e2e` | **78 Playwright tests**, no serious axe violation on any tab in either register |
 | No agent can reach the outside world | `pytest tests/invariants` | every route is a GET; the crew's side-effects column is `none` on every row |
+| Retrieval answers what it can and refuses what it cannot | `python scripts/spike_retrieval.py` | **6/8** in-domain answered, **10/10** out-of-domain refused — [`C2`](docs/results/C2-retrieval.json) |
+| The 3D scene holds its frame budget | `npx playwright test frames.spec.ts` | median **60 fps**, 95th percentile 30 — [`D1`](docs/results/D1-frames.json) |
+| The deployed pair is what it claims to be | `python scripts/verify_deploy.py` | 6/6 checks — [`A12`](docs/results/A12-deploy.json) |
 | The safety claims survive being attacked | `python scripts/red_team.py` | 34 attacks, 7 controls, **33 held** — and the one that works is scored as a break — [`E1`](docs/results/E1-red-team.json) |
 | Provider spend stays at zero | `pytest tests/core/test_llm.py` | Anthropic reports itself unavailable with a key set; the chain ends in a deterministic stub |
 | Every artefact still matches its builder | `pytest tests/test_artefacts_are_current.py` | report, deck, viva, demo and notebook regenerate byte-identically from `docs/results/` |
@@ -211,10 +214,13 @@ Stated here rather than discovered by a reader.
   sighting, so every such row carries one day of uncertainty.
 - **School breaks are approximate windows.** KHDA's calendar page redirects to a
   host whose certificate does not verify.
-- **Most compliance clauses are unread.** The source documents are verified; the
-  specific clauses are quoted verbatim during Phase C's corpus ingestion, and
-  until then the generated brand PDF prints "clause unverified" rather than
-  implying otherwise.
+- **Eight of eleven clauses are cited by section, not quoted.** The source
+  documents are verified and the three SIDRA-authored clauses are quoted. The
+  external ones are not, because the Codex PDFs return **403** to any scripted
+  client — the same wall Visit Dubai puts up. Those rules carry
+  `clause_verified: false`, the generated brand PDF prints "clause unverified"
+  beside each, and no clause text is written from memory. A citation that looks
+  verified and is unsourced is worse than one that admits what it is.
 - **Weather is a coarse grid.** ERA5 at roughly 11 km, so the four sites do not
   each get their own station.
 - **Allocator elasticities are assumed.** No promotion has run, so there is

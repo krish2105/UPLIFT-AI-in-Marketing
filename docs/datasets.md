@@ -183,9 +183,30 @@ real structure to find rather than a single Poisson blob.
 ## Compliance corpus — `observed`, ingested in Phase C
 
 The documents the Compliance agent cites. Each was verified reachable on
-2026-09-07; the specific clauses are read verbatim during Phase C's corpus
-ingestion, and until then every rule in `data/brand/sidra.yaml` carries
-`clause_verified: false` and the generated brand PDF prints "clause unverified".
+2026-09-07. The *landing pages* answer 200. The **clause text does not**, and
+that distinction is the whole of what `clause_verified` records.
+
+Three of eleven rules cite a clause that has been read. The other eight cite a
+section by title, and say so. Closing the gap needs the standard's own text, and
+the standard's own text is not retrievable from a script: the Codex PDFs sit
+behind `fao.org/fao-who-codexalimentarius/sh-proxy/`, which returns **HTTP 403**
+to curl with and without a browser user-agent (retried 2026-09-07), and the
+direct `input/download/standards/` path returns **404**. It is the same wall
+Visit Dubai puts up, and it has the same honest answer: name it, and do not
+pretend past it.
+
+So the eight stay `clause_verified: false`, the generated brand PDF prints
+"clause unverified" beside each, and the Compliance tab shows the section title
+rather than a quotation. What is NOT done is the tempting thing — writing
+plausible clause text from memory of the standard, which would produce a
+citation that looks verified, reads correctly, and is unsourced. A rule that
+cites a section it has genuinely located is worth more than a quotation nobody
+can trace.
+
+**What would close it:** a human opening each PDF in a browser and pasting the
+clause into `data/brand/sidra.yaml`, then flipping the flag. The schema, the PDF
+generator, the API response and the UI already carry the verified case — three
+rules use it today, so the path is exercised rather than theoretical.
 
 | Document | Publisher | Verified |
 |---|---|---|

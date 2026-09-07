@@ -168,15 +168,15 @@ No agent in the registry holds a tool with a side effect; the whole API is GET,
 so there is no verb with which to write. That is an architectural claim, and a
 claim is worth what the attempt to break it is worth.
 
-`scripts/red_team.py` makes 34 attempts across
+`scripts/red_team.py` makes 37 attempts across
 7 OWASP ASI controls — prompt injection into the
 compliance checker, script-mixing and zero-width evasion of the claim rules,
 forged Admin headers, HTTP verbs the API does not answer, provenance stripping,
-and budget exhaustion. **33 of 34 held.**
+and budget exhaustion. **36 of 37 held.**
 
 | Control | Attempts | Held |
 |---|---|---|
-| ASI-01 | 5 | 5 |
+| ASI-01 | 8 | 8 |
 | ASI-03 | 13 | 13 |
 | ASI-04 | 2 | 2 |
 | ASI-06 | 5 | 5 |

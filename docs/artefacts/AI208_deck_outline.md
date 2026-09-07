@@ -64,7 +64,7 @@ subtracted, with both numbers reported.
 
 ## 11 · Safety, and the one attack that worked
 No agent has a tool that reaches the outside world; the whole API is GET.
-**33/34** red-team attacks held across 7
+**36/37** red-team attacks held across 7
 controls. The one that broke is the forged Admin header, and it is on the slide:
 a role carried in an unauthenticated header is not an identity, and scoring it as
 a pass would have made the number meaningless.
