@@ -1,0 +1,82 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install Python dependencies
+        run: uv sync --extra dev --frozen
+
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      # The single green bar: ruff, pytest, the contrast and palette gates, the
+      # placeholder scan, and a TypeScript typecheck. No network, no Ollama, no
+      # database — every test that needs data builds it or fixtures it.
+      - name: make check
+        run: make check
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - run: uv sync --extra dev --frozen
+
+      - working-directory: apps/web
+        run: npm ci
+
+      - name: Install Playwright browser
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+
+      # The e2e suite reads a real database, so the pipelines run first. Weather
+      # and events reach the network; both cache to data/raw/ and both are
+      # courteous about it. If a provider is down the suite fails loudly rather
+      # than testing an empty page.
+      - name: Build the datasets
+        run: |
+          uv run python -m pipeline.weather
+          uv run python -m pipeline.calendar
+          uv run python -m pipeline.events
+          uv run python -m pipeline.footfall
+
+      - name: Playwright
+        working-directory: apps/web
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 7
