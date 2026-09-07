@@ -1,0 +1,953 @@
+{
+  "generated_by": "apps/web/scripts/check-contrast.mjs",
+  "directions": {
+    "almanac": {
+      "file": "apps/web/styles/tokens.almanac.css",
+      "registers": {
+        "dark": [
+          {
+            "foreground": "--text",
+            "background": "--bg",
+            "ratio": 17,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on the page ground"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface",
+            "ratio": 15.66,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a card"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface-raised",
+            "ratio": 14.1,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a raised card"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--bg",
+            "ratio": 9.9,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on the ground"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--surface",
+            "ratio": 9.12,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on a card"
+          },
+          {
+            "foreground": "--text-faint",
+            "background": "--bg",
+            "ratio": 6.16,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "captions and axis labels, large or incidental"
+          },
+          {
+            "foreground": "--border-strong",
+            "background": "--bg",
+            "ratio": 4.58,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "focus rings and input borders (WCAG 1.4.11)"
+          },
+          {
+            "foreground": "--border",
+            "background": "--surface",
+            "ratio": 1.7,
+            "floor": 1.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "hairline separation, decorative floor only"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--bg",
+            "ratio": 10.09,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour used as text"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--surface",
+            "ratio": 9.29,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour as text on a card"
+          },
+          {
+            "foreground": "--text-on-accent",
+            "background": "--accent",
+            "ratio": 6.9,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "text sitting on a filled signal chip"
+          },
+          {
+            "foreground": "--sig-forecast-text",
+            "background": "--bg",
+            "ratio": 10.44,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast series label"
+          },
+          {
+            "foreground": "--sig-actual-text",
+            "background": "--bg",
+            "ratio": 15.64,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured series label"
+          },
+          {
+            "foreground": "--pass-text",
+            "background": "--bg",
+            "ratio": 12.05,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance PASS wording"
+          },
+          {
+            "foreground": "--fail-text",
+            "background": "--bg",
+            "ratio": 9.79,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance FAIL wording"
+          },
+          {
+            "foreground": "--sig-forecast",
+            "background": "--bg",
+            "ratio": 5.84,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast line against the plot ground"
+          },
+          {
+            "foreground": "--sig-actual",
+            "background": "--bg",
+            "ratio": 13.03,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured line against the plot ground"
+          }
+        ],
+        "light": [
+          {
+            "foreground": "--text",
+            "background": "--bg",
+            "ratio": 14.86,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on the page ground"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface",
+            "ratio": 15.83,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a card"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface-raised",
+            "ratio": 16.13,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a raised card"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--bg",
+            "ratio": 7.34,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on the ground"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--surface",
+            "ratio": 7.82,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on a card"
+          },
+          {
+            "foreground": "--text-faint",
+            "background": "--bg",
+            "ratio": 5.04,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "captions and axis labels, large or incidental"
+          },
+          {
+            "foreground": "--border-strong",
+            "background": "--bg",
+            "ratio": 3.61,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "focus rings and input borders (WCAG 1.4.11)"
+          },
+          {
+            "foreground": "--border",
+            "background": "--surface",
+            "ratio": 1.55,
+            "floor": 1.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "hairline separation, decorative floor only"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--bg",
+            "ratio": 7.44,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour used as text"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--surface",
+            "ratio": 7.92,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour as text on a card"
+          },
+          {
+            "foreground": "--text-on-accent",
+            "background": "--accent",
+            "ratio": 7.46,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "text sitting on a filled signal chip"
+          },
+          {
+            "foreground": "--sig-forecast-text",
+            "background": "--bg",
+            "ratio": 6.98,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast series label"
+          },
+          {
+            "foreground": "--sig-actual-text",
+            "background": "--bg",
+            "ratio": 12.87,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured series label"
+          },
+          {
+            "foreground": "--pass-text",
+            "background": "--bg",
+            "ratio": 6.81,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance PASS wording"
+          },
+          {
+            "foreground": "--fail-text",
+            "background": "--bg",
+            "ratio": 6.91,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance FAIL wording"
+          },
+          {
+            "foreground": "--sig-forecast",
+            "background": "--bg",
+            "ratio": 3.27,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast line against the plot ground"
+          },
+          {
+            "foreground": "--sig-actual",
+            "background": "--bg",
+            "ratio": 11.11,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured line against the plot ground"
+          }
+        ]
+      }
+    },
+    "daypart": {
+      "file": "apps/web/styles/tokens.daypart.css",
+      "registers": {
+        "dark": [
+          {
+            "foreground": "--text",
+            "background": "--bg",
+            "ratio": 17.34,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on the page ground"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface",
+            "ratio": 15.94,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a card"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface-raised",
+            "ratio": 14.32,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a raised card"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--bg",
+            "ratio": 10.09,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on the ground"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--surface",
+            "ratio": 9.27,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on a card"
+          },
+          {
+            "foreground": "--text-faint",
+            "background": "--bg",
+            "ratio": 6.33,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "captions and axis labels, large or incidental"
+          },
+          {
+            "foreground": "--border-strong",
+            "background": "--bg",
+            "ratio": 4.76,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "focus rings and input borders (WCAG 1.4.11)"
+          },
+          {
+            "foreground": "--border",
+            "background": "--surface",
+            "ratio": 1.74,
+            "floor": 1.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "hairline separation, decorative floor only"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--bg",
+            "ratio": 9.98,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour used as text"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--surface",
+            "ratio": 9.18,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour as text on a card"
+          },
+          {
+            "foreground": "--text-on-accent",
+            "background": "--accent",
+            "ratio": 7.57,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "text sitting on a filled signal chip"
+          },
+          {
+            "foreground": "--sig-forecast-text",
+            "background": "--bg",
+            "ratio": 10.05,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast series label"
+          },
+          {
+            "foreground": "--sig-actual-text",
+            "background": "--bg",
+            "ratio": 16.01,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured series label"
+          },
+          {
+            "foreground": "--pass-text",
+            "background": "--bg",
+            "ratio": 11.87,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance PASS wording"
+          },
+          {
+            "foreground": "--fail-text",
+            "background": "--bg",
+            "ratio": 9.59,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance FAIL wording"
+          },
+          {
+            "foreground": "--sig-forecast",
+            "background": "--bg",
+            "ratio": 4.92,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast line against the plot ground"
+          },
+          {
+            "foreground": "--sig-actual",
+            "background": "--bg",
+            "ratio": 13.52,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured line against the plot ground"
+          }
+        ],
+        "light": [
+          {
+            "foreground": "--text",
+            "background": "--bg",
+            "ratio": 15.39,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on the page ground"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface",
+            "ratio": 16.07,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a card"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface-raised",
+            "ratio": 16.52,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a raised card"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--bg",
+            "ratio": 7.6,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on the ground"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--surface",
+            "ratio": 7.93,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on a card"
+          },
+          {
+            "foreground": "--text-faint",
+            "background": "--bg",
+            "ratio": 5.21,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "captions and axis labels, large or incidental"
+          },
+          {
+            "foreground": "--border-strong",
+            "background": "--bg",
+            "ratio": 3.84,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "focus rings and input borders (WCAG 1.4.11)"
+          },
+          {
+            "foreground": "--border",
+            "background": "--surface",
+            "ratio": 1.52,
+            "floor": 1.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "hairline separation, decorative floor only"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--bg",
+            "ratio": 6.39,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour used as text"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--surface",
+            "ratio": 6.67,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour as text on a card"
+          },
+          {
+            "foreground": "--text-on-accent",
+            "background": "--accent",
+            "ratio": 5.51,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "text sitting on a filled signal chip"
+          },
+          {
+            "foreground": "--sig-forecast-text",
+            "background": "--bg",
+            "ratio": 7.22,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast series label"
+          },
+          {
+            "foreground": "--sig-actual-text",
+            "background": "--bg",
+            "ratio": 13.35,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured series label"
+          },
+          {
+            "foreground": "--pass-text",
+            "background": "--bg",
+            "ratio": 7.24,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance PASS wording"
+          },
+          {
+            "foreground": "--fail-text",
+            "background": "--bg",
+            "ratio": 7.25,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance FAIL wording"
+          },
+          {
+            "foreground": "--sig-forecast",
+            "background": "--bg",
+            "ratio": 3.45,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast line against the plot ground"
+          },
+          {
+            "foreground": "--sig-actual",
+            "background": "--bg",
+            "ratio": 11.58,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured line against the plot ground"
+          }
+        ]
+      }
+    },
+    "souk": {
+      "file": "apps/web/styles/tokens.souk.css",
+      "registers": {
+        "dark": [
+          {
+            "foreground": "--text",
+            "background": "--bg",
+            "ratio": 17.25,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on the page ground"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface",
+            "ratio": 15.91,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a card"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface-raised",
+            "ratio": 14.32,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a raised card"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--bg",
+            "ratio": 9.99,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on the ground"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--surface",
+            "ratio": 9.21,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on a card"
+          },
+          {
+            "foreground": "--text-faint",
+            "background": "--bg",
+            "ratio": 6.29,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "captions and axis labels, large or incidental"
+          },
+          {
+            "foreground": "--border-strong",
+            "background": "--bg",
+            "ratio": 4.69,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "focus rings and input borders (WCAG 1.4.11)"
+          },
+          {
+            "foreground": "--border",
+            "background": "--surface",
+            "ratio": 1.72,
+            "floor": 1.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "hairline separation, decorative floor only"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--bg",
+            "ratio": 10.42,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour used as text"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--surface",
+            "ratio": 9.61,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour as text on a card"
+          },
+          {
+            "foreground": "--text-on-accent",
+            "background": "--accent",
+            "ratio": 7.89,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "text sitting on a filled signal chip"
+          },
+          {
+            "foreground": "--sig-forecast-text",
+            "background": "--bg",
+            "ratio": 10.42,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast series label"
+          },
+          {
+            "foreground": "--sig-actual-text",
+            "background": "--bg",
+            "ratio": 11.17,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured series label"
+          },
+          {
+            "foreground": "--pass-text",
+            "background": "--bg",
+            "ratio": 11.62,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance PASS wording"
+          },
+          {
+            "foreground": "--fail-text",
+            "background": "--bg",
+            "ratio": 9.32,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance FAIL wording"
+          },
+          {
+            "foreground": "--sig-forecast",
+            "background": "--bg",
+            "ratio": 7.83,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast line against the plot ground"
+          },
+          {
+            "foreground": "--sig-actual",
+            "background": "--bg",
+            "ratio": 7.61,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured line against the plot ground"
+          }
+        ],
+        "light": [
+          {
+            "foreground": "--text",
+            "background": "--bg",
+            "ratio": 14.48,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on the page ground"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface",
+            "ratio": 15.81,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a card"
+          },
+          {
+            "foreground": "--text",
+            "background": "--surface-raised",
+            "ratio": 16.37,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "body text on a raised card"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--bg",
+            "ratio": 7.19,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on the ground"
+          },
+          {
+            "foreground": "--text-muted",
+            "background": "--surface",
+            "ratio": 7.86,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "secondary text on a card"
+          },
+          {
+            "foreground": "--text-faint",
+            "background": "--bg",
+            "ratio": 4.97,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "captions and axis labels, large or incidental"
+          },
+          {
+            "foreground": "--border-strong",
+            "background": "--bg",
+            "ratio": 3.72,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "focus rings and input borders (WCAG 1.4.11)"
+          },
+          {
+            "foreground": "--border",
+            "background": "--surface",
+            "ratio": 1.55,
+            "floor": 1.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "hairline separation, decorative floor only"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--bg",
+            "ratio": 6.59,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour used as text"
+          },
+          {
+            "foreground": "--accent-text",
+            "background": "--surface",
+            "ratio": 7.19,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "the signal colour as text on a card"
+          },
+          {
+            "foreground": "--text-on-accent",
+            "background": "--accent",
+            "ratio": 6.03,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "text sitting on a filled signal chip"
+          },
+          {
+            "foreground": "--sig-forecast-text",
+            "background": "--bg",
+            "ratio": 6.15,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast series label"
+          },
+          {
+            "foreground": "--sig-actual-text",
+            "background": "--bg",
+            "ratio": 6.76,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured series label"
+          },
+          {
+            "foreground": "--pass-text",
+            "background": "--bg",
+            "ratio": 6.73,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance PASS wording"
+          },
+          {
+            "foreground": "--fail-text",
+            "background": "--bg",
+            "ratio": 6.76,
+            "floor": 4.5,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "compliance FAIL wording"
+          },
+          {
+            "foreground": "--sig-forecast",
+            "background": "--bg",
+            "ratio": 4.45,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "forecast line against the plot ground"
+          },
+          {
+            "foreground": "--sig-actual",
+            "background": "--bg",
+            "ratio": 5.53,
+            "floor": 3,
+            "pass": true,
+            "out_of_gamut": false,
+            "why": "measured line against the plot ground"
+          }
+        ]
+      }
+    }
+  },
+  "pairs_measured": 102,
+  "failures": [],
+  "pass": true
+}

@@ -21,3 +21,7 @@ data/processed/*.db-*
 # Secrets
 .env
 .env.local
+
+# Next generates these for AI agents on every dev run.
+apps/web/AGENTS.md
+apps/web/CLAUDE.md

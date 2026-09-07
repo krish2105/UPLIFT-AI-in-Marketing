@@ -6,7 +6,7 @@ SHELL := /bin/bash
 UV := uv run
 
 # The single green bar. Every task must leave this passing.
-check: lint test placeholders web-check
+check: lint test contrast placeholders web-check
 
 # e2e is deliberately outside `check`: it needs the API and the web server
 # running, so folding it in would make the default bar depend on two processes

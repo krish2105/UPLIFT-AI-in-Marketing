@@ -1,0 +1,257 @@
+/* The component kit.
+ *
+ * Every rule here reads from the design tokens and NONE of them names a
+ * colour. That is what makes the /design comparison honest: the three
+ * directions render the same markup through the same stylesheet, so what
+ * differs on screen is the token system and nothing else.
+ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.surface {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.55;
+}
+
+/* ── type ──────────────────────────────────────────────────────────────── */
+
+.display {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  letter-spacing: var(--tracking-display);
+  line-height: 1.02;
+  margin: 0;
+  text-wrap: balance;
+}
+.h2 {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  letter-spacing: var(--tracking-display);
+  line-height: 1.12;
+  margin: 0;
+}
+.h3 {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 1.2;
+  margin: 0;
+}
+.lede { font-size: var(--step-1); color: var(--text-muted); max-width: var(--measure); margin: 0; }
+.body { max-width: var(--measure); margin: 0; }
+.muted { color: var(--text-muted); }
+.faint { color: var(--text-faint); font-size: var(--step--1); }
+
+/* Numerals, zone codes, timestamps. Never prose. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.code {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* An eyebrow labels a section by what it IS, not by its position in a list. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0 0 0.6rem;
+}
+
+/* ── structure ─────────────────────────────────────────────────────────── */
+
+.stack   { display: flex; flex-direction: column; gap: 1rem; }
+.stack-l { display: flex; flex-direction: column; gap: 2rem; }
+.row     { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.between { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+
+.rule { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+
+.section { padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem); }
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: 1.1rem 1.2rem;
+}
+.card-raised { background: var(--surface-raised); box-shadow: var(--shadow-2); }
+
+/* ── controls ──────────────────────────────────────────────────────────── */
+
+.btn {
+  font: inherit;
+  font-size: var(--step--1);
+  padding: 0.42rem 0.85rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.btn:hover { background: var(--surface-hover); }
+.btn[aria-pressed="true"] {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+/* Focus is a neutral, high-contrast ring in every direction. It is structure,
+   not signal, so it never borrows the accent. */
+.btn:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: 2px;
+}
+
+/* ── data display ──────────────────────────────────────────────────────── */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.chip-accent { border-color: var(--accent); color: var(--accent-text); }
+/* A label that says the data underneath it is not observed. It is deliberately
+   NOT coloured — it must read the same in every direction and never look like
+   a status the user can dismiss. */
+.chip-label { border-style: dashed; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius);
+  border: 1px solid currentColor;
+}
+.badge-pass { color: var(--pass-text); }
+.badge-fail { color: var(--fail-text); }
+/* The glyph carries the verdict as well as the colour, so the badge survives
+   a monochrome print and a red-green colour deficiency. */
+.badge::before { font-weight: 700; }
+.badge-pass::before { content: "✓"; }
+.badge-fail::before { content: "✕"; }
+
+table.data { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+table.data th {
+  text-align: start;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 400;
+  padding: 0 0.7rem 0.5rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+table.data td {
+  padding: 0.55rem 0.7rem 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: baseline;
+}
+table.data tr:last-child td { border-bottom: 0; }
+.scroll-x { overflow-x: auto; }
+
+/* ── the creative preview ──────────────────────────────────────────────── */
+
+/* The ad. Phase C composes these from data/brand/sidra.yaml — the field behind
+   the copy is generated from the brand's own palette, which is why the card is
+   not simply a bordered box with text in it. */
+.creative {
+  aspect-ratio: 4 / 5;
+  gap: 1rem;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* The headline block takes the slack so the card never opens a dead gap. */
+  --creative-fill: 1;
+  background: var(--bg-inset);
+  min-width: 0;
+}
+/* The copy block absorbs the card's slack, so a 4:5 ad never opens a dead
+   band between the label and the headline. */
+.creative > .stack { flex: 1; justify-content: center; }
+
+/* The composition field: a soft wash in the direction's own warm ramp, angled
+   so the copy sits in the quiet corner. Cheap to paint, no image request, and
+   it is what an unfilled creative slot honestly looks like. */
+.creative::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(120% 80% at 88% 8%, var(--heat-4) 0%, transparent 58%),
+    radial-gradient(90% 70% at 8% 92%, var(--heat-1) 0%, transparent 62%);
+  opacity: 0.30;
+}
+
+.creative-head {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 1.14;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+.creative-body { font-size: var(--step--1); color: var(--text-muted); }
+.creative-cta {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+/* ── swatches ──────────────────────────────────────────────────────────── */
+
+.ramp { display: flex; height: 2.2rem; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+.ramp > i { flex: 1; }
+
+[dir="rtl"] .creative-cta,
+[dir="rtl"] .eyebrow { text-align: right; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
