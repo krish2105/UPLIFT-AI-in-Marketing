@@ -1,0 +1,65 @@
+# MAWSIM's API on Render's free instance type.
+#
+# WHY THE DATABASE IS BUILT AT DEPLOY TIME AND NOT ATTACHED
+# ---------------------------------------------------------
+# Render's free web services cannot attach a persistent disk — disks are a
+# paid-instance feature — and free Render Postgres expires 30 days after
+# creation. Both checked against Render's own documentation on 2026-09-07.
+#
+# That is fine here, because this application's database is a CACHE of the
+# pipelines rather than a system of record. Nothing a visitor does writes to it:
+# the API is read-only, and every row comes from a pipeline run. So the build
+# step runs the pipelines and bakes the database into the image. It is rebuilt
+# on every deploy, which is also how the deployed data stays current.
+#
+# The cost is build time — the weather ETL fetches 24 months of hourly history —
+# and it is paid once per deploy rather than once per request.
+#
+# WHAT THE VISITOR SEES
+# ---------------------
+# The first request after 15 minutes idle takes roughly a minute while the
+# instance wakes. The README says so rather than letting it read as a broken
+# link.
+services:
+  - type: web
+    name: mawsim-api
+    runtime: python
+    plan: free
+    region: singapore            # closest region to the UAE audience for this work
+    buildCommand: |
+      pip install uv
+      uv sync --frozen
+      uv run python -m pipeline.weather
+      uv run python -m pipeline.calendar
+      uv run python -m pipeline.events
+      uv run python -m pipeline.footfall
+    startCommand: uv run uvicorn services.api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13"
+      # Named so it is obvious in a shell that this is not durable.
+      - key: UPLIFT_DB
+        value: /tmp/mawsim-ephemeral.db
+      # Ollama does not exist here. Phase C's provider chain resolves to Gemini,
+      # then Groq, then the deterministic stub. Without a key it runs on the
+      # stub, which is a supported state and /healthz says so.
+      - key: OLLAMA_HOST
+        value: http://127.0.0.1:1
+      - key: GEMINI_API_KEY
+        sync: false              # set in the Render dashboard; never committed
+      - key: GROQ_API_KEY
+        sync: false
+      # Present and unused. services/api/core/llm.py refuses to select Anthropic
+      # even when this is set, and a test asserts the refusal.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false              # the Vercel URL, once it exists
+      # Requests, not tokens. Free tiers do not return trustworthy token
+      # accounting, and a number the project cannot verify has no business in a
+      # report.
+      - key: QUOTA_GEMINI_REQUESTS
+        value: "200"
+      - key: QUOTA_GROQ_REQUESTS
+        value: "200"

@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 
-.PHONY: check lint test web-check contrast palette placeholders owasp artefacts api web e2e etl
+.PHONY: check lint test web-check contrast palette placeholders owasp artefacts api web e2e smoke-live etl
 
 UV := uv run
 
@@ -13,6 +13,10 @@ check: lint test contrast palette placeholders web-check
 # a contributor has not started.
 e2e:
 	cd apps/web && npx playwright test
+
+# Runs against the deployed pair. Set LIVE_API_URL and LIVE_WEB_URL first.
+smoke-live:
+	cd apps/web && npx playwright test --config=playwright.live.config.ts
 
 lint:
 	$(UV) ruff check services tests scripts pipeline
