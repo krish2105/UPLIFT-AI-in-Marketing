@@ -57,15 +57,41 @@ rules the system applies cannot drift apart.</td>
 
 ## Live
 
-Not deployed yet — deployment needs account actions that belong to the owner,
-not to the build. [`docs/deploy.md`](docs/deploy.md) lists them: a GitHub push,
-a Render blueprint with its secrets, a Vercel import rooted at `apps/web`, and
-closing the CORS loop between the two. This section carries the two URLs and the
-live smoke-test result once that is done.
+| | |
+|---|---|
+| **Application** | **https://uplift-mawsim.vercel.app** |
+| **API** | **https://mawsim-api.onrender.com** — [`/docs`](https://mawsim-api.onrender.com/docs) · [`/healthz`](https://mawsim-api.onrender.com/healthz) |
+| **Verify it** | `LIVE_API_URL=https://mawsim-api.onrender.com LIVE_WEB_URL=https://uplift-mawsim.vercel.app make smoke-live` |
 
-```bash
-LIVE_API_URL=... LIVE_WEB_URL=... make smoke-live
-```
+All fifteen tabs serve measured data. The five live checks pass: the API
+answers, no dataset is empty, the page carries the disclaimer, the web app
+reaches the API across origins, and every tab is present.
+
+**The API sleeps after fifteen minutes idle**, so the first request after a
+quiet period takes about fifty seconds while the free instance wakes. For a
+live demo, open [`/healthz`](https://mawsim-api.onrender.com/healthz) a minute
+before you start. Every page renders an honest "API unreachable" state in the
+meantime rather than an empty chart.
+
+### What deployment taught the project
+
+Three failures reached production and were caught by things built to catch them.
+
+**The database went to `/tmp` and vanished.** Render's build and its runtime are
+different containers. The four pipelines ran, wrote a complete database, and
+threw it away. `/healthz` reported `degraded` and named all five empty datasets
+on the first request — which is the entire reason it reports what is *loaded*
+rather than only that the process is up.
+
+**A global gitignore was hiding a required input.** `~/.gitignore_global`
+excludes `data/raw/` for every repository on the machine, so the curated events
+seed was never committed. `git status` was clean, the file was on disk, and
+nothing inside the repository revealed it. `tests/invariants/test_repo_is_complete.py`
+now asserts that every input the project needs to rebuild itself is tracked.
+
+**The forecast endpoint fitted models per request** — ninety seconds on a
+512 MB instance. The horizon is precomputed at build time and served as data;
+the endpoint went to 21 ms.
 
 ## Standing constraints
 
