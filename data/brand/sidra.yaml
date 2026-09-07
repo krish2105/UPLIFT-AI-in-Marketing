@@ -1,0 +1,370 @@
+# SIDRA — the brand this application plans for.
+#
+# SIDRA IS FICTIONAL. It is not a real company and no claim here describes any
+# real business. It exists so that a forecast, a promotion, a creative and a
+# compliance verdict can all refer to the same thing across the application,
+# which a generic "Brand A" cannot do.
+#
+# This file is the SINGLE SOURCE OF TRUTH. The brand-guideline PDF is generated
+# from it, the Creative agent composes from it, and the Compliance agent
+# enforces `claims_to_avoid` out of it. Nothing downstream hardcodes a brand
+# fact, so the PDF a reviewer reads and the rules the agent applies cannot
+# drift apart.
+
+meta:
+  fictional: true
+  disclaimer: >-
+    SIDRA is a fictional Dubai speciality coffee and bakery chain, invented for
+    the AI 208 coursework demonstration. It is not a real company. Footfall and
+    point-of-sale figures shown against it are simulated, and are labelled as
+    such wherever they appear.
+  created: 2026-09-07
+  owner: Krishna Mathur
+  course: AI 208 AI in Marketing, SP Jain MAIB Term 4
+
+identity:
+  name: SIDRA
+  name_ar: سدرة
+  name_hi: सिदरा
+  # Sidra is the Arabic name for the Ziziphus tree, which fruits in heat and
+  # holds its leaves through the dry season. It is a reasonable name for a
+  # cafe that trades hardest when the weather is worst.
+  etymology: >-
+    Arabic for the Ziziphus (sidr) tree, which fruits in heat and keeps its
+    leaves through the dry season.
+  founded: 2019
+  category: Speciality coffee and bakery
+  positioning: >-
+    A neighbourhood speciality coffee and bakery for Dubai's second peak — the
+    hours after work, when the heat drops and the city comes back outside.
+  proposition: >-
+    Coffee roasted for iced service, and a bakery counter built around dates,
+    cardamom and pistachio rather than around European patisserie.
+  founder_story: >-
+    Opened as a single counter in Deira in 2019 serving the early market trade,
+    and grew toward the evening as it moved west across the city.
+
+zones:
+  - code: DXB-DTN
+    name: Downtown
+    name_ar: وسط المدينة
+    site: Dubai Mall district
+    lat: 25.1972
+    lon: 55.2744
+    seats: 54
+    outdoor_seats: 0
+    opens: "07:00"
+    closes: "23:30"
+    character: Tourist-heavy, event-elastic, flat across the week
+    demand_notes: >-
+      Responds to events at Burj Park and the Dubai Opera district within 2 km.
+      Least weekly seasonality of the four because its customers are not on a
+      local working week.
+
+  - code: DXB-MOE
+    name: Al Barsha
+    name_ar: البرشاء
+    site: Mall of the Emirates district
+    lat: 25.1181
+    lon: 55.2003
+    seats: 68
+    outdoor_seats: 0
+    opens: "08:00"
+    closes: "23:00"
+    character: Resident family, indoor, weather-inelastic
+    demand_notes: >-
+      Fully enclosed and air-conditioned, so temperature moves it least of the
+      four. This is the control site against which the others' weather
+      elasticity is measured.
+
+  - code: DXB-MAR
+    name: Marina Walk
+    name_ar: مرسى دبي
+    site: Dubai Marina promenade
+    lat: 25.0805
+    lon: 55.1403
+    seats: 40
+    outdoor_seats: 46
+    opens: "07:30"
+    closes: "01:00"
+    character: Expat evening, outdoor seating, strongly weather-elastic
+    demand_notes: >-
+      More than half its covers are outdoors, so its demand tracks apparent
+      temperature after 17:00 more tightly than any other site. The steepest
+      temperature coefficient in the estate, and the reason the forecast is
+      built per zone rather than per brand.
+
+  - code: DXB-DEI
+    name: Deira
+    name_ar: ديرة
+    site: Al Rigga
+    lat: 25.2653
+    lon: 55.3218
+    seats: 32
+    outdoor_seats: 12
+    opens: "06:00"
+    closes: "22:00"
+    character: Value segment, early peak, Ramadan-heavy
+    demand_notes: >-
+      The original site and the earliest opening. Peaks before 09:00 on the
+      market trade, and reshapes hardest through Ramadan — daytime trade
+      collapses and the hours after iftar carry the day.
+
+voice:
+  principles:
+    - Say the specific thing. "From 17:00, Marina Walk only" beats "now available".
+    - Name the product, not the feeling. Cardamom cold brew, not "an experience".
+    - One claim per piece. A creative that says three things says none.
+    - Write in sentence case. SIDRA is not shouted.
+    - Arabic is written, not translated. The AR variant is composed in Arabic,
+      not run through a translator from the English.
+  do:
+    - Use exact times, exact sites, exact prices.
+    - Say what is in the cup and what it costs.
+    - Let a limited offer be visibly limited — dates, hours, sites.
+  dont:
+    - Superlatives without substantiation ("best", "finest", "world-class").
+    - Health, nutrition or wellness framing of any kind. See claims_to_avoid.
+    - Urgency manufactured by scarcity language that is not true.
+    - Borrowed cultural reverence — Ramadan and Eid are trading periods for the
+      business, and the copy does not perform piety to sell pastry.
+
+# SIDRA's own palette, which is NOT the application's interface palette. The
+# Creative agent composes ads in these; the interface is styled in
+# apps/web/styles/tokens.css. Keeping them separate is what lets the app render
+# an off-brand creative and have that be visible.
+palette:
+  ink:       "#1C1714"   # roasted, near-black with a red cast
+  date:      "#6B3F28"   # the primary — date syrup
+  cardamom:  "#5F7A63"   # the secondary — green cardamom pod
+  saffron:   "#D9963A"   # the accent, used once per piece
+  semolina:  "#F2E8D8"   # the ground
+  paper:     "#FBF7F0"
+  rules:
+    - Saffron appears once per creative and never as a background.
+    - Date and semolina carry every piece; cardamom is for secondary marks.
+    - Never place ink type on date — it fails contrast. Use semolina.
+
+typography:
+  display: Marcellus
+  body: Karla
+  arabic: Noto Naskh Arabic
+  devanagari: Noto Sans Devanagari
+  rules:
+    - Headlines set in Marcellus, sentence case, no tracking added.
+    - Body never below 14px in a 1080px creative.
+    - Arabic is set in Noto Naskh at 1.08x the Latin size for optical parity.
+
+products:
+  - id: cardamom-cold-brew
+    name: Cardamom cold brew
+    name_ar: قهوة باردة بالهيل
+    price_aed: 24
+    dayparts: [midday, evening]
+  - id: date-syrup-latte
+    name: Date syrup latte
+    name_ar: لاتيه بدبس التمر
+    price_aed: 26
+    dayparts: [morning]
+    notes: Contains added sugars. See rule SID-N-001.
+  - id: pistachio-knafeh
+    name: Pistachio knafeh
+    name_ar: كنافة بالفستق
+    price_aed: 32
+    dayparts: [evening]
+    allergens: [pistachio, dairy, gluten]
+  - id: saj-zaatar
+    name: Za'atar saj
+    name_ar: صاج بالزعتر
+    price_aed: 18
+    dayparts: [morning]
+    allergens: [gluten, sesame]
+
+# ── The compliance rule set ────────────────────────────────────────────────
+#
+# Each rule names the document it comes from. `clause_verified: false` means
+# the DOCUMENT identity is verified — code, title, revision year, URL, all
+# checked by fetching on the date shown — but the specific clause reference has
+# not yet been read verbatim from the source text. Phase C ingests these
+# documents into the RAG corpus and flips the flag by quoting the clause.
+#
+# Recording that distinction is the point. A rule engine that cites a clause it
+# has never read is doing exactly what this project exists to argue against.
+
+sources:
+  codex-claims:
+    code: CXG 23-1997
+    title: Guidelines for Use of Nutrition and Health Claims
+    revision: 2013
+    publisher: FAO/WHO Codex Alimentarius Commission
+    url: https://www.fao.org/fao-who-codexalimentarius/codex-texts/guidelines/en/
+    verified: 2026-09-07
+  codex-labelling:
+    code: CXG 2-1985
+    title: Guidelines on Nutrition Labelling
+    revision: 2024
+    publisher: FAO/WHO Codex Alimentarius Commission
+    url: https://www.fao.org/fao-who-codexalimentarius/codex-texts/guidelines/en/
+    verified: 2026-09-07
+  uae-consumer:
+    code: UAE MoEC
+    title: Consumer protection guidance
+    publisher: UAE Ministry of Economy and Tourism
+    url: https://www.moec.gov.ae/en/consumer-protection
+    verified: 2026-09-07
+  dubai-municipality:
+    code: DM Food Safety
+    title: Dubai Municipality food safety and labelling guidance
+    publisher: Dubai Municipality
+    url: https://www.dm.gov.ae/
+    verified: 2026-09-07
+  sidra-brand:
+    code: SIDRA BG
+    title: SIDRA brand guidelines
+    publisher: SIDRA (fictional)
+    url: docs/brand/SIDRA-brand-guidelines.pdf
+    verified: 2026-09-07
+
+claims_to_avoid:
+  - id: SID-N-001
+    family: nutrition
+    severity: high
+    patterns: ["sugar[- ]free", "no sugar", "zero sugar", "بدون سكر"]
+    why: >-
+      A nutrient-content claim of "free" carries a numeric threshold. The date
+      syrup latte and every syrup-sweetened drink on the menu exceed it, so the
+      claim is false on SIDRA's own products.
+    source: codex-claims
+    clause: "Nutrient content claims — conditions for 'free' claims"
+    clause_verified: false
+
+  - id: SID-N-002
+    family: nutrition
+    severity: high
+    patterns: ["keto", "low[- ]carb", "carb[- ]free"]
+    why: >-
+      A dietary-regime claim implies a compositional guarantee SIDRA does not
+      test for and cannot substantiate per batch.
+    source: codex-claims
+    clause: "Nutrient content and comparative claims"
+    clause_verified: false
+
+  - id: SID-H-003
+    family: health
+    severity: critical
+    patterns: ["detox", "cleanse", "immunity", "immune[- ]boost", "superfood", "مناعة"]
+    why: >-
+      These are health claims. A health claim requires substantiation by
+      competent authority review, which a cafe menu has not had. This is the
+      single most likely failure mode for F&B copy and the one the Compliance
+      agent is tuned hardest against.
+    source: codex-claims
+    clause: "Health claims — general requirements and substantiation"
+    clause_verified: false
+
+  - id: SID-H-004
+    family: health
+    severity: critical
+    patterns: ["cures?", "treats?", "prevents?", "heals?", "clinically proven", "يعالج"]
+    why: >-
+      A claim that a food treats or prevents a condition is a medicinal claim
+      and is prohibited on food outright, not merely unsubstantiated.
+    source: codex-claims
+    clause: "Claims which should be prohibited"
+    clause_verified: false
+
+  - id: SID-N-005
+    family: nutrition
+    severity: medium
+    patterns: ["100% natural", "all natural", "chemical[- ]free", "طبيعي 100"]
+    why: >-
+      Unqualifiable and misleading — every food is chemical. "Natural" has no
+      agreed definition SIDRA can point to when asked.
+    source: uae-consumer
+    clause: "Misleading commercial description"
+    clause_verified: false
+
+  - id: SID-A-006
+    family: allergen
+    severity: critical
+    patterns: []
+    rule_type: presence
+    why: >-
+      Any creative naming a product that carries a declared allergen must carry
+      the allergen statement in the same piece. Pistachio knafeh and za'atar saj
+      both trigger this. Absence is the violation, so this rule is checked by
+      presence rather than by pattern.
+    source: dubai-municipality
+    clause: "Allergen declaration on prepacked and prepared foods"
+    clause_verified: false
+
+  - id: SID-P-007
+    family: price
+    severity: high
+    patterns: ["\\bwas\\b.*\\bnow\\b", "\\d+% ?off", "half price", "خصم"]
+    rule_type: conditional
+    why: >-
+      A discount claim must state the period and the reference price it is
+      discounted from. A bare "30% off" cannot be substantiated by a reader.
+    source: uae-consumer
+    clause: "Price reduction and promotional offer disclosure"
+    clause_verified: false
+
+  - id: SID-B-008
+    family: brand
+    severity: medium
+    patterns: ["best", "finest", "world[- ]class", "number one", "the only", "الأفضل"]
+    why: >-
+      Unsubstantiated superlative. Also against SIDRA's own voice, which is
+      specific rather than boastful — so this fails on brand grounds even where
+      a regulator would not act.
+    source: sidra-brand
+    clause: "Voice — do not use superlatives without substantiation"
+    clause_verified: true
+    clause_quote: "Superlatives without substantiation (\"best\", \"finest\", \"world-class\")."
+
+  - id: SID-B-009
+    family: brand
+    severity: low
+    patterns: ["artisan", "handcrafted", "fresh(ly)? baked", "authentic"]
+    rule_type: conditional
+    why: >-
+      Permitted only where the piece also states what makes it so — baked on
+      site, baked that morning. Alone these are filler, and SIDRA's voice rule
+      is to say the specific thing.
+    source: sidra-brand
+    clause: "Voice — say the specific thing"
+    clause_verified: true
+    clause_quote: "Say the specific thing. \"From 17:00, Marina Walk only\" beats \"now available\"."
+
+  - id: SID-B-010
+    family: brand
+    severity: medium
+    patterns: ["blessed", "holy", "sacred", "spiritual"]
+    why: >-
+      SIDRA does not use religious register to sell. Ramadan and Eid are
+      trading periods for the business and the copy says so plainly.
+    source: sidra-brand
+    clause: "Voice — do not borrow cultural reverence"
+    clause_verified: true
+    clause_quote: >-
+      Borrowed cultural reverence — Ramadan and Eid are trading periods for the
+      business, and the copy does not perform piety to sell pastry.
+
+  - id: SID-N-011
+    family: nutrition
+    severity: high
+    patterns: ["\\bcalories?\\b", "\\bkcal\\b", "\\bprotein\\b", "\\bfibre\\b", "\\blow fat\\b", "\\bسعرات\\b"]
+    rule_type: conditional
+    why: >-
+      Making a nutrition claim triggers a nutrient declaration. A creative that
+      names calories or protein without the accompanying declaration states half
+      of a regulated disclosure, which is worse than stating none of it.
+    source: codex-labelling
+    clause: "Nutrient declaration becomes mandatory where a nutrition claim is made"
+    clause_verified: false
+
+offer_rules:
+  - Every offer states its sites, its hours and its end date.
+  - No offer runs on a day the forecast's lower bound cannot staff.
+  - Nothing is published by this application. Export is a human action.
