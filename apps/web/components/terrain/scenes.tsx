@@ -310,20 +310,48 @@ export function MapScene({ data, focusDay, reduced, onHover }: SceneProps) {
 /* ── the only thing that animates ─────────────────────────────────────────── */
 
 function Breathing({ enabled }: { enabled: boolean }) {
-  const light = useRef<THREE.PointLight>(null);
-  /* frameloop is "demand", so the scene is a still image unless something asks
-     for a frame. This is the one exception: a slow pulse on the key light so
-     the view does not read as a screenshot. It stops entirely under
-     prefers-reduced-motion, and when it stops the scene stops rendering. */
+  const light = useRef<THREE.DirectionalLight>(null);
+  /* A slow pulse on the key light, so a still forecast does not read as a
+     screenshot. It stops entirely under prefers-reduced-motion, and the canvas
+     drops to frameloop="demand" with it, so the scene then renders only when
+     something changes.
+
+     THE KEY LIGHT IS DIRECTIONAL, NOT A POINT LIGHT, AND THAT IS A PERFORMANCE
+     DECISION. A shadow-casting point light is omnidirectional, so three renders
+     its shadow map as a CUBE — six passes, every frame. Measured on the
+     scrubbing test that put the 95th-percentile frame at 50 ms while the median
+     sat on vsync: a visible stutter on exactly the interaction the tab exists
+     for. A directional light is one orthographic pass, and for a scene lit like
+     an almanac it is also the right physical model: this is the sun over a
+     stretch of coast, not a bulb hanging in a room.
+
+     The shadow camera is sized to the ground plane. Left at its 5-unit default
+     the bars at the ends of the horizon simply stop casting, which reads as a
+     rendering bug rather than as a lighting choice. */
   useFrame(({ clock }) => {
     if (!enabled || !light.current) return;
-    light.current.intensity = 26 + Math.sin(clock.elapsedTime * 0.7) * 4;
+    light.current.intensity = 2.6 + Math.sin(clock.elapsedTime * 0.7) * 0.4;
   });
   return (
     <>
       <ambientLight intensity={0.55} />
-      <pointLight ref={light} position={[6, 14, 8]} intensity={26} castShadow />
-      <pointLight position={[-10, 8, -6]} intensity={7} />
+      <directionalLight
+        ref={light}
+        position={[9, 16, 10]}
+        intensity={2.6}
+        castShadow
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-left={-26}
+        shadow-camera-right={26}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
+        shadow-camera-near={1}
+        shadow-camera-far={60}
+      />
+      {/* Fill, from the opposite side and with no shadow of its own: it exists
+          to keep the unlit faces of the blocks from going flat, and a second
+          shadow map would double the cost for nothing. */}
+      <directionalLight position={[-12, 9, -8]} intensity={0.7} />
     </>
   );
 }

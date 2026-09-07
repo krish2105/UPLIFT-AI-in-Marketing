@@ -15,6 +15,7 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { useEffect } from "react";
 import { CAMERAS, SCENES, type Variant } from "./scenes";
 import type { TerrainResponse } from "@/lib/api";
+import { PCFShadowMap } from "three";
 
 export function Terrain3D({
   data,
@@ -36,7 +37,10 @@ export function Terrain3D({
     <Canvas
       frameloop={reduced ? "demand" : "always"}
       dpr={[1, 1.75]}
-      shadows
+      /* PCFSoft is the default and three has deprecated it — it downgrades to
+         PCF and warns on every single render. Asking for PCF outright is the
+         same picture without the console noise. */
+      shadows={{ type: PCFShadowMap }}
       camera={{ position: camera.position, fov: camera.fov }}
       gl={{ antialias: true, powerPreference: "low-power" }}
       data-testid="terrain-3d"

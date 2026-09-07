@@ -15,6 +15,12 @@ const WEB_PORT = 3031;
 
 export default defineConfig({
   testDir: "./e2e",
+  /* The frame-rate measurement is excluded from the default run and has its own
+     command, because it is the one test whose RESULT depends on what else is
+     running. Inside the parallel suite it measured 30 fps; alone, 60 — same
+     scene, same machine, different contention. A number that moves with the
+     neighbours is not a measurement of the thing it names. */
+  testIgnore: "**/frames.spec.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

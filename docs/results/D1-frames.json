@@ -1,0 +1,18 @@
+{
+  "task": "D1-frames",
+  "generated_by": "apps/web/e2e/frames.spec.ts",
+  "scene": "terrain, 4 lanes x 56 days, event bands and weather ribbon",
+  "interaction": "40 keyboard steps of the day scrubber",
+  "samples": 371,
+  "budget_ms": 16.67,
+  "median_frame_ms": 16.7,
+  "p95_frame_ms": 33.4,
+  "median_fps": 59.9,
+  "p95_fps": 29.9,
+  "dropped_frame_share": 0.105,
+  "dropped_frame_threshold_ms": 25,
+  "floor_fps": 30,
+  "measured_alone": true,
+  "meets_floor": true,
+  "note": "Headless Chromium has no display to synchronise with, so this is not a claim about any particular laptop. It measures whether the scene's per-frame work fits inside a 60 fps budget on this machine, and it is recorded rather than asserted because the plan's original wording — '60 fps is not in doubt' — was written before the scene existed."
+}

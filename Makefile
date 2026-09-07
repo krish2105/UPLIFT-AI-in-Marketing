@@ -14,6 +14,10 @@ check: lint test contrast palette redteam placeholders web-check
 e2e:
 	cd apps/web && npx playwright test
 
+# Alone and single-worker on purpose: see the note in playwright.config.ts.
+frames:
+	cd apps/web && npx playwright test --config=playwright.frames.config.ts
+
 # Runs against the deployed pair. Set LIVE_API_URL and LIVE_WEB_URL first.
 smoke-live:
 	cd apps/web && npx playwright test --config=playwright.live.config.ts
