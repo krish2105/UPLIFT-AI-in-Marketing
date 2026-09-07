@@ -1,23 +1,21 @@
-"use client";
-
 import { PageHead } from "@/components/PageHead";
-import { Scaffold } from "@/components/Scaffold";
-import { useLocale } from "@/components/LocaleProvider";
+import { ApiDown } from "@/components/ApiDown";
+import { CreativesView } from "@/components/views/CreativesView";
+import { api, tryFetch } from "@/lib/api";
 
-export default function Page() {
-  const { t } = useLocale();
+export const revalidate = 60;
+
+export default async function CreativesPage() {
+  const c = await tryFetch(() => api.creatives("square"));
+  if ("error" in c) return <ApiDown eyebrow="Make" title="Creatives" detail={c.error} />;
   return (
     <div className="page">
-      <PageHead eyebrow={t("group.make")} title={t("tab.creatives")} lede="Three variants per slot, in three languages, composed from the brand kit." />
-      <Scaffold
-        phase="C"
-        will={[
-          "Deterministic brand-accurate compositions at three sizes, EN/AR/HI with correct RTL mirroring",
-          "Seeded, so the panel scores are reproducible",
-          "A free image tier behind a flag, cached to disk, degrading to the composition",
-        ]}
-        from="data/brand/sidra.yaml and the Phase B plan"
+      <PageHead
+        eyebrow="Make"
+        title="Creatives"
+        lede="Three slots, three languages, composed from the brand kit. Every variant renders identically every time, because the panel that scores it can only mean something if the thing being scored is stable."
       />
+      <CreativesView data={c.data} />
     </div>
   );
 }

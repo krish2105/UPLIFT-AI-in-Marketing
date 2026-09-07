@@ -229,7 +229,7 @@ claims_to_avoid:
   - id: SID-N-001
     family: nutrition
     severity: high
-    patterns: ["sugar[- ]free", "no sugar", "zero sugar", "بدون سكر"]
+    patterns: ["sugar[- ]free", "no sugar", "zero sugar", "بدون سكر", "خالٍ? من السكر", "خالي من السكر", "शुगर[- ]?फ्री", "बिना चीनी"]
     why: >-
       A nutrient-content claim of "free" carries a numeric threshold. The date
       syrup latte and every syrup-sweetened drink on the menu exceed it, so the
@@ -241,7 +241,7 @@ claims_to_avoid:
   - id: SID-N-002
     family: nutrition
     severity: high
-    patterns: ["keto", "low[- ]carb", "carb[- ]free"]
+    patterns: ["keto", "low[- ]carb", "carb[- ]free", "كيتو", "قليل الكربوهيدرات", "कीटो", "लो[- ]?कार्ब"]
     why: >-
       A dietary-regime claim implies a compositional guarantee SIDRA does not
       test for and cannot substantiate per batch.
@@ -252,7 +252,7 @@ claims_to_avoid:
   - id: SID-H-003
     family: health
     severity: critical
-    patterns: ["detox", "cleanse", "immunity", "immune[- ]boost", "superfood", "مناعة"]
+    patterns: ["detox", "cleanse", "immunity", "immune[- ]boost", "superfood", "مناعة", "ديتوكس", "تنقية", "सुपरफूड", "डिटॉक्स", "इम्युनिटी", "प्रतिरक्षा"]
     why: >-
       These are health claims. A health claim requires substantiation by
       competent authority review, which a cafe menu has not had. This is the
@@ -265,7 +265,7 @@ claims_to_avoid:
   - id: SID-H-004
     family: health
     severity: critical
-    patterns: ["cures?", "treats?", "prevents?", "heals?", "clinically proven", "يعالج"]
+    patterns: ["cures?", "treats?", "prevents?", "heals?", "clinically proven", "يعالج", "يشفي", "يمنع", "مثبت سريري", "इलाज", "ठीक करता", "clinically proven", "चिकित्सकीय"]
     why: >-
       A claim that a food treats or prevents a condition is a medicinal claim
       and is prohibited on food outright, not merely unsubstantiated.
@@ -276,7 +276,7 @@ claims_to_avoid:
   - id: SID-N-005
     family: nutrition
     severity: medium
-    patterns: ["100% natural", "all natural", "chemical[- ]free", "طبيعي 100"]
+    patterns: ["100% natural", "all natural", "chemical[- ]free", "طبيعي 100", "طبيعي ١٠٠", "100٪ ?طبيعي", "طبيعي بالكامل", "100% natural", "पूर्णतः प्राकृतिक", "100% प्राकृतिक"]
     why: >-
       Unqualifiable and misleading — every food is chemical. "Natural" has no
       agreed definition SIDRA can point to when asked.
@@ -301,7 +301,7 @@ claims_to_avoid:
   - id: SID-P-007
     family: price
     severity: high
-    patterns: ["\\bwas\\b.*\\bnow\\b", "\\d+% ?off", "half price", "خصم"]
+    patterns: ["\\bwas\\b.*\\bnow\\b", "\\d+% ?off", "half price", "خصم", "تخفيض", "نصف السعر", "छूट", "\\d+% ?की छूट", "आधी कीमत"]
     rule_type: conditional
     why: >-
       A discount claim must state the period and the reference price it is
@@ -313,7 +313,7 @@ claims_to_avoid:
   - id: SID-B-008
     family: brand
     severity: medium
-    patterns: ["best", "finest", "world[- ]class", "number one", "the only", "الأفضل"]
+    patterns: ["best", "finest", "world[- ]class", "number one", "the only", "الأفضل", "أفضل", "الأول", "لا مثيل", "बेहतरीन", "सर्वश्रेष्ठ", "सबसे अच्छा", "नंबर वन"]
     why: >-
       Unsubstantiated superlative. Also against SIDRA's own voice, which is
       specific rather than boastful — so this fails on brand grounds even where
@@ -326,7 +326,7 @@ claims_to_avoid:
   - id: SID-B-009
     family: brand
     severity: low
-    patterns: ["artisan", "handcrafted", "fresh(ly)? baked", "authentic"]
+    patterns: ["artisan", "handcrafted", "fresh(ly)? baked", "authentic", "حرفي", "أصيل", "طازج", "आर्टिज़न", "हस्तनिर्मित", "प्रामाणिक"]
     rule_type: conditional
     why: >-
       Permitted only where the piece also states what makes it so — baked on
@@ -340,7 +340,7 @@ claims_to_avoid:
   - id: SID-B-010
     family: brand
     severity: medium
-    patterns: ["blessed", "holy", "sacred", "spiritual"]
+    patterns: ["blessed", "holy", "sacred", "spiritual", "مبارك", "مقدس", "روحاني", "पवित्र", "आशीर्वाद"]
     why: >-
       SIDRA does not use religious register to sell. Ramadan and Eid are
       trading periods for the business and the copy says so plainly.

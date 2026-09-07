@@ -18,9 +18,8 @@ Built for SP Jain MAIB Term 4, AI 208 AI in Marketing. Owner: Krishna Mathur.
 > so. A real pilot replaces that dataset with an actual export; nothing else in
 > the system changes.
 
-![The Season tab in the night register: the daypart dial, the mashrabiya
-confidence screen, eight weeks of demand for four sites, and evening footfall
-plotted against apparent temperature](docs/images/season-night.png)
+![The Season tab in the night register: the station strip, four sites as small
+multiples, and evening footfall plotted against apparent temperature](docs/images/season-night.png)
 
 **The chart on the lower right is the argument.** Four sites, one axis, evening
 footfall against apparent temperature. Marina Walk — 54% of its seats outdoors —
@@ -89,10 +88,43 @@ LIVE_API_URL=... LIVE_WEB_URL=... make smoke-live
   externally. Exporting a campaign is a human action, taken outside this
   application.
 
+## Fifteen tabs, all working
+
+Every tab renders measured output. None is a scaffold.
+
+| Group | Tabs |
+|---|---|
+| **Plan** | Season (3D in Phase D) · Forecast · Plan · Segments |
+| **Make** | Creatives · Brand · Compliance · Panel |
+| **Prove** | Measure · Experiments · Report |
+| **System** | Ask · Crew · Data · Security |
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/forecast-night.png" alt="The Forecast tab: 36 of 36 site-weeks beaten, a prediction interval, driver importances and a week-by-week table"></td>
+<td width="50%"><img src="docs/images/creatives-night.png" alt="The Creatives tab: three composed ads with panel scores and compliance verdicts citing their clauses"></td>
+</tr>
+<tr>
+<td><b>The forecast is gated on a baseline.</b> 36 of 36 site-weeks
+beaten against a 70% target. The interval is two quantile models, not a
+residual multiplied by 1.28 — demand is bounded below by zero and its spread grows with its
+level.</td>
+<td><b>Creatives are composed, not generated.</b> Free image endpoints garble Arabic inside
+images, which in an application about brand compliance is a liability. Each is an SVG built from
+the brand kit, identical every run — which is what makes a panel score mean anything. One breaks
+the rules on purpose.</td>
+</tr>
+</table>
+
 ## What is measured, and where
 
 | Claim | Evidence | Result |
 |---|---|---|
+| Forecast beats seasonal naive | `python scripts/run_phase_b.py` | **36/36 site-weeks**, MAE 28–34% lower — [`B1`](docs/results/B1-forecast.json) |
+| An injected lift is recovered | same | all 5 checks within **2.61 pts** of a 5-point tolerance — [`B4`](docs/results/B4-uplift.json) |
+| Segments survive resampling | same | **91.8%** keep their segment — [`B2`](docs/results/B2-segments.json) |
+| The allocator finds the optimum | same | KKT marginal spread ~0 — [`B3`](docs/results/B3-allocator.json) |
+| Compliance catches violations in three languages | `python scripts/run_phase_c.py` | recall **100%** worst language, precision 100% — [`C1`](docs/results/C1-compliance.json) |
 | Weather history is complete | `python -m pipeline.weather --verify` | 18,048 hours per site, no gap over 3 h — [`A4`](docs/results/A4-weather-etl.json) |
 | Islamic dates reproduce UAE observances | `python -m pipeline.calendar --verify` | all four 2025 observances matched — [`A5`](docs/results/A5-calendar.json) |
 | Events are curated and say so | `python -m pipeline.events --verify` | 245 instances, no row claiming a verified date — [`A6`](docs/results/A6-events.json) |
@@ -100,7 +132,8 @@ LIVE_API_URL=... LIVE_WEB_URL=... make smoke-live
 | The embedding model is fit for trilingual retrieval | `python scripts/spike_embeddings.py` | bge-m3 +0.447/+0.318 margin; nomic-embed-text disqualified — [`A9`](docs/results/A9-embedding-spike.json) |
 | Text and UI meet WCAG in both registers | `node apps/web/scripts/check-contrast.mjs` | 34 pairs measured — [`A2`](docs/results/A2-contrast.json) |
 | Chart series are distinguishable | `node apps/web/scripts/check-palette.mjs` | six checks, both registers — [`A10`](docs/results/A10-palette.json) |
-| The shell is responsive, accessible and RTL-correct | `make e2e` | 35 Playwright tests |
+| The shell is responsive, accessible and RTL-correct | `make e2e` | **68 Playwright tests**, no serious axe violation on any tab in either register |
+| No agent can reach the outside world | `pytest tests/invariants` | every route is a GET; the crew's side-effects column is `none` on every row |
 
 ## Running it
 
@@ -108,6 +141,9 @@ LIVE_API_URL=... LIVE_WEB_URL=... make smoke-live
 uv sync --extra dev
 cd apps/web && npm install && cd ../..
 make etl        # build the datasets — weather and events reach the network, cached to data/raw/
+uv run python scripts/run_phase_b.py   # forecast, segments, allocator, uplift
+uv run python scripts/run_phase_c.py   # compliance and panel
+uv run python scripts/build_report.py  # the AI 208 artefact, from docs/results/
 make check      # the green bar: ruff, pytest, contrast, palette, placeholders, typecheck
 make e2e        # Playwright; starts both servers itself
 make api        # http://localhost:8000/docs
@@ -125,6 +161,7 @@ make web        # http://localhost:3000
 | `docs/results/` | Every measured number, written by a script |
 | `docs/datasets.md` · `docs/models.md` | What the data is, what the models are, and why |
 | `docs/directions.md` | The three design directions that were built, and which one was chosen |
+| `docs/artefacts/` | The generated AI 208 report, in markdown and docx |
 
 ## Limitations
 
@@ -148,6 +185,16 @@ Stated here rather than discovered by a reader.
   implying otherwise.
 - **Weather is a coarse grid.** ERA5 at roughly 11 km, so the four sites do not
   each get their own station.
+- **Allocator elasticities are assumed.** No promotion has run, so there is
+  nothing to fit them to. Every response carries `assumed: true`.
+- **Synthetic control cannot fully control for weather here.** With four sites
+  and one uniquely weather-elastic, the treated unit is inside the donors' hull
+  on level and outside it on elasticity. The residual bias is measured on a
+  placebo-in-time window and reported rather than absorbed.
+- **The persona panel is not customer research.** It applies a rubric; it does
+  not observe a reaction.
+- **Ask retrieves, it does not generate.** BM25 over the project's own corpus,
+  returning passages with sources. A model that writes prose over them is Phase C.
 
 ## Not advice
 

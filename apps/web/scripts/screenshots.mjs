@@ -15,9 +15,14 @@ mkdirSync(OUT, { recursive: true });
 
 const SHOTS = [
   { route: "/", name: "season-night", theme: "Night", width: 1440 },
-  { route: "/", name: "season-day", theme: "Day", width: 1440 },
+  { route: "/forecast", name: "forecast-night", theme: "Night", width: 1440 },
+  { route: "/measure", name: "measure-day", theme: "Day", width: 1440 },
+  { route: "/creatives", name: "creatives-night", theme: "Night", width: 1440 },
+  { route: "/compliance", name: "compliance-day", theme: "Day", width: 1440 },
+  { route: "/plan", name: "plan-night", theme: "Night", width: 1440 },
   { route: "/data", name: "data-night", theme: "Night", width: 1440 },
   { route: "/brand", name: "brand-day", theme: "Day", width: 1440 },
+  { route: "/security", name: "security-night", theme: "Night", width: 1440 },
   { route: "/", name: "season-mobile", theme: "Night", width: 390 },
 ];
 

@@ -114,9 +114,13 @@ export function PlanView({ initial }: { initial: AllocatorResponse }) {
                             minWidth: "3.5rem",
                             padding: "0.1rem 0.35rem",
                             borderRadius: "var(--radius)",
+                            /* Capped at 34%. At 70% the fill reached the ramp's
+                               dark end and the label inside it measured 2.41:1 —
+                               a heat map that hides its own numbers. The cell is
+                               a shade, and the number stays readable. */
                             background:
                               c && c.spend > 0
-                                ? `color-mix(in oklab, var(${DAYPART_TOKEN[DAYPARTS[i]]}) ${Math.round((c.spend / maxSpend) * 70) + 12}%, transparent)`
+                                ? `color-mix(in oklab, var(${DAYPART_TOKEN[DAYPARTS[i]]}) ${Math.round((c.spend / maxSpend) * 26) + 8}%, transparent)`
                                 : "transparent",
                           }}
                         >

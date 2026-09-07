@@ -395,6 +395,13 @@ export function ResponseChart({
 
 /* ── a single number, when a chart would be worse ─────────────────────────── */
 
+/** Tokens designed to be read as text. Anything else is a FILL and is drawn as
+ *  a swatch beside the number instead of colouring it. */
+const TEXT_SAFE = new Set([
+  "--pass-text", "--fail-text", "--accent-text",
+  "--sig-forecast-text", "--sig-actual-text", "--text", "--text-muted",
+]);
+
 export function StatTile({
   value,
   label,
@@ -406,14 +413,44 @@ export function StatTile({
   detail?: string;
   token?: string;
 }) {
+  /* TEXT WEARS TEXT TOKENS, NEVER THE SERIES COLOUR.
+   *
+   * This tile used to paint the number in whatever token it was handed, and an
+   * axe scan caught the consequence: --heat-1 is the light end of a sequential
+   * ramp, which measured 1.86:1 against the light surface. A ramp step is a
+   * FILL — light by construction at one end — and using it as text is a
+   * category error that happens to look fine in the dark register and fails
+   * outright in the light one.
+   *
+   * So a fill token becomes a swatch beside the number, which carries the same
+   * identity without asking a reader to read colour as text. */
+  const asText = token && TEXT_SAFE.has(token);
+  const asSwatch = token && !asText;
+
   return (
     <div className="card stack" style={{ gap: "0.25rem" }}>
       <span className="eyebrow" style={{ margin: 0 }}>{label}</span>
-      <span className="num" style={{
-        fontSize: "var(--step-2)", lineHeight: 1.05,
-        color: token ? `var(${token})` : "var(--text)",
-      }}>
-        {value}
+      <span className="row" style={{ gap: "0.45rem", alignItems: "baseline" }}>
+        {asSwatch && (
+          <i
+            aria-hidden="true"
+            style={{
+              width: 10, height: 10, borderRadius: 2, flex: "none",
+              background: `var(${token})`, display: "inline-block",
+              alignSelf: "center",
+            }}
+          />
+        )}
+        <span
+          className="num"
+          style={{
+            fontSize: "var(--step-2)",
+            lineHeight: 1.05,
+            color: asText ? `var(${token})` : "var(--text)",
+          }}
+        >
+          {value}
+        </span>
       </span>
       {detail && <span className="faint">{detail}</span>}
     </div>

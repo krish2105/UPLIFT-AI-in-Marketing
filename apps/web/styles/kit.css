@@ -438,3 +438,19 @@ a:hover { text-decoration-thickness: 2px; }
 /* The Hijri date is the first thing to go when the strip runs out of room —
    it is context, where the zone and the index are the reading. */
 @media (max-width: 44rem) { .station-hijri { display: none; } }
+
+/* A chip carrying a ramp colour shows it as a DOT, never as its text colour.
+ * Ramp steps are fills: light at one end by construction, dark at the other,
+ * and legible as text at neither. An axe scan caught --heat-1 at 1.86:1 on the
+ * light surface and --heat-3 at 3.64:1 — both invisible in the register they
+ * were designed in. This makes the mistake unavailable rather than discouraged.
+ */
+.chip-dot { color: var(--text-muted); }
+.chip-dot::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--dot, var(--text-faint));
+  flex: none;
+}

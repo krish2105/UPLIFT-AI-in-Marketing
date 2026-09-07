@@ -1,0 +1,165 @@
+{
+  "task": "C1-compliance",
+  "generated_by": "scripts/run_phase_c.py",
+  "generated_at": "2026-09-07T08:50:49+00:00",
+  "method": "Regex over NFKC-normalised text against the eleven rules in data/brand/sidra.yaml. Deterministic: a rule engine whose verdict depends on a model's mood cannot be audited. Three rule types — pattern, conditional (fires unless a qualifier is present) and presence (fires on something missing, such as an allergen statement).",
+  "target_recall": 0.9,
+  "by_language": {
+    "en": {
+      "cases": 40,
+      "violations": 20,
+      "clean": 20,
+      "true_positives": 20,
+      "false_negatives": 0,
+      "false_positives": 0,
+      "true_negatives": 20,
+      "recall": 1.0,
+      "precision": 1.0,
+      "f1": 1.0,
+      "missed": [],
+      "false_alarms": []
+    },
+    "ar": {
+      "cases": 10,
+      "violations": 7,
+      "clean": 3,
+      "true_positives": 7,
+      "false_negatives": 0,
+      "false_positives": 0,
+      "true_negatives": 3,
+      "recall": 1.0,
+      "precision": 1.0,
+      "f1": 1.0,
+      "missed": [],
+      "false_alarms": []
+    },
+    "hi": {
+      "cases": 10,
+      "violations": 6,
+      "clean": 4,
+      "true_positives": 6,
+      "false_negatives": 0,
+      "false_positives": 0,
+      "true_negatives": 4,
+      "recall": 1.0,
+      "precision": 1.0,
+      "f1": 1.0,
+      "missed": [],
+      "false_alarms": []
+    }
+  },
+  "worst_recall": 1.0,
+  "meets_target": true,
+  "overall_english": {
+    "cases": 40,
+    "recall": 1.0,
+    "precision": 1.0,
+    "f1": 1.0
+  },
+  "note_on_language": "Recall is reported per language and never blended. The rule set was written in English first and on the same violating creative caught six rules in English, four in Arabic and two in Hindi — for a UAE brand a real gap rather than a cosmetic one. Arabic and Hindi patterns were added and the gold set extended; a single blended number would have hidden the imbalance it was written to find.",
+  "note_on_precision": "Precision is reported beside recall because a rule that flags everything scores perfect recall. The clean half of the gold set is deliberately adversarial: it contains discounts with stated terms, allergen statements, and the word 'fresh' qualified by 'baked on site'.",
+  "creatives": [
+    {
+      "slot": "eid-evening",
+      "lang": "en",
+      "seed": "0e8b41932ccb",
+      "passed": true,
+      "findings": [],
+      "panel_mean": 7.07,
+      "panel_spread": 1.52
+    },
+    {
+      "slot": "eid-evening",
+      "lang": "ar",
+      "seed": "da9bf8dd4f5c",
+      "passed": true,
+      "findings": [],
+      "panel_mean": 4.73,
+      "panel_spread": 0.6
+    },
+    {
+      "slot": "eid-evening",
+      "lang": "hi",
+      "seed": "133ace7fdb3b",
+      "passed": true,
+      "findings": [],
+      "panel_mean": 4.73,
+      "panel_spread": 0.6
+    },
+    {
+      "slot": "morning-deira",
+      "lang": "en",
+      "seed": "f7a84b93bb1f",
+      "passed": true,
+      "findings": [],
+      "panel_mean": 6.91,
+      "panel_spread": 0.78
+    },
+    {
+      "slot": "morning-deira",
+      "lang": "ar",
+      "seed": "89836f89deb3",
+      "passed": true,
+      "findings": [],
+      "panel_mean": 4.7,
+      "panel_spread": 1.05
+    },
+    {
+      "slot": "morning-deira",
+      "lang": "hi",
+      "seed": "50fa9a2299cf",
+      "passed": true,
+      "findings": [],
+      "panel_mean": 4.7,
+      "panel_spread": 1.05
+    },
+    {
+      "slot": "summer-detox",
+      "lang": "en",
+      "seed": "d6de1a6d4b2e",
+      "passed": false,
+      "findings": [
+        "SID-H-003",
+        "SID-H-004",
+        "SID-N-001",
+        "SID-P-007",
+        "SID-N-005",
+        "SID-B-008"
+      ],
+      "panel_mean": 3.69,
+      "panel_spread": 2.0
+    },
+    {
+      "slot": "summer-detox",
+      "lang": "ar",
+      "seed": "44f7fd0fe03a",
+      "passed": false,
+      "findings": [
+        "SID-H-003",
+        "SID-H-004",
+        "SID-N-001",
+        "SID-P-007",
+        "SID-N-005",
+        "SID-B-008"
+      ],
+      "panel_mean": 4.79,
+      "panel_spread": 0.85
+    },
+    {
+      "slot": "summer-detox",
+      "lang": "hi",
+      "seed": "e544da9c7970",
+      "passed": false,
+      "findings": [
+        "SID-H-003",
+        "SID-H-004",
+        "SID-N-001",
+        "SID-N-005",
+        "SID-B-008"
+      ],
+      "panel_mean": 3.91,
+      "panel_spread": 1.5
+    }
+  ],
+  "panel_is_not_research": "Panel scores are a deterministic rubric applied by five stated personas. They are a filter, not evidence about real customers, and every persona publishes what it over- and under-weights."
+}

@@ -249,6 +249,117 @@ export type UpliftResponse = Labelled & {
   note_on_bias: string;
 };
 
+export type Finding = {
+  rule_id: string;
+  family: string;
+  severity: string;
+  matched: string[];
+  why: string;
+  source_code: string;
+  source_title: string;
+  source_url: string;
+  clause: string;
+  clause_verified: boolean;
+  clause_quote: string;
+};
+
+export type PersonaScore = {
+  persona: string;
+  name: string;
+  total: number;
+  criteria: Record<string, number>;
+  note: string;
+};
+
+export type CreativeItem = {
+  slot: string;
+  lang: string;
+  size: string;
+  width: number;
+  height: number;
+  seed: string;
+  zone: string;
+  daypart: string;
+  product: string;
+  headline: string;
+  body: string;
+  cta: string;
+  svg: string;
+  compliance: { passed: boolean; checked_rules: number; citations: number; findings: Finding[] };
+  panel: { mean: number; spread: number; scores: PersonaScore[]; simulated: boolean };
+};
+
+export type CreativesResponse = {
+  count: number;
+  creatives: CreativeItem[];
+  passing: number;
+  deterministic: boolean;
+};
+
+export type RuleRow = {
+  id: string;
+  family: string;
+  severity: string;
+  patterns: string[];
+  rule_type: string;
+  why: string;
+  source: string;
+  source_url: string;
+  clause: string;
+  clause_verified: boolean;
+  clause_quote: string;
+};
+
+export type RulesResponse = {
+  rules: RuleRow[];
+  sources: Record<string, string>;
+  deterministic: boolean;
+  note: string;
+};
+
+export type GoldResponse = {
+  cases: number;
+  violations: number;
+  clean: number;
+  recall: number;
+  precision: number;
+  f1: number;
+  missed: { text: string; expected: string; fired: string[] }[];
+  false_alarms: { text: string; fired: string[] }[];
+  target_recall: number;
+};
+
+export type ExperimentsResponse = {
+  days: number;
+  zone: string;
+  by_zone: { zone: string; daily_mean: number; gap_sd: number; cv: number; mde: number; mde_pct: number; donors: string[] }[];
+  sweep: { days: number; mde: number; mde_pct: number }[];
+  method: string;
+  note: string;
+  simulated: boolean;
+};
+
+export type CrewResponse = {
+  crew: { agent: string; tools: string[]; phase: string; output: string; reads: string; side_effects: string; note: string }[];
+  side_effect_free: boolean;
+  claim: string;
+  publishing: string;
+};
+
+export type SecurityResponse = {
+  summary: { controls: number; by_status: Record<string, number>; enforced: number; coverage: number };
+  controls: { id: string; risk: string; claim: string; evidence: string; status: string; verified_by: string }[];
+  note: string;
+};
+
+export type AskResponse = {
+  query: string;
+  answered: boolean;
+  citations: { rank: number; id: string; score: number; text: string; source: string; source_url: string; kind: string }[];
+  note: string;
+  corpus_size: number;
+};
+
 export const api = {
   zones: () => get<ZonesResponse>("/data/zones"),
   freshness: () => get<Freshness>("/data/freshness"),
@@ -261,6 +372,14 @@ export const api = {
   segments: () => get<SegmentsResponse>("/marketing/segments"),
   allocator: (budget = 12000) => get<AllocatorResponse>(`/marketing/allocator?budget=${budget}`),
   uplift: (q = "") => get<UpliftResponse>(`/marketing/uplift${q}`),
+  creatives: (size = "square") => get<CreativesResponse>(`/creative/all?size=${size}`),
+  rules: () => get<RulesResponse>("/compliance/rules"),
+  gold: () => get<GoldResponse>("/compliance/gold"),
+  experiments: (zone = "DXB-MAR", days = 14) =>
+    get<ExperimentsResponse>(`/experiments?zone=${zone}&days=${days}`),
+  crew: () => get<CrewResponse>("/crew"),
+  security: () => get<SecurityResponse>("/security"),
+  ask: (q: string, k = 4) => get<AskResponse>(`/ask?q=${encodeURIComponent(q)}&k=${k}`),
 };
 
 /** Fetch without throwing, so a page can render an honest "API unreachable"
