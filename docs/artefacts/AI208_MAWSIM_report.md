@@ -146,7 +146,7 @@ accounting sentence with a citation attached.
 
 | | |
 |---|---|
-| Contrast pairs measured | 34, both registers |
+| Contrast pairs measured | 36, both registers |
 | Palette checks | seven, both registers |
 
 The palette was rejected twice by its own gate before passing: a saturated
@@ -162,7 +162,34 @@ read grey. Neither failure is visible by eye on a designer's monitor.
 | Compliance recall ≥0.90 | 100% worst language | MET |
 | Segments stable under bootstrap | 91.8% | MET |
 
-## 10. Limitations
+## 10. Safety, and what happened when it was attacked
+
+No agent in the registry holds a tool with a side effect; the whole API is GET,
+so there is no verb with which to write. That is an architectural claim, and a
+claim is worth what the attempt to break it is worth.
+
+`scripts/red_team.py` makes 34 attempts across
+7 OWASP ASI controls — prompt injection into the
+compliance checker, script-mixing and zero-width evasion of the claim rules,
+forged Admin headers, HTTP verbs the API does not answer, provenance stripping,
+and budget exhaustion. **33 of 34 held.**
+
+| Control | Attempts | Held |
+|---|---|---|
+| ASI-01 | 5 | 5 |
+| ASI-03 | 13 | 13 |
+| ASI-04 | 2 | 2 |
+| ASI-06 | 5 | 5 |
+| ASI-07 | 2 | 2 |
+| ASI-08 | 1 | 1 |
+| ASI-09 | 6 | 5 |
+
+One case is recorded as a break on purpose. RT-AUT-06 BREAKS, and the scoreboard says so. The Admin role is an unauthenticated request header, so 'ADMIN ' is normalised, accepted, and sendable by anyone; the attacker engages the kill switch without holding the scope. The project accepts that risk — the header is a coursework stand-in for identity and /admin/roles states it in the UI — but an accepted risk is still a break. Scoring it as held would have made the harness report 34/34 while a forged header worked, which is precisely the reassurance it exists to withhold. Binding roles to identity is the fix, and it is listed under limitations rather than claimed.
+
+A pass here is narrow, and the file says so in its own words:
+The attack did not achieve its objective. It does not mean the system is secure — no harness can say that. It means these specific attempts, the ones a marketing-compliance tool actually invites, were tried and recorded, and the result is a number rather than an assurance.
+
+## 11. Limitations
 
 - **Footfall is generated.** No public hourly footfall series exists for a Dubai
   café. What is not invented is the evaluation.
@@ -174,6 +201,11 @@ read grey. Neither failure is visible by eye on a designer's monitor.
 - **Most compliance clauses are unread.** Source documents are verified; the
   clauses are quoted verbatim during corpus ingestion, and until then the brand
   PDF prints "clause unverified".
+- **Roles are a request header, not an identity.** `X-Mawsim-Role: admin` is
+  unauthenticated and therefore forgeable, and the red team scores that as a
+  break rather than an expected result. Binding roles to a signed session is the
+  fix; the application states the gap at `/admin/roles` instead of implying a
+  control it does not have.
 - **The persona panel is not customer research.** It applies a rubric; it does
   not observe a reaction.
 - **Synthetic control cannot fully control for weather here.** With four sites
