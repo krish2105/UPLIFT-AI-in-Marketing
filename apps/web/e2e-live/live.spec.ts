@@ -66,9 +66,16 @@ test("the deployed instance carries the red-team result, not just the scorecard"
      trying not to ship. */
   await page.goto("/security");
   await expect(page.getByRole("heading", { name: /when the claims were attacked/i })).toBeVisible();
+  /* Asserted by NAME, not by count: "48 of 48 held" would still pass if the
+     token attacks quietly stopped being run. This row is the mechanism that
+     replaced the forgeable header, so its presence is the thing worth checking
+     reached production. */
   await expect(
-    page.locator("table.data tbody tr").filter({ hasText: "case and whitespace" }).first(),
-  ).toContainText(/broke/i);
+    page
+      .locator("table.data tbody tr")
+      .filter({ hasText: "rewrite a viewer token's role to admin" })
+      .first(),
+  ).toContainText(/held/i);
 });
 
 test("the deployed instance has no Admin, and says so", async ({ request }) => {

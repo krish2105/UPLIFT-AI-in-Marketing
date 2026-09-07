@@ -63,10 +63,12 @@ rules the system applies cannot drift apart.</td>
 | **API** | **https://mawsim-api.onrender.com** — [`/docs`](https://mawsim-api.onrender.com/docs) · [`/healthz`](https://mawsim-api.onrender.com/healthz) |
 | **Verify it** | `LIVE_API_URL=https://mawsim-api.onrender.com LIVE_WEB_URL=https://uplift-mawsim.vercel.app make smoke-live` |
 
-All fifteen tabs serve measured data. The six live checks pass: the API
+All fifteen tabs serve measured data. The seven live checks pass: the API
 answers, no dataset is empty, the page carries the disclaimer, the web app
-reaches the API across origins, every tab is present, and the Security tab
-carries the red-team result rather than the scorecard alone.
+reaches the API across origins, every tab is present, the Security tab carries
+the red-team result rather than the scorecard alone, and the instance grants no
+Admin — fail-closed asserted against the real URL rather than inferred from the
+code.
 
 **The API sleeps after fifteen minutes idle**, so the first request after a
 quiet period takes about fifty seconds while the free instance wakes. For a
@@ -163,7 +165,7 @@ the rules on purpose.</td>
 | No agent can reach the outside world | `pytest tests/invariants` | every route is a GET; the crew's side-effects column is `none` on every row |
 | Retrieval answers what it can and refuses what it cannot | `python scripts/spike_retrieval.py` | **6/8** in-domain answered, **10/10** out-of-domain refused — [`C2`](docs/results/C2-retrieval.json) |
 | The 3D scene holds its frame budget | `npx playwright test frames.spec.ts` | median **60 fps**, 95th percentile 30 — [`D1`](docs/results/D1-frames.json) |
-| The deployed pair is what it claims to be | `python scripts/verify_deploy.py` | 6/6 checks — [`A12`](docs/results/A12-deploy.json) |
+| The deployed pair is what it claims to be | `python scripts/verify_deploy.py` | 8/8 checks, including that the live instance grants no Admin — [`A12`](docs/results/A12-deploy.json) |
 | The safety claims survive being attacked | `python scripts/red_team.py` | 48 attacks, 7 controls, **48 held** — including 11 against the capability token that replaced the forgeable header — [`E1`](docs/results/E1-red-team.json) |
 | A privileged role is proved, not claimed | `pytest tests/security` | signed tokens; role, expiry, signature and revocation all attacked — 26 cases |
 | Provider spend stays at zero | `pytest tests/core/test_llm.py` | Anthropic reports itself unavailable with a key set; the chain ends in a deterministic stub |

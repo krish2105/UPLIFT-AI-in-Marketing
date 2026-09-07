@@ -1,7 +1,7 @@
 {
   "task": "A12-deploy",
   "generated_by": "scripts/verify_deploy.py",
-  "generated_at": "2026-09-07T11:14:04+00:00",
+  "generated_at": "2026-09-07T11:40:44+00:00",
   "api": "https://mawsim-api.onrender.com",
   "web": "https://uplift-mawsim.vercel.app",
   "host_api": "Render free web service, region singapore",
@@ -30,7 +30,17 @@
     {
       "check": "the red-team result reached the deployed instance",
       "held": true,
-      "detail": "36/37 held"
+      "detail": "48/48 held"
+    },
+    {
+      "check": "the deployed instance grants no Admin",
+      "held": true,
+      "detail": "admin available: False"
+    },
+    {
+      "check": "the retired role header grants nothing",
+      "held": true,
+      "detail": "HTTP 403"
     },
     {
       "check": "the web app answers",
@@ -38,8 +48,8 @@
       "detail": "HTTP 200"
     }
   ],
-  "held": 6,
-  "total": 6,
+  "held": 8,
+  "total": 8,
   "datasets_loaded": {
     "weather_hourly": 72192,
     "calendar_days": 1161,
