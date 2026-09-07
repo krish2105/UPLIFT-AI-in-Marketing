@@ -124,6 +124,13 @@ def trading_mask(zone: str, hours: np.ndarray) -> np.ndarray:
 def predict(models: dict, df: pd.DataFrame, zone: str | None = None) -> pd.DataFrame:
     x = df[list(FEATURES)].to_numpy(dtype=float)
     out = pd.DataFrame({"ts": df["ts"].to_numpy()})
+    # Carried through so a consumer can show the weather the forecast ASSUMED
+    # rather than joining to an observation table that necessarily stops before
+    # the horizon begins. Beyond the 16-day provider window these are the
+    # climatology the forward frame filled in, and the payload says so.
+    for col in ("apparent_c", "temp_c", "event_pull"):
+        if col in df.columns:
+            out[col] = df[col].to_numpy()
     # Demand cannot be negative, and a quantile model will happily say it is.
     out["yhat"] = np.maximum(0, models["median"].predict(x))
     out["lo"] = np.maximum(0, models["lo"].predict(x))

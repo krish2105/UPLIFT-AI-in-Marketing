@@ -1,7 +1,7 @@
 {
   "task": "B4-uplift",
   "generated_by": "scripts/run_phase_b.py",
-  "generated_at": "2026-09-07T09:01:53+00:00",
+  "generated_at": "2026-09-07T09:46:27+00:00",
   "method": "Synthetic control with non-negative weights summing to one, fitted on 56 pre-period days; CUPED variance reduction; a permutation placebo across donor sites for the p-value; and a placebo-in-time run for the estimator's own bias.",
   "tolerance_points": 5.0,
   "recovery": [

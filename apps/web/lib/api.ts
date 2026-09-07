@@ -360,6 +360,42 @@ export type AskResponse = {
   corpus_size: number;
 };
 
+export type TerrainDay = { date: string; yhat: number; lo: number; hi: number };
+
+export type TerrainLane = {
+  zone: string;
+  name: string;
+  lat: number;
+  lon: number;
+  outdoor_share: number;
+  days: TerrainDay[];
+};
+
+export type TerrainBand = {
+  event_id: string;
+  title: string;
+  category: string;
+  start: string;
+  end: string;
+  scale: string;
+  weight: number;
+  venue: string;
+  curated: boolean;
+};
+
+export type TerrainResponse = {
+  horizon: string[];
+  days: number;
+  lanes: TerrainLane[];
+  bands: TerrainBand[];
+  ribbon: { date: string; apparent_c: number }[];
+  calendar: { date: string; holiday: string | null; ramadan: boolean; school_break: boolean }[];
+  simulated: boolean;
+  note: string;
+  ribbon_note: string;
+  calendar_note: string;
+};
+
 export const api = {
   zones: () => get<ZonesResponse>("/data/zones"),
   freshness: () => get<Freshness>("/data/freshness"),
@@ -380,6 +416,7 @@ export const api = {
   crew: () => get<CrewResponse>("/crew"),
   security: () => get<SecurityResponse>("/security"),
   ask: (q: string, k = 4) => get<AskResponse>(`/ask?q=${encodeURIComponent(q)}&k=${k}`),
+  terrain: (days = 56) => get<TerrainResponse>(`/marketing/terrain?days=${days}`),
 };
 
 /** Fetch without throwing, so a page can render an honest "API unreachable"

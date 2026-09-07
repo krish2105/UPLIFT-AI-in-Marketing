@@ -1,7 +1,7 @@
 {
   "task": "B3-allocator",
   "generated_by": "scripts/run_phase_b.py",
-  "generated_at": "2026-09-07T09:01:53+00:00",
+  "generated_at": "2026-09-07T09:46:27+00:00",
   "method": "Fifteen cells — five channels by three dayparts — each with a saturating response a(1-exp(-bx)). The objective is concave, so greedy marginal allocation reaches the exact optimum and the KKT condition (equal marginal return across funded cells) is checkable.",
   "daypart_demand_90d": {
     "evening": 242655,

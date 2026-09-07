@@ -191,3 +191,150 @@ def get_uplift(
         "note_on_bias": payload["note_on_bias"],
         "simulated": True,
     }
+
+
+@router.get("/terrain", summary="Everything the 3D season view draws, in one call")
+def terrain(
+    conn: sqlite3.Connection = Depends(db),
+    days: int = Query(56, ge=7, le=56),
+) -> dict:
+    """One payload, because the scene must not draw from four half-loaded fetches.
+
+    A terrain that renders its blocks before its event bands arrive shows a
+    reader a demand landscape with no reason attached to it, which is worse than
+    an empty frame — so the view waits for this and draws once.
+
+    The interval travels per day as [lo, hi] rather than as a single number. The
+    cap on each block IS that interval, and a block whose forecast is uncertain
+    has to look uncertain; a symmetric plus-or-minus would flatten exactly the
+    asymmetry that matters at the low end, where demand is bounded by zero.
+    """
+    brand = load_brand()
+    zones = [z.code for z in brand.zones]
+    forward = _forward_all()
+
+    # Hourly to daily. The interval does not sum: adding 24 hourly bands assumes
+    # every hour misses in the same direction at once. Variances add, so the
+    # half-widths combine in quadrature.
+    lanes = []
+    for code in zones:
+        by_day: dict[str, dict[str, float]] = {}
+        for row in forward.get(code, []):
+            d = row["ts"][:10]
+            cur = by_day.setdefault(d, {"yhat": 0.0, "half_sq": 0.0})
+            cur["yhat"] += row["yhat"]
+            half = (row["hi"] - row["lo"]) / 2
+            cur["half_sq"] += half * half
+        z = brand.zone(code)
+        days_out = []
+        for d, v in sorted(by_day.items())[:days]:
+            half = v["half_sq"] ** 0.5
+            days_out.append(
+                {
+                    "date": d,
+                    "yhat": round(v["yhat"], 1),
+                    "lo": round(max(0.0, v["yhat"] - half), 1),
+                    "hi": round(v["yhat"] + half, 1),
+                }
+            )
+        lanes.append(
+            {
+                "zone": code,
+                "name": z.name,
+                "lat": z.lat,
+                "lon": z.lon,
+                "outdoor_share": round(z.outdoor_share, 3),
+                "days": days_out,
+            }
+        )
+
+    horizon = [d["date"] for d in lanes[0]["days"]] if lanes else []
+    start, end = (horizon[0], horizon[-1]) if horizon else (None, None)
+
+    # Event bands cross every lane at once, which is what makes them bands
+    # rather than per-site marks.
+    bands = (
+        [
+            {
+                "event_id": r["event_id"],
+                "title": r["title"],
+                "category": r["category"],
+                "start": r["start_date"],
+                "end": r["end_date"],
+                "scale": r["scale"],
+                "weight": r["scale_weight"],
+                "venue": r["venue_name"],
+                "curated": True,
+            }
+            for r in conn.execute(
+                "SELECT event_id, title, category, start_date, end_date, scale, scale_weight, "
+                "venue_name FROM events WHERE end_date >= ? AND start_date <= ? "
+                "ORDER BY scale_weight DESC, start_date LIMIT 24",
+                (start, end),
+            )
+        ]
+        if horizon
+        else []
+    )
+
+    # The weather ribbon runs along the ground plane, one value per day, taken
+    # at the evening hours because that is when the terrace decision is made.
+    #
+    # It comes from the FORECAST's own assumed weather, not from the observation
+    # table. Observations necessarily stop before the horizon begins — the first
+    # version joined to them and returned an empty ribbon for every future day —
+    # and showing a reader a different weather series from the one the model
+    # used would be worse than showing none.
+    ribbon_acc: dict[str, list[float]] = {}
+    for row in forward.get("DXB-MAR", []):
+        hour = int(row["ts"][11:13])
+        if 17 <= hour <= 22 and row.get("apparent_c") is not None:
+            ribbon_acc.setdefault(row["ts"][:10], []).append(row["apparent_c"])
+    ribbon = [
+        {"date": d, "apparent_c": round(sum(v) / len(v), 1)}
+        for d, v in sorted(ribbon_acc.items())[:days]
+    ]
+
+    calendar = (
+        [
+            {
+                "date": r["date_local"],
+                "holiday": r["holiday_name"],
+                "ramadan": bool(r["is_ramadan"]),
+                "school_break": bool(r["is_school_break"]),
+            }
+            for r in conn.execute(
+                "SELECT date_local, holiday_name, is_ramadan, is_school_break FROM calendar_days "
+                "WHERE date_local BETWEEN ? AND ? AND "
+                "(is_public_holiday = 1 OR is_ramadan = 1 OR is_school_break = 1) ORDER BY 1",
+                (start, end),
+            )
+        ]
+        if horizon
+        else []
+    )
+
+    return {
+        "horizon": horizon,
+        "days": len(horizon),
+        "lanes": lanes,
+        "bands": bands,
+        "ribbon": ribbon,
+        "calendar": calendar,
+        "simulated": True,
+        "note": (
+            "The cap on each block is its 80% prediction interval, so a forecast that is "
+            "uncertain looks uncertain. Daily intervals combine in quadrature rather than "
+            "summing: adding 24 hourly bands would assume every hour misses in the same "
+            "direction at once."
+        ),
+        "ribbon_note": (
+            "Evening apparent temperature as the forecast assumed it — the provider's "
+            "16-day window, then climatology. Not the observation table, which stops "
+            "before the horizon begins."
+        ),
+        "calendar_note": (
+            "Public holidays, Ramadan days and school breaks falling inside the horizon. "
+            "An empty list is a real answer: this window may simply contain none."
+        ),
+    }
