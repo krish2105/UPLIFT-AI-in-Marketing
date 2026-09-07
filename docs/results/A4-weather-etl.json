@@ -1,0 +1,62 @@
+{
+  "task": "A4-weather-etl",
+  "dataset": "weather_hourly",
+  "generated_by": "pipeline/weather.py --verify",
+  "generated_at": "2026-09-07T07:05:49+00:00",
+  "pass": true,
+  "stats": {
+    "rows_total": 72192,
+    "rows_per_zone": {
+      "DXB-DEI": 18048,
+      "DXB-DTN": 18048,
+      "DXB-MAR": 18048,
+      "DXB-MOE": 18048
+    },
+    "span_local": [
+      "2024-09-01T00:00",
+      "2026-09-22T23:00"
+    ],
+    "sources": {
+      "archive": 69984,
+      "forecast": 2208
+    },
+    "gaps_over_3h": {
+      "DXB-DEI": 0,
+      "DXB-DTN": 0,
+      "DXB-MAR": 0,
+      "DXB-MOE": 0
+    },
+    "null_temperatures": 0,
+    "temp_range_c": [
+      11.0,
+      47.6
+    ]
+  },
+  "checks": [
+    {
+      "name": "all four zones present",
+      "pass": true,
+      "detail": "have ['DXB-DEI', 'DXB-DTN', 'DXB-MAR', 'DXB-MOE']"
+    },
+    {
+      "name": "at least 17000 hours per zone",
+      "pass": true,
+      "detail": "min 18048"
+    },
+    {
+      "name": "no gap longer than 3 hours",
+      "pass": true,
+      "detail": "{'DXB-DEI': 0, 'DXB-DTN': 0, 'DXB-MAR': 0, 'DXB-MOE': 0}"
+    },
+    {
+      "name": "no null temperatures",
+      "pass": true,
+      "detail": "0 null rows"
+    },
+    {
+      "name": "temperatures are plausible for Dubai",
+      "pass": true,
+      "detail": "11.0C to 47.6C"
+    }
+  ]
+}
