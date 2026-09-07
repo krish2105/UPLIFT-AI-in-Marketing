@@ -78,24 +78,36 @@ test("the deployed instance carries the red-team result, not just the scorecard"
   ).toContainText(/held/i);
 });
 
-test("the deployed instance has no Admin, and says so", async ({ request }) => {
-  /* Fail-closed, checked in production rather than assumed from the code.
-     No signing secret is set on the public instance, so the capability is
-     ABSENT rather than open — and the endpoint that used to grant it with a
-     header now refuses. A deployment that quietly acquired a secret, or one
-     where the header still worked, both show up here. */
+test("no caller without a token can reach Admin on the deployed instance", async ({
+  request,
+}) => {
+  /* The claim that must hold whether or not a signing secret is configured.
+     An earlier version asserted `admin_available_on_this_instance === false`,
+     which was really asserting that nobody had enabled the feature yet — so it
+     would have failed the moment the operator did, reporting a deliberate
+     configuration change as a regression. What is actually security-relevant is
+     that an ANONYMOUS caller gets nothing, and that the retired header — the
+     string that engaged the kill switch on this very URL — still gets nothing.
+     Both are true in either state. The mode itself is recorded, not asserted. */
   const roles = await request.get(`${API}/admin/roles`, { timeout: 120_000 });
   expect(roles.status()).toBe(200);
   const body = await roles.json();
   expect(body.you_are).toBe("viewer");
-  expect(body.admin_available_on_this_instance).toBe(false);
+  expect(body.authenticated).toBe(false);
+  console.log(`admin configured on this instance: ${body.admin_available_on_this_instance}`);
+
+  const anonymous = await request.get(`${API}/admin/killswitch/engage?reason=live+probe`, {
+    timeout: 120_000,
+  });
+  expect(anonymous.status()).toBe(403);
 
   const forged = await request.get(`${API}/admin/killswitch/engage?reason=live+probe`, {
     headers: { "X-Mawsim-Role": "ADMIN " },
     timeout: 120_000,
   });
   expect(forged.status()).toBe(403);
-  expect((await request.get(`${API}/admin/killswitch`)).json()).resolves.toMatchObject({
-    engaged: false,
-  });
+
+  // Nothing above may have moved the latch.
+  const latch = await request.get(`${API}/admin/killswitch`, { timeout: 120_000 });
+  expect((await latch.json()).engaged).toBe(false);
 });

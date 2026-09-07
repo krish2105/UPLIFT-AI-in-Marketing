@@ -68,6 +68,13 @@ services:
       # so a mismatch renders the app's honest "API unreachable" state, which
       # reads as a design decision rather than as a misconfiguration. The live
       # smoke test checks for exactly that string for the same reason.
+      # The Admin capability. Absent unless this is set, and set in the dashboard
+      # rather than here — a value in the repo is a value in every clone. With
+      # no secret there is no Admin at all, which is the correct default for a
+      # public URL: the capability is missing rather than open, and /admin/roles
+      # says which. See docs/deploy.md to enable it.
+      - key: UPLIFT_SIGNING_SECRET
+        sync: false
       - key: CORS_ORIGINS
         value: https://uplift-mawsim.vercel.app,https://uplift-mawsim-krishnamathur008-1499s-projects.vercel.app,https://uplift-mawsim-git-main-krishnamathur008-1499s-projects.vercel.app
       # Requests, not tokens. Free tiers do not return trustworthy token

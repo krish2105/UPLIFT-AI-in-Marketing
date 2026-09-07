@@ -32,6 +32,17 @@ WEB = os.environ.get("LIVE_WEB_URL", "https://uplift-mawsim.vercel.app")
 TIMEOUT = 120
 
 
+def get_with(url: str, headers: dict[str, str]) -> tuple[int, str]:
+    req = urllib.request.Request(url, headers=headers)  # noqa: S310
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:  # noqa: S310
+            return r.status, r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        return e.code, ""
+    except Exception as e:  # noqa: BLE001
+        return 0, str(e)
+
+
 def get(url: str) -> tuple[int, str]:
     try:
         with urllib.request.urlopen(url, timeout=TIMEOUT) as r:  # noqa: S310
@@ -84,18 +95,30 @@ def main() -> int:
 
     status, body = get(f"{API}/admin/roles")
     roles = json.loads(body) if status == 200 and body else {}
+    # Whether Admin is CONFIGURED is an operator decision and is recorded, not
+    # asserted — an earlier version required it to be absent, which would have
+    # reported the operator enabling it as a failed deployment. What is asserted
+    # is that nobody reaches it without a token.
     record(
-        "the deployed instance grants no Admin",
-        roles.get("admin_available_on_this_instance") is False and roles.get("you_are") == "viewer",
-        f"admin available: {roles.get('admin_available_on_this_instance')}",
+        "an anonymous caller is a Viewer",
+        roles.get("you_are") == "viewer" and roles.get("authenticated") is False,
+        f"you_are={roles.get('you_are')}, admin configured={roles.get('admin_available_on_this_instance')}",
     )
 
-    # The string that used to engage the kill switch on this very URL.
     status, _ = get(f"{API}/admin/killswitch/engage?reason=deploy+probe")
+    record("an anonymous caller cannot engage the kill switch", status == 403, f"HTTP {status}")
+
+    # The exact string that engaged it on this URL before roles were signed.
+    status, _ = get_with(
+        f"{API}/admin/killswitch/engage?reason=deploy+probe", {"X-Mawsim-Role": "ADMIN "}
+    )
+    record("the retired role header grants nothing", status == 403, f"HTTP {status}")
+
+    status, body = get(f"{API}/admin/killswitch")
     record(
-        "the retired role header grants nothing",
-        status == 403,
-        f"HTTP {status}",
+        "and none of that moved the latch",
+        status == 200 and json.loads(body).get("engaged") is False,
+        f"engaged: {json.loads(body).get('engaged') if body else '?'}",
     )
 
     status, _ = get(WEB)
@@ -103,6 +126,7 @@ def main() -> int:
 
     payload = {
         "task": "A12-deploy",
+        "admin_configured": roles.get("admin_available_on_this_instance"),
         "generated_by": "scripts/verify_deploy.py",
         "generated_at": now_iso(),
         "api": API,

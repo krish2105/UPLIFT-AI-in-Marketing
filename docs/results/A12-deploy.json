@@ -1,7 +1,8 @@
 {
   "task": "A12-deploy",
+  "admin_configured": false,
   "generated_by": "scripts/verify_deploy.py",
-  "generated_at": "2026-09-07T11:40:44+00:00",
+  "generated_at": "2026-09-07T11:50:46+00:00",
   "api": "https://mawsim-api.onrender.com",
   "web": "https://uplift-mawsim.vercel.app",
   "host_api": "Render free web service, region singapore",
@@ -33,9 +34,14 @@
       "detail": "48/48 held"
     },
     {
-      "check": "the deployed instance grants no Admin",
+      "check": "an anonymous caller is a Viewer",
       "held": true,
-      "detail": "admin available: False"
+      "detail": "you_are=viewer, admin configured=False"
+    },
+    {
+      "check": "an anonymous caller cannot engage the kill switch",
+      "held": true,
+      "detail": "HTTP 403"
     },
     {
       "check": "the retired role header grants nothing",
@@ -43,13 +49,18 @@
       "detail": "HTTP 403"
     },
     {
+      "check": "and none of that moved the latch",
+      "held": true,
+      "detail": "engaged: False"
+    },
+    {
       "check": "the web app answers",
       "held": true,
       "detail": "HTTP 200"
     }
   ],
-  "held": 8,
-  "total": 8,
+  "held": 10,
+  "total": 10,
   "datasets_loaded": {
     "weather_hourly": 72192,
     "calendar_days": 1161,
