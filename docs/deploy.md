@@ -79,11 +79,13 @@ application, and no agent in the crew has a tool that reaches the outside world.
 
 ## Enabling Admin on a deployed instance
 
-The live instance has **no signing secret**, so it has no Admin role. That is the
-intended state for a public URL: the capability is absent rather than open, and
-`/admin/roles` says so rather than implying a control that is not there.
+An instance with no signing secret has no Admin role. That is the safe default
+for a public URL — the capability is absent rather than open — and
+`/admin/roles` reports which state a given instance is in rather than leaving a
+document to go stale about it.
 
-Two commands enable it, and neither puts the secret in this repository.
+Enabling it takes one generated value and one dashboard field, and neither puts
+the secret in this repository.
 
 Generate one — 64 hex characters from the OS CSPRNG, printed once and stored
 nowhere by this project:
@@ -93,8 +95,14 @@ uv run python scripts/mint_token.py --new-secret
 ```
 
 Set it as `UPLIFT_SIGNING_SECRET` in the Render dashboard (Environment → Add
-Environment Variable), which restarts the service. Then mint a token locally
-with the *same* secret exported, and use it:
+Environment Variable), which restarts the service.
+
+**Paste it; do not pipe it through anything that keeps a transcript.** A chat
+log, a CI log and a shell history are all durable copies you did not choose to
+make. The value belongs in exactly two places: the dashboard, and wherever you
+keep credentials.
+
+Then mint a token locally with the *same* secret exported, and use it:
 
 ```bash
 export UPLIFT_SIGNING_SECRET=<the value you just set on Render>

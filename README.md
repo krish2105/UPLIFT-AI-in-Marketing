@@ -237,10 +237,13 @@ Stated here rather than discovered by a reader.
   tell its holder from its owner. Lifetimes default to eight hours and
   `/admin/tokens/revoke` refuses an id immediately, though that set is process
   memory and clears on restart.
-- **The live instance has no Admin.** No signing secret is set there, so the
-  capability is absent rather than open — which also means the kill switch
-  cannot be demonstrated against the public URL. Enabling it is two commands in
-  [`docs/deploy.md`](docs/deploy.md).
+- **Whether the live instance has an Admin is a deployment choice.** With no
+  signing secret configured the capability is absent rather than open, and the
+  kill switch cannot be demonstrated against the public URL;
+  [`/admin/roles`](https://mawsim-api.onrender.com/admin/roles) answers which
+  state the instance is actually in rather than leaving this paragraph to go
+  stale. Either way an anonymous caller is a Viewer, and the live checks assert
+  that rather than asserting the mode.
 - **The persona panel is not customer research.** It applies a rubric; it does
   not observe a reaction.
 - **Ask retrieves, it does not generate.** BM25 over the project's own corpus,
