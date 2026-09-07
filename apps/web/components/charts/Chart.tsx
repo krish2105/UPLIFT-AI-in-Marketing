@@ -21,19 +21,26 @@
 
 import { useId, useMemo, useState } from "react";
 
+/* ALMANAC HAS NO PER-SITE COLOUR, DELIBERATELY.
+ *
+ * Colour means temperature here. Giving four sites four hues would spend the
+ * palette on identity and leave nothing to say "hot" with, and would need four
+ * colours that survive a colour-vision check. Sites are drawn as SMALL
+ * MULTIPLES instead — one card each, one shared scale, one forecast blue — so
+ * identity comes from position and label. apps/web/scripts/check-palette.mjs
+ * fails if a --zone-* token ever appears.
+ *
+ * It is also the better comparison. Four sparklines on a shared scale are read
+ * against each other; four overlaid lines are read against whichever is on top.
+ *
+ * Dayparts keep a ramp position rather than a hue: morning is the cool end of
+ * the thermal ramp and evening the warm end, which is both true and consistent
+ * with the one rule.
+ */
 export const DAYPART_TOKEN: Record<string, string> = {
-  morning: "--dp-morning",
-  midday: "--dp-midday",
-  evening: "--dp-evening",
-};
-
-/** Zone series colours. Assigned in a FIXED order and never cycled, so a
- *  filter that removes a zone does not repaint the survivors. */
-export const ZONE_TOKEN: Record<string, string> = {
-  "DXB-MAR": "--dp-evening",
-  "DXB-DTN": "--dp-morning",
-  "DXB-MOE": "--dp-midday",
-  "DXB-DEI": "--sig-actual",
+  morning: "--heat-1",
+  midday: "--heat-3",
+  evening: "--heat-5",
 };
 
 export function fmt(n: number): string {
@@ -78,6 +85,7 @@ export function LineChart({
   caption,
   yLabel,
   band,
+  bandPoints,
   xTicks,
   height = FRAME.h,
 }: {
@@ -86,6 +94,9 @@ export function LineChart({
   yLabel: string;
   /** Optional symmetric interval as a fraction of y, drawn behind the lines. */
   band?: number;
+  /** An explicit [lo, hi] per point — what a quantile model actually produces.
+   *  Takes precedence over `band`, which only exists for illustrative bands. */
+  bandPoints?: [number, number][];
   xTicks?: { at: number; label: string }[];
   height?: number;
 }) {
@@ -97,7 +108,7 @@ export function LineChart({
   const h = height;
   const xs = series.flatMap((s) => s.points.map((p) => p.x));
   const ys = series.flatMap((s) => s.points.map((p) => p.y));
-  const yMax = Math.max(...ys, 1) * 1.08;
+  const yMax = Math.max(...ys, ...(bandPoints?.map((b) => b[1]) ?? []), 1) * 1.08;
   const x = scale([Math.min(...xs), Math.max(...xs)], [pad.l, w - pad.r]);
   const y = scale([0, yMax], [h - pad.b, pad.t]);
 
@@ -142,7 +153,18 @@ export function LineChart({
         ))}
 
         {/* the interval band, behind everything */}
-        {band !== undefined &&
+        {bandPoints && (
+          <polygon
+            fill="var(--sig-forecast)"
+            opacity="0.18"
+            points={[
+              ...bandPoints.map((b, i) => `${x(series[0].points[i].x)},${y(b[1])}`),
+              ...[...bandPoints].reverse().map((b, i) =>
+                `${x(series[0].points[bandPoints.length - 1 - i].x)},${y(b[0])}`),
+            ].join(" ")}
+          />
+        )}
+        {bandPoints === undefined && band !== undefined &&
           series.map((s) => (
             <polygon
               key={`${id}-${s.key}-band`}

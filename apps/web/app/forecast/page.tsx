@@ -1,23 +1,26 @@
-"use client";
-
 import { PageHead } from "@/components/PageHead";
-import { Scaffold } from "@/components/Scaffold";
-import { useLocale } from "@/components/LocaleProvider";
+import { ApiDown } from "@/components/ApiDown";
+import { ForecastView } from "@/components/views/ForecastView";
+import { api, tryFetch } from "@/lib/api";
 
-export default function Page() {
-  const { t } = useLocale();
+export const revalidate = 60;
+
+export default async function ForecastPage() {
+  const [f, z] = await Promise.all([
+    tryFetch(() => api.forecast("?horizon=28")),
+    tryFetch(api.zones),
+  ]);
+  if ("error" in f || "error" in z) {
+    return <ApiDown eyebrow="Plan" title="Forecast" detail={"error" in f ? f.error : ""} />;
+  }
   return (
     <div className="page">
-      <PageHead eyebrow={t("group.plan")} title={t("tab.forecast")} lede="Eight weeks of demand per site, with the drivers that moved it." />
-      <Scaffold
-        phase="B"
-        will={[
-          "Gradient-boosted hourly forecast per site, 56 days ahead, with an 80% prediction interval",
-          "Win rate against a seasonal-naive baseline, reported per week — the model is not used if it loses",
-          "Driver attribution: event proximity, apparent temperature against outdoor share, Ramadan, school break",
-        ]}
-        from="footfall_hourly joined to weather_hourly, calendar_days and events"
+      <PageHead
+        eyebrow="Plan"
+        title="Forecast"
+        lede="Hourly demand per site, and the baseline it has to beat. A forecast that loses to “the same hour last week” is worse than no forecast, because it looks like knowledge."
       />
+      <ForecastView forecast={f.data} zones={z.data.zones} />
     </div>
   );
 }

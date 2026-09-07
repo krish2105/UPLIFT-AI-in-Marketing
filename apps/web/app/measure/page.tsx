@@ -1,23 +1,21 @@
-"use client";
-
 import { PageHead } from "@/components/PageHead";
-import { Scaffold } from "@/components/Scaffold";
-import { useLocale } from "@/components/LocaleProvider";
+import { ApiDown } from "@/components/ApiDown";
+import { MeasureView } from "@/components/views/MeasureView";
+import { api, tryFetch } from "@/lib/api";
 
-export default function Page() {
-  const { t } = useLocale();
+export const revalidate = 60;
+
+export default async function MeasurePage() {
+  const u = await tryFetch(() => api.uplift());
+  if ("error" in u) return <ApiDown eyebrow="Prove" title="Measure" detail={u.error} />;
   return (
     <div className="page">
-      <PageHead eyebrow={t("group.prove")} title={t("tab.measure")} lede="Incremental lift, not clicks." />
-      <Scaffold
-        phase="B"
-        will={[
-          "Synthetic control per promo window, built from comparable non-promo days and sites",
-          "CUPED variance reduction using pre-period footfall as the covariate",
-          "Lift reported with a confidence interval; an injected +20% must be recovered within 5 points",
-        ]}
-        from="footfall_hourly and the Phase B plan"
+      <PageHead
+        eyebrow="Prove"
+        title="Measure"
+        lede="Incremental lift, not clicks. A promotion runs in a week; comparing that week to the last one attributes the weather, the school holiday and the festival two kilometres away to the promotion."
       />
+      <MeasureView data={u.data} />
     </div>
   );
 }

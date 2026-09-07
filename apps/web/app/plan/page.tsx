@@ -1,23 +1,21 @@
-"use client";
-
 import { PageHead } from "@/components/PageHead";
-import { Scaffold } from "@/components/Scaffold";
-import { useLocale } from "@/components/LocaleProvider";
+import { ApiDown } from "@/components/ApiDown";
+import { PlanView } from "@/components/views/PlanView";
+import { api, tryFetch } from "@/lib/api";
 
-export default function Page() {
-  const { t } = useLocale();
+export const revalidate = 60;
+
+export default async function PlanPage() {
+  const a = await tryFetch(() => api.allocator(12000));
+  if ("error" in a) return <ApiDown eyebrow="Plan" title="Plan" detail={a.error} />;
   return (
     <div className="page">
-      <PageHead eyebrow={t("group.plan")} title={t("tab.plan")} lede="A promo calendar sized to the forecast's lower bound, and a budget split." />
-      <Scaffold
-        phase="B"
-        will={[
-          "Calendar builder over the 56-day horizon, with event and weather bands",
-          "Budget allocator over channel x daypart — 5 channels, 3 dayparts, 15 cells on a simplex",
-          "What-if sliders: allocation always sums to budget and is monotone in ROI",
-        ]}
-        from="the Phase B forecast and convex response curves per cell"
+      <PageHead
+        eyebrow="Plan"
+        title="Plan"
+        lede="Budget across five channels and three dayparts. Fifteen cells, a concave objective, and an optimum you can check rather than trust."
       />
+      <PlanView initial={a.data} />
     </div>
   );
 }

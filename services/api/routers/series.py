@@ -11,6 +11,7 @@ from __future__ import annotations
 import sqlite3
 from datetime import date, timedelta
 
+import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from services.api.brand import load_brand
@@ -156,3 +157,112 @@ def weather_response(
         ),
         "simulated": True,
     }
+
+
+@router.get("/station", summary="The current station reading for a site")
+def station(
+    conn: sqlite3.Connection = Depends(db),
+    zone: str = Query("DXB-MAR"),
+) -> dict:
+    """Everything the station strip prints, in one call.
+
+    The demand index is the site's next 24 hours against its own trailing
+    28-day median for the same hours — a ratio to itself, so a small site and a
+    large one are comparable, and so the number means "busier than usual here"
+    rather than "busier than the other sites".
+    """
+    _require_zone(zone)
+
+    latest = (
+        conn.execute(
+            "SELECT ts_local, temp_c, humidity, wind_kmh FROM weather_hourly "
+            "WHERE zone_code = ? AND ts_local >= datetime('now') ORDER BY ts_local LIMIT 1",
+            (zone,),
+        ).fetchone()
+        or conn.execute(
+            "SELECT ts_local, temp_c, humidity, wind_kmh FROM weather_hourly "
+            "WHERE zone_code = ? ORDER BY ts_local DESC LIMIT 1",
+            (zone,),
+        ).fetchone()
+    )
+
+    recent = (
+        conn.execute(
+            "SELECT AVG(footfall) a FROM footfall_hourly WHERE zone_code = ? "
+            "AND substr(ts_local,1,10) >= date((SELECT MAX(substr(ts_local,1,10)) "
+            "FROM footfall_hourly), '-7 day')",
+            (zone,),
+        ).fetchone()["a"]
+        or 0.0
+    )
+    trailing = (
+        conn.execute(
+            "SELECT AVG(footfall) a FROM footfall_hourly WHERE zone_code = ? "
+            "AND substr(ts_local,1,10) >= date((SELECT MAX(substr(ts_local,1,10)) "
+            "FROM footfall_hourly), '-35 day') "
+            "AND substr(ts_local,1,10) < date((SELECT MAX(substr(ts_local,1,10)) "
+            "FROM footfall_hourly), '-7 day')",
+            (zone,),
+        ).fetchone()["a"]
+        or 1.0
+    )
+
+    index = recent / trailing if trailing else 1.0
+
+    # The interval width is the dispersion of that ratio across the last eight
+    # weeks — not a model output, and labelled as an observed spread.
+    weekly = [
+        r["a"]
+        for r in conn.execute(
+            "SELECT AVG(footfall) a FROM footfall_hourly WHERE zone_code = ? "
+            "GROUP BY strftime('%Y-%W', ts_local) ORDER BY 1 DESC LIMIT 8",
+            (zone,),
+        )
+    ]
+    spread = float(np.std(weekly) / np.mean(weekly)) if len(weekly) > 1 and np.mean(weekly) else 0.1
+
+    hijri = conn.execute(
+        "SELECT is_ramadan, ramadan_day FROM calendar_days WHERE date_local = date('now')"
+    ).fetchone()
+
+    return {
+        "zone": zone,
+        "ts": latest["ts_local"] if latest else None,
+        "temp_c": round(latest["temp_c"], 1) if latest else None,
+        "humidity": round(latest["humidity"], 0) if latest else None,
+        "wind_kmh": round(latest["wind_kmh"], 1) if latest else None,
+        "hijri": _hijri_today(),
+        "ramadan_day": hijri["ramadan_day"] if hijri and hijri["is_ramadan"] else None,
+        "index": round(index, 2),
+        "pi": round(spread, 2),
+        "simulated": True,
+    }
+
+
+def _hijri_today() -> str:
+    """Today in the Hijri calendar, for the station strip.
+
+    Calculated from the Umm al-Qura tabular calendar, which can differ from a
+    sighting by a day — the same caveat the calendar pipeline carries.
+    """
+    from datetime import date
+
+    from hijridate import Gregorian
+
+    months = [
+        "Muharram",
+        "Safar",
+        "Rabi' I",
+        "Rabi' II",
+        "Jumada I",
+        "Jumada II",
+        "Rajab",
+        "Sha'ban",
+        "Ramadan",
+        "Shawwal",
+        "Dhu al-Qi'dah",
+        "Dhu al-Hijjah",
+    ]
+    t = date.today()
+    h = Gregorian(t.year, t.month, t.day).to_hijri()
+    return f"{h.day} {months[h.month - 1]} {h.year}"

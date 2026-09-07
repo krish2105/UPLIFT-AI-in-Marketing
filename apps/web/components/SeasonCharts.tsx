@@ -1,6 +1,7 @@
 "use client";
 
-import { LineChart, GroupedBars, ResponseChart, StatTile, ZONE_TOKEN, DAYPART_TOKEN, fmt } from "@/components/charts/Chart";
+import { GroupedBars, ResponseChart, StatTile, DAYPART_TOKEN, fmt } from "@/components/charts/Chart";
+import { SparkGrid, type Spark } from "@/components/charts/SparkCard";
 import type { DaypartResponse, FootfallResponse, WeatherResponse, Zone } from "@/lib/api";
 
 /* The charts on the Season tab.
@@ -25,23 +26,30 @@ export function SeasonCharts({
 }) {
   const name = Object.fromEntries(zones.map((z) => [z.code, z.name]));
 
-  const dates = footfall.series[ZONE_ORDER[0]]?.map((p) => p.t) ?? [];
-  const lineSeries = ZONE_ORDER.filter((z) => footfall.series[z]).map((z) => ({
-    key: z,
-    label: name[z] ?? z,
-    token: ZONE_TOKEN[z],
-    points: footfall.series[z].map((p, i) => ({ x: i, y: p.footfall })),
+  const sparks: Spark[] = ZONE_ORDER.filter((z) => footfall.series[z]).map((z) => ({
+    code: z,
+    name: name[z] ?? z,
+    points: footfall.series[z].map((p) => p.footfall),
+    detail: zones.find((x) => x.code === z)?.character,
   }));
-  const xTicks = dates
-    .map((d, i) => ({ at: i, label: d.slice(5) }))
-    .filter((_, i) => i % Math.ceil(dates.length / 6) === 0);
 
-  const responseSeries = ZONE_ORDER.filter((z) => weather.by_zone[z]).map((z) => ({
-    key: z,
-    label: `${name[z] ?? z} · ${Math.round((weather.outdoor_share[z] ?? 0) * 100)}% outdoor`,
-    token: ZONE_TOKEN[z],
-    points: weather.by_zone[z].map((p) => ({ x: p.apparent_c, y: p.mean_footfall })),
-  }));
+  /* The response chart is the ONE place four sites share an axis, because the
+     whole point is their divergence. They are separated by lightness along the
+     thermal ramp — ordered by outdoor share, so the ramp position itself
+     carries the variable the chart is about — and every line is directly
+     labelled, so identity never rests on tone alone. */
+  const byOutdoor = [...ZONE_ORDER].sort(
+    (a, b) => (weather.outdoor_share[b] ?? 0) - (weather.outdoor_share[a] ?? 0),
+  );
+  const RAMP = ["--heat-5", "--heat-4", "--heat-2", "--heat-1"];
+  const responseSeries = byOutdoor
+    .filter((z) => weather.by_zone[z])
+    .map((z, i) => ({
+      key: z,
+      label: `${name[z] ?? z} · ${Math.round((weather.outdoor_share[z] ?? 0) * 100)}% outdoor`,
+      token: RAMP[i] ?? "--sig-forecast",
+      points: weather.by_zone[z].map((p) => ({ x: p.apparent_c, y: p.mean_footfall })),
+    }));
 
   const totals = ZONE_ORDER.map((z) => ({
     zone: z,
@@ -62,42 +70,36 @@ export function SeasonCharts({
           label="Busiest site, last 8 weeks"
           value={name[busiest.zone] ?? busiest.zone}
           detail={`${fmt(busiest.total)} visitors`}
-          token={ZONE_TOKEN[busiest.zone]}
         />
         <StatTile
           label="Evening share of trade"
           value={`${Math.round(eveningShare * 100)}%`}
           detail="17:00 onward, all four sites"
-          token="--dp-evening"
+          token="--heat-5"
         />
         <StatTile
           label="Most weather-sensitive"
           value="Marina Walk"
           detail={`${Math.round((weather.outdoor_share["DXB-MAR"] ?? 0) * 100)}% of seats outdoors`}
-          token="--dp-evening"
+          token="--heat-5"
         />
         <StatTile
           label="Least weather-sensitive"
           value="Al Barsha"
           detail="fully enclosed — the control site"
-          token="--dp-midday"
+          token="--heat-1"
         />
       </div>
 
       <section className="stack">
         <h2 className="h3">Eight weeks of demand, per site</h2>
         <p className="note">
-          Four sites on one axis, because they are the same measure. The shaded band is an
-          illustrative ±12% interval; the Phase B forecast replaces it with a measured 80%
-          prediction interval.
+          Small multiples rather than four coloured lines. In this direction colour means
+          temperature, so spending it on site identity would leave nothing to say &ldquo;hot&rdquo;
+          with — and four sparklines on one shared scale are read against each other, where four
+          overlaid lines are read against whichever is on top.
         </p>
-        <LineChart
-          series={lineSeries}
-          band={0.12}
-          xTicks={xTicks}
-          caption="Daily footfall by site, generated"
-          yLabel="visitors per day"
-        />
+        <SparkGrid sparks={sparks} caption="Daily footfall, last eight weeks, generated" />
       </section>
 
       <div className="split">

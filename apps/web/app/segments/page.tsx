@@ -1,23 +1,21 @@
-"use client";
-
 import { PageHead } from "@/components/PageHead";
-import { Scaffold } from "@/components/Scaffold";
-import { useLocale } from "@/components/LocaleProvider";
+import { ApiDown } from "@/components/ApiDown";
+import { SegmentsView } from "@/components/views/SegmentsView";
+import { api, tryFetch } from "@/lib/api";
 
-export default function Page() {
-  const { t } = useLocale();
+export const revalidate = 60;
+
+export default async function SegmentsPage() {
+  const s = await tryFetch(api.segments);
+  if ("error" in s) return <ApiDown eyebrow="Plan" title="Segments" detail={s.error} />;
   return (
     <div className="page">
-      <PageHead eyebrow={t("group.plan")} title={t("tab.segments")} lede="Who the customers are, and how each group responds." />
-      <Scaffold
-        phase="B"
-        will={[
-          "RFM segmentation over the point-of-sale sample, with stability under bootstrap",
-          "Segment-level response curves feeding the allocator",
-          "Daypart and site mix per segment",
-        ]}
-        from="pos_baskets — a generated sample export"
+      <PageHead
+        eyebrow="Plan"
+        title="Segments"
+        lede="Who the customers are, in groups a shift manager can name and act on."
       />
+      <SegmentsView data={s.data} />
     </div>
   );
 }

@@ -118,6 +118,137 @@ async function get<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
+export type Station = {
+  zone: string;
+  ts: string | null;
+  temp_c: number | null;
+  humidity: number | null;
+  wind_kmh: number | null;
+  hijri: string;
+  ramadan_day: number | null;
+  index: number;
+  pi: number;
+  simulated: boolean;
+};
+
+export type WeeklyScore = {
+  week: number;
+  hours: number;
+  mae_model: number;
+  mae_baseline: number;
+  won: boolean;
+};
+
+export type ZoneForecast = {
+  mae: number;
+  baseline_mae: number;
+  improvement: number;
+  smape: number;
+  baseline_smape: number;
+  weeks_won: number;
+  weeks_total: number;
+  win_rate: number;
+  coverage_80: number;
+  weekly: WeeklyScore[];
+  top_drivers: Record<string, number>;
+};
+
+export type ForwardPoint = { ts: string; yhat: number; lo: number; hi: number; zone: string };
+
+export type ForecastResponse = Labelled & {
+  method: string;
+  generated_at: string;
+  target_win_rate: number;
+  win_rate: number;
+  weeks_won: number;
+  weeks_total: number;
+  meets_target: boolean;
+  note_on_smape: string;
+  zones: Record<string, ZoneForecast>;
+  forward?: Record<string, ForwardPoint[]>;
+  horizon_days?: number;
+};
+
+export type SegmentRow = {
+  segment: string;
+  customers: number;
+  revenue: number;
+  avg_basket: number;
+  median_recency: number;
+  median_frequency: number;
+  revenue_share: number;
+  customer_share: number;
+  description: string;
+};
+
+export type SegmentsResponse = {
+  method: string;
+  as_of: string;
+  customers: number;
+  bootstrap_stability: number;
+  segments: SegmentRow[];
+  response_curves: {
+    segment: string;
+    customers: number;
+    revenue_share: number;
+    ceiling: number;
+    saturation_rate: number;
+    assumed: boolean;
+  }[];
+  curves_are_assumed: boolean;
+  note_on_curves: string;
+};
+
+export type AllocCell = {
+  channel: string;
+  label: string;
+  daypart: string;
+  spend: number;
+  response: number;
+  ceiling: number;
+};
+
+export type AllocatorResponse = {
+  budget: number;
+  total_response: number;
+  marginal_spread: number;
+  by_channel: Record<string, number>;
+  by_daypart: Record<string, number>;
+  cells: AllocCell[];
+  sweep: { budget: number; response: number; marginal_per_1000: number }[];
+  method: string;
+  assumed: boolean;
+  note: string;
+};
+
+export type UpliftResponse = Labelled & {
+  treated: string;
+  window: [string, string];
+  weights: Record<string, number>;
+  pre_rmse: number;
+  lift_raw: number;
+  bias: number;
+  lift_adjusted: number;
+  ci: [number, number];
+  variance_reduction: number;
+  placebo_p: number;
+  treated_total: number;
+  counterfactual_total: number;
+  series: { date: string; actual: number; counterfactual: number; in_promo: boolean }[];
+  recovery: {
+    injected: number;
+    recovered_raw: number;
+    bias: number;
+    recovered: number;
+    error_points: number;
+    within_5_points: boolean;
+  }[];
+  all_within_tolerance: boolean;
+  worst_error_points: number;
+  method: string;
+  note_on_bias: string;
+};
+
 export const api = {
   zones: () => get<ZonesResponse>("/data/zones"),
   freshness: () => get<Freshness>("/data/freshness"),
@@ -125,6 +256,11 @@ export const api = {
   footfall: (q = "") => get<FootfallResponse>(`/series/footfall${q}`),
   dayparts: (q = "") => get<DaypartResponse>(`/series/dayparts${q}`),
   weatherResponse: (q = "") => get<WeatherResponse>(`/series/weather-response${q}`),
+  station: (zone = "DXB-MAR") => get<Station>(`/series/station?zone=${zone}`),
+  forecast: (q = "") => get<ForecastResponse>(`/marketing/forecast${q}`),
+  segments: () => get<SegmentsResponse>("/marketing/segments"),
+  allocator: (budget = 12000) => get<AllocatorResponse>(`/marketing/allocator?budget=${budget}`),
+  uplift: (q = "") => get<UpliftResponse>(`/marketing/uplift${q}`),
 };
 
 /** Fetch without throwing, so a page can render an honest "API unreachable"
