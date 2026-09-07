@@ -1,28 +1,37 @@
-/* The categorical palette gate.
+/* The palette gate.
  *
- * MAWSIM's three daypart hues are a chart palette before they are a design
- * choice: a reader has to tell a morning series from an evening one. That is a
- * COMPUTABLE property, so it is computed rather than judged.
+ * ALMANAC's rule is that colour means TEMPERATURE, so the palette is not a
+ * categorical set with a sequential ramp beside it — it is a ramp, plus three
+ * signal marks that can legitimately share a chart: the forecast, what was
+ * measured, and a planned promotion. Those three have to be separable, and the
+ * ramp has to read as a scale. Both are computable, so they are computed.
  *
- * The six checks, run in both registers:
- *   1. lightness band      all three inside the register's band, so no series
- *                          looks more important than another
- *   2. chroma floor        none reads as grey
- *   3. CVD separation      adjacent pairs stay apart under deuteranopia,
- *                          protanopia and tritanopia (OKLab dE, x100)
- *   4. normal-vision floor adjacent pairs are distinguishable with full colour
- *                          vision — a separate and stricter bar
- *   5. contrast vs surface every hue reaches 3:1 against its own ground
- *   6. sequential ramp     the heat ramp is monotone in lightness
+ * The checks, run in both registers:
+ *   1. signal separation   forecast / measured / promo stay apart, by HUE or by
+ *                          LIGHTNESS — the first two are deliberately the same
+ *                          hue at different lightness so the pair survives a
+ *                          monochrome print, and the gate accepts that and says
+ *                          which mechanism carries each pair
+ *   2. CVD separation      the same pairs under deuteranopia
+ *   3. chroma floor        the promo signal does not read as grey
+ *   4. contrast vs surface every mark reaches 3:1 against its own ground
+ *   5. ramp monotone       lightness climbs or falls without turning back
+ *   6. ramp is a scale     no two steps collide
+ *   7. zones are unhued    there is no per-site colour token, because sites are
+ *                          shown as small multiples rather than as overlaid
+ *                          series — asserting the design rule, not just holding it
  *
  * The method follows the dataviz reference; it is reimplemented here rather
  * than shelled out to, so the check runs on any machine and in CI.
  *
- * HISTORY WORTH KEEPING: the first palette was literal — cool morning, bleached
- * yellow midday, ember evening — and this gate rejected it. Saturating midday
- * to clear the chroma floor put it 40 degrees from evening orange and collapsed
- * deuteranopia separation to dE 3.5. Desaturating it cleared that and made it
- * read grey. Neither is visible by eye on a designer's monitor.
+ * HISTORY WORTH KEEPING. Two earlier palettes were rejected here. A literal
+ * daypart set — cool morning, yellow midday, ember evening — collapsed to
+ * deltaE 3.5 under deuteranopia once midday was saturated enough not to read
+ * grey; desaturating it fixed the collision and reintroduced the grey. And this
+ * ramp originally rose to a pale yellow in the middle and fell away, which is
+ * what a "turbo" colormap does: the eye ranks by lightness before hue, so a
+ * non-monotone ramp reads as categories rather than as a scale. Neither failure
+ * is visible by eye on a designer's monitor.
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -34,11 +43,12 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const TOKENS = join(HERE, "..", "styles", "tokens.css");
 const RESULTS = join(HERE, "..", "..", "..", "docs", "results");
 
-const BAND = { light: [0.43, 0.77], dark: [0.48, 0.67] };
 const CHROMA_FLOOR = 0.1;
-const CVD_FLOOR = 8;      // below this is a fail; 6-8 needs secondary encoding
-const NORMAL_FLOOR = 15;
+const CVD_FLOOR = 8;           // below this is a fail; 6-8 needs secondary encoding
+const NORMAL_FLOOR = 15;       // separable by hue alone
+const LIGHTNESS_FLOOR = 0.18;  // separable by lightness alone, in OKLCH L
 const CONTRAST_FLOOR = 3;
+const RAMP_STEP_FLOOR = 0.05;  // adjacent ramp steps must differ in lightness
 
 /* ── colour maths ─────────────────────────────────────────────────────────── */
 
@@ -130,24 +140,20 @@ const contrast = (a, b) =>
 /* ── token extraction ─────────────────────────────────────────────────────── */
 
 
-/* ── run ──────────────────────────────────────────────────────────────────── */
+/* ── run ────────────────────────────────────────────────────────────────── */
 
 const REGISTERS = parseRegisters(readFileSync(TOKENS, "utf8"));
-const CATEGORICAL = ["--dp-morning", "--dp-midday", "--dp-evening"];
+
+/** The three marks that can share one chart. */
+const SIGNALS = ["--sig-forecast", "--sig-actual", "--accent"];
 const RAMP = ["--heat-0", "--heat-1", "--heat-2", "--heat-3", "--heat-4", "--heat-5"];
 
 const report = { generated_by: "apps/web/scripts/check-palette.mjs", registers: {} };
 const failures = [];
 
-for (const register of ["dark", "light"]) {
+for (const register of ["light", "dark"]) {
   const tokens = REGISTERS[register];
   const surface = oklchToLinear(...tokens["--bg"]);
-  const swatches = CATEGORICAL.map((name) => ({
-    name,
-    oklch: tokens[name],
-    linear: oklchToLinear(...tokens[name]),
-  }));
-
   const checks = [];
   const fail = (name, detail) => {
     checks.push({ name, pass: false, detail });
@@ -155,68 +161,86 @@ for (const register of ["dark", "light"]) {
   };
   const pass = (name, detail) => checks.push({ name, pass: true, detail });
 
-  const [lo, hi] = BAND[register];
-  const offband = swatches.filter((s) => s.oklch[0] < lo || s.oklch[0] > hi);
-  offband.length
-    ? fail("lightness band", `outside ${lo}–${hi}: ${offband.map((s) => `${s.name} ${s.oklch[0]}`)}`)
-    : pass("lightness band", `all inside L ${lo}–${hi}`);
-
-  const grey = swatches.filter((s) => s.oklch[1] < CHROMA_FLOOR);
-  grey.length
-    ? fail("chroma floor", `reads grey: ${grey.map((s) => `${s.name} C=${s.oklch[1]}`)}`)
-    : pass("chroma floor", `all C >= ${CHROMA_FLOOR}`);
-
-  const pairs = [];
-  for (let i = 0; i < swatches.length; i++)
-    for (let j = i + 1; j < swatches.length; j++) pairs.push([swatches[i], swatches[j]]);
-
-  const cvd = pairs.flatMap(([a, b]) =>
-    ["deutan", "tritan"].map((kind) => ({
-      pair: `${a.name}/${b.name}`,
-      kind,
-      dE: +deltaE(simulate(a.linear, kind), simulate(b.linear, kind)).toFixed(1),
-    })),
-  );
-  const binding = cvd.filter((c) => c.kind === "deutan");
-  const worstCvd = binding.reduce((w, c) => (c.dE < w.dE ? c : w));
-  worstCvd.dE < CVD_FLOOR
-    ? fail("cvd separation", `${worstCvd.pair} dE ${worstCvd.dE} (${worstCvd.kind})`)
-    : pass("cvd separation", `worst ${worstCvd.pair} dE ${worstCvd.dE} (${worstCvd.kind})`);
-
-  const normal = pairs.map(([a, b]) => ({
-    pair: `${a.name}/${b.name}`,
-    dE: +deltaEOklch(a.oklch, b.oklch).toFixed(1),
+  const marks = SIGNALS.map((name) => ({
+    name,
+    oklch: tokens[name],
+    linear: oklchToLinear(...tokens[name]),
   }));
-  const worstNormal = normal.reduce((w, c) => (c.dE < w.dE ? c : w));
-  worstNormal.dE < NORMAL_FLOOR
-    ? fail("normal-vision floor", `${worstNormal.pair} dE ${worstNormal.dE}`)
-    : pass("normal-vision floor", `worst ${worstNormal.pair} dE ${worstNormal.dE}`);
 
-  const lowContrast = swatches.filter((s) => contrast(s.linear, surface) < CONTRAST_FLOOR);
-  lowContrast.length
-    ? fail("contrast vs surface", `${lowContrast.map((s) => s.name)}`)
-    : pass("contrast vs surface", `all >= ${CONTRAST_FLOOR}:1`);
+  /* 1 + 2. Separation. A pair may be separated by hue OR by lightness; the
+     forecast/measured pair is deliberately the latter, so that the divergence
+     between what was predicted and what happened survives a monochrome print
+     and does not spend a hue the thermal ramp needs. */
+  const pairs = [];
+  for (let i = 0; i < marks.length; i++)
+    for (let j = i + 1; j < marks.length; j++) pairs.push([marks[i], marks[j]]);
 
-  const rampL = RAMP.map((n) => tokens[n]?.[0]).filter((v) => v !== undefined);
-  const monotone = rampL.every((v, i) => i === 0 || Math.abs(v) >= 0 ) &&
-    (rampL.every((v, i) => i === 0 || v >= rampL[i - 1]) ||
-     rampL.every((v, i) => i === 0 || v <= rampL[i - 1]));
-  monotone
-    ? pass("sequential ramp monotone", `L ${rampL.join(" -> ")}`)
-    : fail("sequential ramp monotone", `L ${rampL.join(" -> ")} is not ordered`);
+  const separation = pairs.map(([a, b]) => {
+    const hue = +deltaEOklch(a.oklch, b.oklch).toFixed(1);
+    const light = +Math.abs(a.oklch[0] - b.oklch[0]).toFixed(3);
+    const cvd = +deltaE(simulate(a.linear, "deutan"), simulate(b.linear, "deutan")).toFixed(1);
+    const by =
+      hue >= NORMAL_FLOOR && cvd >= CVD_FLOOR ? "hue"
+      : light >= LIGHTNESS_FLOOR ? "lightness"
+      : null;
+    return { pair: `${a.name}/${b.name}`, hue_dE: hue, cvd_dE: cvd, lightness_delta: light, separated_by: by };
+  });
+  report.registers[register] = { separation };
 
-  report.registers[register] = {
-    surface_oklch: tokens["--bg"],
-    swatches: swatches.map((s) => ({
-      name: s.name,
-      oklch: s.oklch,
-      contrast_vs_surface: +contrast(s.linear, surface).toFixed(2),
-    })),
-    cvd_pairs: cvd,
-    normal_pairs: normal,
-    checks,
-  };
+  const unseparated = separation.filter((s) => !s.separated_by);
+  unseparated.length
+    ? fail("signal separation",
+        unseparated.map((s) => `${s.pair} hue dE ${s.hue_dE}, deutan ${s.cvd_dE}, L delta ${s.lightness_delta}`).join("; "))
+    : pass("signal separation",
+        separation.map((s) => `${s.pair} by ${s.separated_by}`).join(", "));
+
+  /* 3. The promo signal is the one that must never read as grey — it is the
+     only mark that means "a human decided something". */
+  const promo = tokens["--accent"];
+  promo[1] < CHROMA_FLOOR
+    ? fail("chroma floor", `--accent C=${promo[1]} reads grey`)
+    : pass("chroma floor", `--accent C=${promo[1]}`);
+
+  /* 4. Every mark against its own ground. */
+  const low = marks.filter((m) => contrast(m.linear, surface) < CONTRAST_FLOOR);
+  low.length
+    ? fail("contrast vs surface", low.map((m) => `${m.name} ${contrast(m.linear, surface).toFixed(2)}:1`).join(", "))
+    : pass("contrast vs surface",
+        marks.map((m) => `${m.name} ${contrast(m.linear, surface).toFixed(2)}:1`).join(", "));
+
+  /* 5 + 6. The ramp reads as a scale. */
+  const rampL = RAMP.map((n) => tokens[n]?.[0]);
+  if (rampL.some((v) => v === undefined)) {
+    fail("ramp monotone", "a --heat-* step is missing");
+  } else {
+    const up = rampL.every((v, i) => i === 0 || v > rampL[i - 1]);
+    const down = rampL.every((v, i) => i === 0 || v < rampL[i - 1]);
+    up || down
+      ? pass("ramp monotone", `L ${rampL.join(" -> ")}`)
+      : fail("ramp monotone", `L ${rampL.join(" -> ")} turns back on itself`);
+
+    const steps = rampL.slice(1).map((v, i) => Math.abs(v - rampL[i]));
+    const tight = steps.filter((d) => d < RAMP_STEP_FLOOR);
+    tight.length
+      ? fail("ramp steps are distinct", `${tight.length} step(s) under ${RAMP_STEP_FLOOR} in L`)
+      : pass("ramp steps are distinct", `min step ${Math.min(...steps).toFixed(3)} in L`);
+    report.registers[register].ramp_lightness = rampL;
+  }
+
+  report.registers[register].checks = checks;
 }
+
+/* 7. The design rule, asserted rather than merely documented: sites are shown
+      as small multiples, so there is no per-site colour token to drift into
+      existence. A four-hue zone palette would break "colour is temperature". */
+const zoneTokens = Object.keys(REGISTERS.dark).filter((n) => /^--zone-|^--dp-/.test(n));
+if (zoneTokens.length) {
+  failures.push(
+    `sites have been given colour tokens (${zoneTokens.join(", ")}) — Almanac shows sites as ` +
+      "small multiples so that colour can keep meaning temperature",
+  );
+}
+report.zone_colour_tokens = zoneTokens;
 
 report.pass = failures.length === 0;
 report.failures = failures;
@@ -230,6 +254,6 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  "palette gate passed — 3 categorical hues and a 6-step ramp, six checks, both registers. " +
-    "docs/results/A10-palette.json written.",
+  "palette gate passed — three signal marks and a six-step thermal ramp, " +
+    "seven checks, both registers. docs/results/A10-palette.json written.",
 );

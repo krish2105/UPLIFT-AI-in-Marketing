@@ -1,0 +1,285 @@
+{
+  "task": "B3-allocator",
+  "generated_by": "scripts/run_phase_b.py",
+  "generated_at": "2026-09-07T08:17:29+00:00",
+  "method": "Fifteen cells — five channels by three dayparts — each with a saturating response a(1-exp(-bx)). The objective is concave, so greedy marginal allocation reaches the exact optimum and the KKT condition (equal marginal return across funded cells) is checkable.",
+  "daypart_demand_90d": {
+    "evening": 242655,
+    "midday": 103356,
+    "morning": 111317
+  },
+  "cells": [
+    {
+      "channel": "instagram",
+      "daypart": "morning",
+      "ceiling": 98.58,
+      "rate": 0.55
+    },
+    {
+      "channel": "instagram",
+      "daypart": "midday",
+      "ceiling": 162.72,
+      "rate": 0.55
+    },
+    {
+      "channel": "instagram",
+      "daypart": "evening",
+      "ceiling": 477.53,
+      "rate": 0.55
+    },
+    {
+      "channel": "google",
+      "daypart": "morning",
+      "ceiling": 153.35,
+      "rate": 0.4
+    },
+    {
+      "channel": "google",
+      "daypart": "midday",
+      "ceiling": 172.89,
+      "rate": 0.4
+    },
+    {
+      "channel": "google",
+      "daypart": "evening",
+      "ceiling": 358.15,
+      "rate": 0.4
+    },
+    {
+      "channel": "aggregator",
+      "daypart": "morning",
+      "ceiling": 43.81,
+      "rate": 0.6
+    },
+    {
+      "channel": "aggregator",
+      "daypart": "midday",
+      "ceiling": 203.4,
+      "rate": 0.6
+    },
+    {
+      "channel": "aggregator",
+      "daypart": "evening",
+      "ceiling": 405.9,
+      "rate": 0.6
+    },
+    {
+      "channel": "near_store_ooh",
+      "daypart": "morning",
+      "ceiling": 219.07,
+      "rate": 0.85
+    },
+    {
+      "channel": "near_store_ooh",
+      "daypart": "midday",
+      "ceiling": 111.87,
+      "rate": 0.85
+    },
+    {
+      "channel": "near_store_ooh",
+      "daypart": "evening",
+      "ceiling": 334.27,
+      "rate": 0.85
+    },
+    {
+      "channel": "sms_crm",
+      "daypart": "morning",
+      "ceiling": 131.44,
+      "rate": 1.3
+    },
+    {
+      "channel": "sms_crm",
+      "daypart": "midday",
+      "ceiling": 91.53,
+      "rate": 1.3
+    },
+    {
+      "channel": "sms_crm",
+      "daypart": "evening",
+      "ceiling": 453.66,
+      "rate": 1.3
+    }
+  ],
+  "sweep": [
+    {
+      "budget": 2000,
+      "response": 571.44,
+      "marginal_per_1000": 285.72
+    },
+    {
+      "budget": 4000,
+      "response": 917.59,
+      "marginal_per_1000": 229.4
+    },
+    {
+      "budget": 6000,
+      "response": 1185.89,
+      "marginal_per_1000": 197.65
+    },
+    {
+      "budget": 8000,
+      "response": 1409.16,
+      "marginal_per_1000": 176.14
+    },
+    {
+      "budget": 12000,
+      "response": 1764.67,
+      "marginal_per_1000": 147.06
+    },
+    {
+      "budget": 16000,
+      "response": 2038.66,
+      "marginal_per_1000": 127.42
+    },
+    {
+      "budget": 24000,
+      "response": 2444.41,
+      "marginal_per_1000": 101.85
+    },
+    {
+      "budget": 32000,
+      "response": 2726.57,
+      "marginal_per_1000": 85.21
+    }
+  ],
+  "plans": {
+    "2000": {
+      "total_response": 571.44,
+      "marginal_spread": 0.00163479,
+      "sums_to_budget": true,
+      "by_channel": {
+        "instagram": 475.0,
+        "google": 0.0,
+        "aggregator": 300.0,
+        "near_store_ooh": 400.0,
+        "sms_crm": 825.0
+      },
+      "by_daypart": {
+        "morning": 0.0,
+        "midday": 0.0,
+        "evening": 2000.0
+      }
+    },
+    "4000": {
+      "total_response": 917.59,
+      "marginal_spread": 0.0021579,
+      "sums_to_budget": true,
+      "by_channel": {
+        "instagram": 1025.0,
+        "google": 0.0,
+        "aggregator": 825.0,
+        "near_store_ooh": 1000.0,
+        "sms_crm": 1150.0
+      },
+      "by_daypart": {
+        "morning": 350.0,
+        "midday": 0.0,
+        "evening": 3650.0
+      }
+    },
+    "6000": {
+      "total_response": 1185.89,
+      "marginal_spread": 0.00222639,
+      "sums_to_budget": true,
+      "by_channel": {
+        "instagram": 1400.0,
+        "google": 425.0,
+        "aggregator": 1175.0,
+        "near_store_ooh": 1500.0,
+        "sms_crm": 1500.0
+      },
+      "by_daypart": {
+        "morning": 775.0,
+        "midday": 0.0,
+        "evening": 5225.0
+      }
+    },
+    "8000": {
+      "total_response": 1409.16,
+      "marginal_spread": 0.0024309,
+      "sums_to_budget": true,
+      "by_channel": {
+        "instagram": 1700.0,
+        "google": 825.0,
+        "aggregator": 1700.0,
+        "near_store_ooh": 1900.0,
+        "sms_crm": 1875.0
+      },
+      "by_daypart": {
+        "morning": 1100.0,
+        "midday": 400.0,
+        "evening": 6500.0
+      }
+    },
+    "12000": {
+      "total_response": 1764.67,
+      "marginal_spread": 0.00216214,
+      "sums_to_budget": true,
+      "by_channel": {
+        "instagram": 2500.0,
+        "google": 1525.0,
+        "aggregator": 2650.0,
+        "near_store_ooh": 2800.0,
+        "sms_crm": 2525.0
+      },
+      "by_daypart": {
+        "morning": 1650.0,
+        "midday": 1600.0,
+        "evening": 8750.0
+      }
+    },
+    "16000": {
+      "total_response": 2038.66,
+      "marginal_spread": 0.00120454,
+      "sums_to_budget": true,
+      "by_channel": {
+        "instagram": 3350.0,
+        "google": 2450.0,
+        "aggregator": 3450.0,
+        "near_store_ooh": 3675.0,
+        "sms_crm": 3075.0
+      },
+      "by_daypart": {
+        "morning": 2150.0,
+        "midday": 3200.0,
+        "evening": 10650.0
+      }
+    },
+    "24000": {
+      "total_response": 2444.41,
+      "marginal_spread": 0.00128472,
+      "sums_to_budget": true,
+      "by_channel": {
+        "instagram": 5150.0,
+        "google": 5250.0,
+        "aggregator": 4700.0,
+        "near_store_ooh": 4975.0,
+        "sms_crm": 3925.0
+      },
+      "by_daypart": {
+        "morning": 4225.0,
+        "midday": 6175.0,
+        "evening": 13600.0
+      }
+    },
+    "32000": {
+      "total_response": 2726.57,
+      "marginal_spread": 0.00090776,
+      "sums_to_budget": true,
+      "by_channel": {
+        "instagram": 7125.0,
+        "google": 7950.0,
+        "aggregator": 5900.0,
+        "near_store_ooh": 6250.0,
+        "sms_crm": 4775.0
+      },
+      "by_daypart": {
+        "morning": 6525.0,
+        "midday": 9025.0,
+        "evening": 16450.0
+      }
+    }
+  },
+  "parameters_are_assumed": true,
+  "note_on_parameters": "Affinities and saturation rates are structural assumptions scaled by the forecast, not fitted elasticities. No promotion has run. Every response the allocator returns carries assumed=true, and an allocator presented as optimal on invented elasticities would be the most confident wrong thing in this application."
+}

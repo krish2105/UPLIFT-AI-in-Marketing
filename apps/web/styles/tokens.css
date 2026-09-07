@@ -1,132 +1,131 @@
-/* MAWSIM design tokens.
+/* MAWSIM design tokens — ALMANAC.
  *
- * DAYPART — "the interface keeps the café's hours"
+ * "The weather station that sells coffee."
  *
- * THE ONE CHROMA RULE: colour is the TIME OF DAY, and where that daypart's
- * trade happens. SIDRA's demand is bimodal — a commuter peak before 11:00 and
- * a longer evening peak after 17:00 — and the media allocator optimises over
- * channel × daypart. So the palette is not decoration beside the data model;
- * it IS the data model. There is no separate brand colour and no success
- * green: a control that is not about a time of day is neutral.
+ * THE ONE CHROMA RULE: colour is TEMPERATURE.
+ * A single thermal ramp (--heat-0 cool … --heat-5 hot) is the only multi-hue
+ * system in the interface, and it is reserved for values that ARE a temperature
+ * or a demand index derived from one. Exactly one non-thermal hue exists —
+ * --accent, a signal violet — and it means "a human planned a promotion here".
+ * It sits far enough from the ramp in hue that it can never be misread as heat.
+ * Buttons, hovers, borders, focus and success states carry NO chroma at all.
  *
- * THE THREE HUES WERE MEASURED, NOT CHOSEN.
- * The first attempt was literal — cool blue morning, bleached yellow midday,
- * ember evening — and apps/web/scripts/check-palette.mjs rejected it. A
- * saturated midday ochre sits 40 degrees from evening orange and collapsed to
- * ΔE 3.5 under deuteranopia: indistinguishable. Desaturating midday cleared
- * that check and failed another, reading as grey. Neither failure is visible by
- * eye on a designer's monitor.
+ * ZONES ARE NOT COLOURED. Four sites on one chart in four hues would break the
+ * rule above and would need four colours that survive a colour-vision check.
+ * Instead sites are shown as SMALL MULTIPLES — one card each, same scale, same
+ * single forecast blue — so identity comes from position and label rather than
+ * from hue. That is also the more honest comparison: four sparklines on a
+ * shared scale are read against each other, where four overlaid lines are read
+ * against whichever one is on top.
  *
- * The resolution was to stop colouring the LIGHT and start colouring WHERE THE
- * TRADE HAPPENS. Morning is cool and outdoors. Midday is shade-green, because
- * at 41 degrees Dubai's midday trade moves inside — which is literally true of
- * Al Barsha, SIDRA's fully enclosed site. Evening is the warm terrace. The
- * triad clears all six checks in both registers; see docs/results/A10-palette.json.
+ * WHY NOT INK-AND-PAPER: the obvious answer for a data tool is a neutral grey
+ * ramp, and for a "document" it is cream. This ground is neither. Dark is the
+ * slate-teal of the Gulf sky forty minutes before dawn — the hour SIDRA's
+ * morning daypart actually begins. Light is plotting paper: cool, faintly blue,
+ * the surface a meteorological chart is drawn on. Both are cold on purpose, so
+ * the heat ramp is the only warmth on the screen and reads as information the
+ * instant it appears.
  *
- * WHY light-dark() AND NOT TWO BLOCKS
- * Every token is defined ONCE. The earlier version carried the light values
- * twice — in :root[data-theme="light"] and again inside a prefers-color-scheme
- * media query — and the two silently drifted apart the first time the palette
- * changed, so the gates measured stale colours while the browser drew new ones.
- * light-dark() resolves against `color-scheme`, so the three theme states are
- * three values of one property rather than three copies of one palette.
+ * WHY light-dark() AND NOT TWO BLOCKS: every token is declared once. An earlier
+ * version carried the light values twice — under [data-theme="light"] and again
+ * inside a prefers-color-scheme block — and the two silently drifted apart the
+ * first time the palette changed, so the gates measured stale colours while the
+ * browser drew new ones. light-dark() resolves against `color-scheme`, so three
+ * theme states are three values of one property rather than three copies of a
+ * palette.
  *
  * Every contrast ratio is MEASURED by scripts/check-contrast.mjs and every
- * colour-vision separation by scripts/check-palette.mjs. None is estimated.
+ * ramp and categorical property by scripts/check-palette.mjs. None is estimated.
  */
 
 /* @register both */
 :root {
-  /* Auto follows the system. An explicit choice below overrides it, and
-     light-dark() reads whichever is in force. */
   color-scheme: light dark;
 
   /* light-dark(LIGHT, DARK) — light first, always. */
 
-  /* Ground. Light is bleached high-key stone at noon; dark is deep petrol. */
-  --bg:              light-dark(oklch(0.975 0.008 240), oklch(0.162 0.026 252));
-  --bg-inset:        light-dark(oklch(0.948 0.011 240), oklch(0.132 0.025 252));
-  --surface:         light-dark(oklch(0.990 0.004 240), oklch(0.208 0.028 252));
-  --surface-raised:  light-dark(oklch(1.000 0.000 240), oklch(0.250 0.030 252));
-  --surface-hover:   light-dark(oklch(0.960 0.012 240), oklch(0.292 0.032 252));
+  /* Plotting paper, and pre-dawn slate. */
+  --bg:              light-dark(oklch(0.971 0.006 216), oklch(0.170 0.021 218));
+  --bg-inset:        light-dark(oklch(0.944 0.008 216), oklch(0.140 0.020 218));
+  --surface:         light-dark(oklch(0.993 0.003 216), oklch(0.212 0.023 218));
+  --surface-raised:  light-dark(oklch(1.000 0.000 216), oklch(0.252 0.024 218));
+  --surface-hover:   light-dark(oklch(0.958 0.008 216), oklch(0.292 0.025 218));
 
-  --border:          light-dark(oklch(0.852 0.014 240), oklch(0.374 0.028 252));
-  --border-strong:   light-dark(oklch(0.588 0.024 240), oklch(0.592 0.032 252));
-  --rule:            light-dark(oklch(0.752 0.018 240), oklch(0.442 0.028 252));
+  --border:          light-dark(oklch(0.850 0.011 216), oklch(0.370 0.022 218));
+  --border-strong:   light-dark(oklch(0.600 0.018 216), oklch(0.585 0.024 218));
+  /* Isopleths: the hairlines that divide sections. Brighter than a row rule
+     because they carry the chart metaphor and must read as drawn, not as a gap. */
+  --rule:            light-dark(oklch(0.762 0.014 216), oklch(0.430 0.022 218));
 
-  --text:            light-dark(oklch(0.238 0.030 252), oklch(0.962 0.008 252));
-  --text-muted:      light-dark(oklch(0.428 0.028 252), oklch(0.792 0.014 252));
-  --text-faint:      light-dark(oklch(0.516 0.026 252), oklch(0.664 0.018 252));
-  --text-on-accent:  light-dark(oklch(0.990 0.003 40),  oklch(0.148 0.020 40));
+  --text:            light-dark(oklch(0.245 0.024 218), oklch(0.960 0.006 218));
+  --text-muted:      light-dark(oklch(0.432 0.022 218), oklch(0.790 0.012 218));
+  --text-faint:      light-dark(oklch(0.520 0.020 218), oklch(0.660 0.014 218));
+  --text-on-accent:  light-dark(oklch(0.995 0.002 330), oklch(0.155 0.012 330));
 
-  /* The three dayparts: the entire categorical palette, measured.
-     Fills sit inside each register's lightness band so no series looks more
-     important than another. The -text variants are lifted out of that band
-     because a fill and a word have different legibility floors. */
-  --dp-morning:      light-dark(oklch(0.550 0.145 250), oklch(0.630 0.145 250));
-  --dp-midday:       light-dark(oklch(0.550 0.115 165), oklch(0.630 0.115 165));
-  --dp-evening:      light-dark(oklch(0.550 0.165 40),  oklch(0.630 0.165 40));
+  /* The thermal ramp. Cool -> hot, and MONOTONE IN LIGHTNESS in both registers.
+     The first version rose to a pale yellow in the middle and fell away again,
+     which is what a "turbo" colormap does: it reads as categories rather than
+     as a scale, because the eye ranks by lightness before hue. Sweeping hue
+     while lightness climbs steadily is what a good thermal map does, and it is
+     what check-palette.mjs enforces. */
+  --heat-0:          light-dark(oklch(0.880 0.045 232), oklch(0.400 0.070 236));
+  --heat-1:          light-dark(oklch(0.790 0.075 220), oklch(0.480 0.090 220));
+  --heat-2:          light-dark(oklch(0.700 0.085 196), oklch(0.560 0.085 190));
+  --heat-3:          light-dark(oklch(0.610 0.110 110), oklch(0.640 0.105 108));
+  --heat-4:          light-dark(oklch(0.520 0.150 62),  oklch(0.720 0.145 62));
+  --heat-5:          light-dark(oklch(0.430 0.175 30),  oklch(0.800 0.150 34));
 
-  --dp-morning-text: light-dark(oklch(0.480 0.140 250), oklch(0.800 0.098 250));
-  --dp-midday-text:  light-dark(oklch(0.455 0.100 165), oklch(0.800 0.090 165));
-  --dp-evening-text: light-dark(oklch(0.485 0.150 38),  oklch(0.795 0.112 40));
+  /* The single non-thermal signal: a planned promotion.
+     Hue 330 rather than the 318 this started at, and darker in the light
+     register. At 318 the violet and the forecast blue converged under
+     deuteranopia — deltaE 5.5, below the floor — and sat only 0.15 apart in
+     lightness, so neither hue nor lightness carried the pair. 330 clears the
+     colour-vision floor on hue alone AND puts 0.20 of lightness between them,
+     so the separation survives either way. Measured, not chosen. */
+  --accent:          light-dark(oklch(0.420 0.180 330), oklch(0.660 0.185 330));
+  --accent-text:     light-dark(oklch(0.420 0.180 330), oklch(0.815 0.115 330));
 
-  /* Evening is the accent, because the evening peak is where the money is. */
-  --accent:          light-dark(oklch(0.530 0.163 40),  oklch(0.680 0.165 40));
-  --accent-text:     light-dark(oklch(0.485 0.150 38),  oklch(0.795 0.112 40));
-
-  /* Forecast against measured. A lightness pair inside one hue family rather
-     than two hues, so the divergence survives a monochrome print. */
-  --sig-forecast:      light-dark(oklch(0.615 0.070 252), oklch(0.600 0.070 252));
-  --sig-forecast-text: light-dark(oklch(0.440 0.070 252), oklch(0.790 0.060 252));
-  --sig-actual:        light-dark(oklch(0.325 0.045 252), oklch(0.880 0.040 252));
-  --sig-actual-text:   light-dark(oklch(0.285 0.040 252), oklch(0.935 0.026 252));
-  --sig-promo:         light-dark(oklch(0.530 0.163 40),  oklch(0.680 0.165 40));
-
-  /* Demand intensity. SEQUENTIAL: one hue, monotone in lightness — the evening
-     hue, because peak demand is an evening event for this brand. The first
-     version swept blue through green to orange and rose then fell in lightness:
-     a rainbow, which encodes magnitude as hue and reads as categories. */
-  --heat-0:          light-dark(oklch(0.900 0.028 40), oklch(0.380 0.040 40));
-  --heat-1:          light-dark(oklch(0.812 0.060 40), oklch(0.470 0.072 40));
-  --heat-2:          light-dark(oklch(0.724 0.095 40), oklch(0.560 0.102 40));
-  --heat-3:          light-dark(oklch(0.636 0.128 40), oklch(0.650 0.130 40));
-  --heat-4:          light-dark(oklch(0.548 0.158 40), oklch(0.740 0.150 40));
-  --heat-5:          light-dark(oklch(0.460 0.150 40), oklch(0.830 0.135 40));
+  /* Forecast against measured. A LIGHTNESS pair inside one hue family rather
+     than two hues, so the divergence reads even in monochrome — and so it does
+     not add a colour that would compete with the thermal ramp. */
+  --sig-forecast:      light-dark(oklch(0.620 0.075 218), oklch(0.640 0.090 218));
+  --sig-forecast-text: light-dark(oklch(0.440 0.070 218), oklch(0.800 0.075 218));
+  --sig-actual:        light-dark(oklch(0.330 0.040 218), oklch(0.870 0.045 218));
+  --sig-actual-text:   light-dark(oklch(0.290 0.035 218), oklch(0.930 0.030 218));
+  --sig-promo:         light-dark(oklch(0.420 0.180 330), oklch(0.660 0.185 330));
 
   /* Compliance verdicts. Never signalled by colour alone — the badge carries a
      glyph and the word; these only tune the wording's legibility. */
-  --pass-text:       light-dark(oklch(0.430 0.080 168), oklch(0.830 0.085 168));
-  --fail-text:       light-dark(oklch(0.460 0.165 22),  oklch(0.790 0.105 22));
+  --pass-text:       light-dark(oklch(0.440 0.096 158), oklch(0.840 0.080 158));
+  --fail-text:       light-dark(oklch(0.470 0.180 25),  oklch(0.800 0.106 25));
 
-  --radius:    10px;
-  --radius-lg: 18px;
-  --shadow-1:  light-dark(0 1px 3px oklch(0.238 0.030 252 / 0.07), none);
-  --shadow-2:  light-dark(0 16px 44px oklch(0.238 0.030 252 / 0.12),
-                          0 14px 40px oklch(0.08 0.02 252 / 0.58));
+  /* A station report is drawn on a grid, not on rounded cards. */
+  --radius:    3px;
+  --radius-lg: 5px;
+  --shadow-1:  light-dark(0 1px 2px oklch(0.245 0.024 218 / 0.07), none);
+  --shadow-2:  light-dark(0 10px 30px oklch(0.245 0.024 218 / 0.11),
+                          0 10px 30px oklch(0.09 0.02 218 / 0.55));
 }
 
-/* The three theme states. Each sets only color-scheme; every token above
-   resolves against it. */
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"]  { color-scheme: dark; }
 
-/* Type. Archivo carries a variable WIDTH axis: expanded at display sizes so a
-   headline has real presence, normal in the interface so nothing gets shouty.
-   That one family doing two jobs is the type idea here. Figtree sets the prose
-   — a humanist grotesque with an open aperture that stays readable in the
-   bleached light register. Geist Mono carries numerals and zone codes. */
+/* Type. Bricolage Grotesque has a variable WIDTH axis, which is what a station
+   report needs: condensed for a zone code, normal for a sentence. Instrument
+   Sans sets the prose. Martian Mono was drawn for telemetry and carries every
+   number, timestamp and zone code, never prose. Noto Kufi carries Arabic
+   because the register here is technical rather than calligraphic. */
 :root {
-  --font-display: "Archivo", "Noto Sans Arabic", system-ui, sans-serif;
-  --font-body:    "Figtree", "Noto Sans Arabic", "Noto Sans Devanagari", system-ui, sans-serif;
-  --font-mono:    "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: "Bricolage Grotesque", "Noto Kufi Arabic", system-ui, sans-serif;
+  --font-body:    "Instrument Sans", "Noto Kufi Arabic", "Noto Sans Devanagari", system-ui, sans-serif;
+  --font-mono:    "Martian Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  --step--1: clamp(0.78rem, 0.76rem + 0.10vw, 0.84rem);
-  --step-0:  clamp(0.95rem, 0.92rem + 0.16vw, 1.05rem);
-  --step-1:  clamp(1.24rem, 1.14rem + 0.48vw, 1.55rem);
-  --step-2:  clamp(1.70rem, 1.42rem + 1.20vw, 2.60rem);
-  --step-3:  clamp(2.40rem, 1.70rem + 3.10vw, 5.00rem);
+  --step--1: clamp(0.76rem, 0.74rem + 0.10vw, 0.82rem);
+  --step-0:  clamp(0.94rem, 0.91rem + 0.15vw, 1.02rem);
+  --step-1:  clamp(1.18rem, 1.10rem + 0.40vw, 1.42rem);
+  --step-2:  clamp(1.55rem, 1.38rem + 0.80vw, 2.10rem);
+  --step-3:  clamp(2.10rem, 1.70rem + 1.90vw, 3.60rem);
 
-  --measure: 38rem;
-  --tracking-display: -0.035em;
+  --measure: 36rem;
+  --tracking-display: -0.02em;
 }

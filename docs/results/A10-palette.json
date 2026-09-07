@@ -1,235 +1,128 @@
 {
   "generated_by": "apps/web/scripts/check-palette.mjs",
   "registers": {
-    "dark": {
-      "surface_oklch": [
-        0.162,
-        0.026,
-        252
-      ],
-      "swatches": [
+    "light": {
+      "separation": [
         {
-          "name": "--dp-morning",
-          "oklch": [
-            0.63,
-            0.145,
-            250
-          ],
-          "contrast_vs_surface": 5.54
+          "pair": "--sig-forecast/--sig-actual",
+          "hue_dE": 29.2,
+          "cvd_dE": 25.7,
+          "lightness_delta": 0.29,
+          "separated_by": "hue"
         },
         {
-          "name": "--dp-midday",
-          "oklch": [
-            0.63,
-            0.115,
-            165
-          ],
-          "contrast_vs_surface": 5.85
+          "pair": "--sig-forecast/--accent",
+          "hue_dE": 29.7,
+          "cvd_dE": 9.4,
+          "lightness_delta": 0.2,
+          "separated_by": "hue"
         },
         {
-          "name": "--dp-evening",
-          "oklch": [
-            0.63,
-            0.165,
-            40
-          ],
-          "contrast_vs_surface": 5.16
+          "pair": "--sig-actual/--accent",
+          "hue_dE": 21.8,
+          "cvd_dE": 24,
+          "lightness_delta": 0.09,
+          "separated_by": "hue"
         }
       ],
-      "cvd_pairs": [
-        {
-          "pair": "--dp-morning/--dp-midday",
-          "kind": "deutan",
-          "dE": 11.4
-        },
-        {
-          "pair": "--dp-morning/--dp-midday",
-          "kind": "tritan",
-          "dE": 15.4
-        },
-        {
-          "pair": "--dp-morning/--dp-evening",
-          "kind": "deutan",
-          "dE": 38.8
-        },
-        {
-          "pair": "--dp-morning/--dp-evening",
-          "kind": "tritan",
-          "dE": 31.6
-        },
-        {
-          "pair": "--dp-midday/--dp-evening",
-          "kind": "deutan",
-          "dE": 32.1
-        },
-        {
-          "pair": "--dp-midday/--dp-evening",
-          "kind": "tritan",
-          "dE": 25.2
-        }
-      ],
-      "normal_pairs": [
-        {
-          "pair": "--dp-morning/--dp-midday",
-          "dE": 17.7
-        },
-        {
-          "pair": "--dp-morning/--dp-evening",
-          "dE": 29.9
-        },
-        {
-          "pair": "--dp-midday/--dp-evening",
-          "dE": 24.9
-        }
+      "ramp_lightness": [
+        0.88,
+        0.79,
+        0.7,
+        0.61,
+        0.52,
+        0.43
       ],
       "checks": [
         {
-          "name": "lightness band",
+          "name": "signal separation",
           "pass": true,
-          "detail": "all inside L 0.48–0.67"
+          "detail": "--sig-forecast/--sig-actual by hue, --sig-forecast/--accent by hue, --sig-actual/--accent by hue"
         },
         {
           "name": "chroma floor",
           "pass": true,
-          "detail": "all C >= 0.1"
-        },
-        {
-          "name": "cvd separation",
-          "pass": true,
-          "detail": "worst --dp-morning/--dp-midday dE 11.4 (deutan)"
-        },
-        {
-          "name": "normal-vision floor",
-          "pass": true,
-          "detail": "worst --dp-morning/--dp-midday dE 17.7"
+          "detail": "--accent C=0.18"
         },
         {
           "name": "contrast vs surface",
           "pass": true,
-          "detail": "all >= 3:1"
+          "detail": "--sig-forecast 3.27:1, --sig-actual 11.11:1, --accent 8.63:1"
         },
         {
-          "name": "sequential ramp monotone",
+          "name": "ramp monotone",
           "pass": true,
-          "detail": "L 0.38 -> 0.47 -> 0.56 -> 0.65 -> 0.74 -> 0.83"
+          "detail": "L 0.88 -> 0.79 -> 0.7 -> 0.61 -> 0.52 -> 0.43"
+        },
+        {
+          "name": "ramp steps are distinct",
+          "pass": true,
+          "detail": "min step 0.090 in L"
         }
       ]
     },
-    "light": {
-      "surface_oklch": [
-        0.975,
-        0.008,
-        240
-      ],
-      "swatches": [
+    "dark": {
+      "separation": [
         {
-          "name": "--dp-morning",
-          "oklch": [
-            0.55,
-            0.145,
-            250
-          ],
-          "contrast_vs_surface": 4.52
+          "pair": "--sig-forecast/--sig-actual",
+          "hue_dE": 23.4,
+          "cvd_dE": 28.4,
+          "lightness_delta": 0.23,
+          "separated_by": "hue"
         },
         {
-          "name": "--dp-midday",
-          "oklch": [
-            0.55,
-            0.115,
-            165
-          ],
-          "contrast_vs_surface": 4.26
+          "pair": "--sig-forecast/--accent",
+          "hue_dE": 23.5,
+          "cvd_dE": 25,
+          "lightness_delta": 0.02,
+          "separated_by": "hue"
         },
         {
-          "name": "--dp-evening",
-          "oklch": [
-            0.55,
-            0.165,
-            40
-          ],
-          "contrast_vs_surface": 4.87
+          "pair": "--sig-actual/--accent",
+          "hue_dE": 29.4,
+          "cvd_dE": 8.1,
+          "lightness_delta": 0.21,
+          "separated_by": "hue"
         }
       ],
-      "cvd_pairs": [
-        {
-          "pair": "--dp-morning/--dp-midday",
-          "kind": "deutan",
-          "dE": 11.3
-        },
-        {
-          "pair": "--dp-morning/--dp-midday",
-          "kind": "tritan",
-          "dE": 15.5
-        },
-        {
-          "pair": "--dp-morning/--dp-evening",
-          "kind": "deutan",
-          "dE": 38.2
-        },
-        {
-          "pair": "--dp-morning/--dp-evening",
-          "kind": "tritan",
-          "dE": 31.1
-        },
-        {
-          "pair": "--dp-midday/--dp-evening",
-          "kind": "deutan",
-          "dE": 32.1
-        },
-        {
-          "pair": "--dp-midday/--dp-evening",
-          "kind": "tritan",
-          "dE": 25.2
-        }
-      ],
-      "normal_pairs": [
-        {
-          "pair": "--dp-morning/--dp-midday",
-          "dE": 17.7
-        },
-        {
-          "pair": "--dp-morning/--dp-evening",
-          "dE": 29.9
-        },
-        {
-          "pair": "--dp-midday/--dp-evening",
-          "dE": 24.9
-        }
+      "ramp_lightness": [
+        0.4,
+        0.48,
+        0.56,
+        0.64,
+        0.72,
+        0.8
       ],
       "checks": [
         {
-          "name": "lightness band",
+          "name": "signal separation",
           "pass": true,
-          "detail": "all inside L 0.43–0.77"
+          "detail": "--sig-forecast/--sig-actual by hue, --sig-forecast/--accent by hue, --sig-actual/--accent by hue"
         },
         {
           "name": "chroma floor",
           "pass": true,
-          "detail": "all C >= 0.1"
-        },
-        {
-          "name": "cvd separation",
-          "pass": true,
-          "detail": "worst --dp-morning/--dp-midday dE 11.3 (deutan)"
-        },
-        {
-          "name": "normal-vision floor",
-          "pass": true,
-          "detail": "worst --dp-morning/--dp-midday dE 17.7"
+          "detail": "--accent C=0.185"
         },
         {
           "name": "contrast vs surface",
           "pass": true,
-          "detail": "all >= 3:1"
+          "detail": "--sig-forecast 5.84:1, --sig-actual 13.03:1, --accent 5.59:1"
         },
         {
-          "name": "sequential ramp monotone",
+          "name": "ramp monotone",
           "pass": true,
-          "detail": "L 0.9 -> 0.812 -> 0.724 -> 0.636 -> 0.548 -> 0.46"
+          "detail": "L 0.4 -> 0.48 -> 0.56 -> 0.64 -> 0.72 -> 0.8"
+        },
+        {
+          "name": "ramp steps are distinct",
+          "pass": true,
+          "detail": "min step 0.080 in L"
         }
       ]
     }
   },
+  "zone_colour_tokens": [],
   "pass": true,
   "failures": []
 }

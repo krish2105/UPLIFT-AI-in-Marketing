@@ -961,6 +961,7 @@ dependencies = [
     { name = "rank-bm25" },
     { name = "reportlab" },
     { name = "scikit-learn" },
+    { name = "scipy" },
     { name = "sqlite-vec" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -997,6 +998,7 @@ requires-dist = [
     { name = "reportlab", specifier = ">=4.2" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8" },
     { name = "scikit-learn", specifier = ">=1.5" },
+    { name = "scipy", specifier = ">=1.18.1" },
     { name = "sqlite-vec", specifier = ">=0.1.6" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32" },
 ]

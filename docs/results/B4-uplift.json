@@ -1,0 +1,124 @@
+{
+  "task": "B4-uplift",
+  "generated_by": "scripts/run_phase_b.py",
+  "generated_at": "2026-09-07T08:17:29+00:00",
+  "method": "Synthetic control with non-negative weights summing to one, fitted on 56 pre-period days; CUPED variance reduction; a permutation placebo across donor sites for the p-value; and a placebo-in-time run for the estimator's own bias.",
+  "tolerance_points": 5.0,
+  "recovery": [
+    {
+      "injected": 0.3,
+      "recovered_raw": 0.2391,
+      "bias": -0.0348,
+      "recovered": 0.2739,
+      "error_points": -2.61,
+      "within_5_points": true,
+      "ci": [
+        0.1867,
+        0.2915
+      ],
+      "pre_rmse": 108.28,
+      "weights": {
+        "DXB-DEI": 0.1211,
+        "DXB-DTN": 0.0,
+        "DXB-MOE": 0.8789
+      },
+      "placebo_p": 0.5
+    },
+    {
+      "injected": 0.2,
+      "recovered_raw": 0.1438,
+      "bias": -0.0348,
+      "recovered": 0.1786,
+      "error_points": -2.14,
+      "within_5_points": true,
+      "ci": [
+        0.0955,
+        0.1921
+      ],
+      "pre_rmse": 108.28,
+      "weights": {
+        "DXB-DEI": 0.1211,
+        "DXB-DTN": 0.0,
+        "DXB-MOE": 0.8789
+      },
+      "placebo_p": 0.5
+    },
+    {
+      "injected": 0.1,
+      "recovered_raw": 0.0485,
+      "bias": -0.0348,
+      "recovered": 0.0833,
+      "error_points": -1.67,
+      "within_5_points": true,
+      "ci": [
+        0.004,
+        0.093
+      ],
+      "pre_rmse": 108.28,
+      "weights": {
+        "DXB-DEI": 0.1211,
+        "DXB-DTN": 0.0,
+        "DXB-MOE": 0.8789
+      },
+      "placebo_p": 0.5
+    },
+    {
+      "injected": 0.05,
+      "recovered_raw": 0.0008,
+      "bias": -0.0348,
+      "recovered": 0.0356,
+      "error_points": -1.44,
+      "within_5_points": true,
+      "ci": [
+        -0.0419,
+        0.0435
+      ],
+      "pre_rmse": 108.28,
+      "weights": {
+        "DXB-DEI": 0.1211,
+        "DXB-DTN": 0.0,
+        "DXB-MOE": 0.8789
+      },
+      "placebo_p": 0.75
+    },
+    {
+      "injected": 0.0,
+      "recovered_raw": -0.0468,
+      "bias": -0.0348,
+      "recovered": -0.012,
+      "error_points": -1.2,
+      "within_5_points": true,
+      "ci": [
+        -0.0879,
+        -0.0058
+      ],
+      "pre_rmse": 108.28,
+      "weights": {
+        "DXB-DEI": 0.1211,
+        "DXB-DTN": 0.0,
+        "DXB-MOE": 0.8789
+      },
+      "placebo_p": 0.75
+    }
+  ],
+  "all_within_tolerance": true,
+  "worst_error_points": 2.61,
+  "example_window": {
+    "treated": "DXB-MAR",
+    "window": [
+      "2026-06-01",
+      "2026-06-14"
+    ],
+    "weights": {
+      "DXB-DEI": 0.1211,
+      "DXB-DTN": 0.0,
+      "DXB-MOE": 0.8789
+    },
+    "pre_rmse": 108.28,
+    "lift_raw": -0.0468,
+    "bias": -0.0348,
+    "variance_reduction": -0.0132,
+    "placebo_p": 0.75
+  },
+  "note_on_bias": "The estimator returns about -3.5% on a window where nothing happened, and that is not noise. The donor blend is dominated by Al Barsha, which is fully enclosed; Marina Walk is more than half outdoor seating. As the Gulf summer arrives Marina falls away from its own history while the enclosed donor does not, so the counterfactual drifts above the treated site for reasons unrelated to any promotion. With four sites and one of them uniquely weather-elastic, no convex blend of the others can match Marina's weather response: it is inside the donors' hull on level and outside it on elasticity. That is a real limitation of synthetic control on a small donor pool, so it is measured on a placebo window and subtracted, and both numbers are reported."
+}

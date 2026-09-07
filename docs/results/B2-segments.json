@@ -1,0 +1,148 @@
+{
+  "task": "B2-segments",
+  "generated_by": "scripts/run_phase_b.py",
+  "generated_at": "2026-09-07T08:17:29+00:00",
+  "method": "RFM quintiles over the point-of-sale sample, assigned by a decision list so the rules read in order rather than as overlapping sets. Stability is the share of customers keeping their segment across 25 bootstrap resamples.",
+  "as_of": "2026-09-07",
+  "customers": 1854,
+  "bootstrap_stability": 0.9175,
+  "segments": [
+    {
+      "segment": "Champions",
+      "customers": 485,
+      "revenue": 217458.0,
+      "avg_basket": 42.4993803035,
+      "median_recency": 18.0,
+      "median_frequency": 7.0,
+      "revenue_share": 0.5833476404,
+      "customer_share": 0.261596548,
+      "description": "Recent and frequent. The evening regulars the whole estate runs on."
+    },
+    {
+      "segment": "Loyal",
+      "customers": 257,
+      "revenue": 66058.0,
+      "avg_basket": 42.2621289445,
+      "median_recency": 96.0,
+      "median_frequency": 5.0,
+      "revenue_share": 0.1772056141,
+      "customer_share": 0.1386192017,
+      "description": "Frequent but not necessarily recent. Worth a reason to come back this week."
+    },
+    {
+      "segment": "Hibernating",
+      "customers": 497,
+      "revenue": 28394.0,
+      "avg_basket": 43.6498993964,
+      "median_recency": 216.0,
+      "median_frequency": 1.0,
+      "revenue_share": 0.0761690667,
+      "customer_share": 0.2680690399,
+      "description": "Long gone. Reactivation spend here rarely pays back."
+    },
+    {
+      "segment": "Promising",
+      "customers": 225,
+      "revenue": 18148.0,
+      "avg_basket": 39.6718518519,
+      "median_recency": 24.0,
+      "median_frequency": 2.0,
+      "revenue_share": 0.0486833916,
+      "customer_share": 0.1213592233,
+      "description": "Came recently, has not built a habit yet. The cheapest group to convert."
+    },
+    {
+      "segment": "At risk",
+      "customers": 147,
+      "revenue": 17166.0,
+      "avg_basket": 41.7664399093,
+      "median_recency": 170.0,
+      "median_frequency": 3.0,
+      "revenue_share": 0.0460491019,
+      "customer_share": 0.0792880259,
+      "description": "Used to be frequent and has stopped. The most expensive group to lose."
+    },
+    {
+      "segment": "Occasional",
+      "customers": 188,
+      "revenue": 15156.0,
+      "avg_basket": 41.3209219858,
+      "median_recency": 79.0,
+      "median_frequency": 2.0,
+      "revenue_share": 0.0406571238,
+      "customer_share": 0.1014023732,
+      "description": "Everyone else. Do not build a campaign around them."
+    },
+    {
+      "segment": "Big spenders",
+      "customers": 55,
+      "revenue": 10396.0,
+      "avg_basket": 60.6060606061,
+      "median_recency": 32.0,
+      "median_frequency": 3.0,
+      "revenue_share": 0.0278880615,
+      "customer_share": 0.0296655879,
+      "description": "Larger baskets, moderate frequency. Respond to bundles, not discounts."
+    }
+  ],
+  "response_curves": [
+    {
+      "segment": "Champions",
+      "customers": 485,
+      "revenue_share": 0.5833,
+      "ceiling": 0.1,
+      "saturation_rate": 0.9,
+      "assumed": true
+    },
+    {
+      "segment": "Loyal",
+      "customers": 257,
+      "revenue_share": 0.1772,
+      "ceiling": 0.16,
+      "saturation_rate": 0.7,
+      "assumed": true
+    },
+    {
+      "segment": "Hibernating",
+      "customers": 497,
+      "revenue_share": 0.0762,
+      "ceiling": 0.06,
+      "saturation_rate": 0.3,
+      "assumed": true
+    },
+    {
+      "segment": "Promising",
+      "customers": 225,
+      "revenue_share": 0.0487,
+      "ceiling": 0.26,
+      "saturation_rate": 0.5,
+      "assumed": true
+    },
+    {
+      "segment": "At risk",
+      "customers": 147,
+      "revenue_share": 0.046,
+      "ceiling": 0.22,
+      "saturation_rate": 0.45,
+      "assumed": true
+    },
+    {
+      "segment": "Occasional",
+      "customers": 188,
+      "revenue_share": 0.0407,
+      "ceiling": 0.09,
+      "saturation_rate": 0.5,
+      "assumed": true
+    },
+    {
+      "segment": "Big spenders",
+      "customers": 55,
+      "revenue_share": 0.0279,
+      "ceiling": 0.14,
+      "saturation_rate": 0.6,
+      "assumed": true
+    }
+  ],
+  "curves_are_assumed": true,
+  "note_on_curves": "The response ceilings and saturation rates are structural assumptions, not fitted values: no promotion has run, so there is nothing to fit them to. Phase D's measured lift replaces them."
+}
