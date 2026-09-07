@@ -1,0 +1,60 @@
+[project]
+name = "uplift"
+version = "0.1.0"
+description = "UPLIFT / MAWSIM — demand-aware promo planning for Dubai retail: forecast, plan, create, comply, measure."
+requires-python = ">=3.13,<3.14"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.32",
+  "pydantic>=2.9",
+  "pydantic-settings>=2.6",
+  "httpx>=0.27",
+  "python-multipart>=0.0.9",
+  "sqlite-vec>=0.1.6",
+  "rank-bm25>=0.2.2",
+  "numpy>=2.1",
+  "pandas>=2.2",
+  "scikit-learn>=1.5",
+  "hijridate>=2.5",
+  "reportlab>=4.2",
+  "pypdf>=5.1",
+  "python-docx>=1.1",
+  "jinja2>=3.1",
+  "python-dotenv>=1.0",
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# The deployed instance has no Ollama. Which embedder it falls back to is
+# decided by the A9 spike, not here.
+cloud = ["fastembed>=0.5"]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "ruff>=0.8",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["services", "."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency system is call-in-default. B008 is a true positive for
+# mutable defaults and a false one here.
+extend-immutable-calls = [
+  "fastapi.Depends", "fastapi.File", "fastapi.Form", "fastapi.Header",
+  "fastapi.Path", "fastapi.Query", "fastapi.Body",
+]
+
+[tool.uv]
+package = false

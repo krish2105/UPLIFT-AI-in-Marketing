@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Task A2 replaces this with the selected design direction's tokens.
+   Until then: enough to render, nothing that pretends to be a design. */
+:root { color-scheme: light dark; }
+html, body { margin: 0; padding: 0; }
+body { font-family: ui-sans-serif, system-ui, sans-serif; }

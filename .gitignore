@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+apps/web/test-results/
+apps/web/playwright-report/
+
+# Data — raw API responses are cached, not committed; processed DBs are built.
+data/raw/*.json
+data/raw/*.jsonl
+data/processed/*.db
+data/processed/*.db-*
+
+# Secrets
+.env
+.env.local
