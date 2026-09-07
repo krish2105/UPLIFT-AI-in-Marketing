@@ -12,7 +12,28 @@ node_modules/
 apps/web/test-results/
 apps/web/playwright-report/
 
-# Data — raw API responses are cached, not committed; processed DBs are built.
+# Data.
+#
+# THIS BLOCK EXISTS BECAUSE OF A GLOBAL IGNORE, NOT A LOCAL PREFERENCE.
+# The owner's ~/.gitignore_global excludes `data/raw/` outright. That is
+# invisible from inside the repository: `git status` is clean, the files are on
+# disk, and the first sign of trouble was a deployed build failing with
+# FileNotFoundError on data/raw/dubai_events_seed.yaml — a curated input the
+# events pipeline cannot run without.
+#
+# Git cannot re-include a file whose PARENT DIRECTORY is excluded, so a bare
+# `!data/raw/seed.yaml` would not have worked. The directory is un-ignored
+# first, its contents excluded, and then the inputs re-included by name.
+!data/raw/
+data/raw/*
+# Curated inputs — the project cannot rebuild itself without these.
+!data/raw/dubai_events_seed.yaml
+!data/raw/dubai_events_24mo.csv
+!data/raw/uae_calendar.csv
+# The Wikipedia cache. Committed so a build does not re-fetch 48 articles from
+# an API that rate-limits, and so the enrichment is reproducible.
+!data/raw/wikipedia_events.yaml
+# Provider responses are caches, rebuilt on demand.
 data/raw/*.json
 data/raw/*.jsonl
 data/processed/*.db
