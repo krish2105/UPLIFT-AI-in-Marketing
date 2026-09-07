@@ -1,7 +1,7 @@
 {
   "task": "A12-deploy",
   "generated_by": "scripts/verify_deploy.py",
-  "generated_at": "2026-09-07T10:46:17+00:00",
+  "generated_at": "2026-09-07T11:14:04+00:00",
   "api": "https://mawsim-api.onrender.com",
   "web": "https://uplift-mawsim.vercel.app",
   "host_api": "Render free web service, region singapore",
@@ -30,7 +30,7 @@
     {
       "check": "the red-team result reached the deployed instance",
       "held": true,
-      "detail": "33/34 held"
+      "detail": "36/37 held"
     },
     {
       "check": "the web app answers",
