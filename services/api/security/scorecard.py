@@ -125,17 +125,23 @@ CONTROLS: tuple[Control, ...] = (
     Control(
         id="ASI-09",
         risk="Identity and authorisation",
-        claim="Role is currently a request header, and that is stated rather than hidden.",
+        claim="A privileged role is proved, not claimed.",
         evidence=(
-            "Authorisation, not authentication, and stated as such at /admin/roles. The "
-            "role is a request header and therefore forgeable. Adequate here because the "
-            "entire API is read-only and cannot act in the world: the worst a forged "
-            "Admin header achieves is stopping a demo. Scopes are strictly nested and "
-            "least privilege is the default — an unrecognised role is a Viewer, not an "
-            "error. Binding roles to real identity is what a private deployment needs."
+            "Admin comes from a token signed with HMAC-SHA256 under a secret only the "
+            "operator holds — no accounts and no password store, because there are no "
+            "users. The signature covers the role AND the expiry, the algorithm is fixed "
+            "by the verifier rather than named in the token, and the comparison is "
+            "constant-time. It fails closed: with no secret configured there is no Admin, "
+            "which is the state of the public deployment. The X-Mawsim-Role header that "
+            "used to grant this was removed rather than kept, since a vestigial input "
+            "that once carried privilege is what gets re-enabled by accident. Scopes stay "
+            "strictly nested and least privilege is the default in both directions — an "
+            "absent, forged, expired or revoked credential is a Viewer, not an error. "
+            "Residual: a bearer token works for whoever holds it until it expires, so "
+            "lifetimes are short and /admin/tokens/revoke refuses an id early."
         ),
-        status="partial",
-        verified_by="tests/core/test_llm.py::TestRoles",
+        status="enforced",
+        verified_by="tests/security/test_identity.py, scripts/red_team.py::RT-TOK-*",
     ),
     Control(
         id="ASI-10",

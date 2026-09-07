@@ -168,11 +168,12 @@ No agent in the registry holds a tool with a side effect; the whole API is GET,
 so there is no verb with which to write. That is an architectural claim, and a
 claim is worth what the attempt to break it is worth.
 
-`scripts/red_team.py` makes 37 attempts across
+`scripts/red_team.py` makes 48 attempts across
 7 OWASP ASI controls — prompt injection into the
 compliance checker, script-mixing and zero-width evasion of the claim rules,
-forged Admin headers, HTTP verbs the API does not answer, provenance stripping,
-and budget exhaustion. **36 of 37 held.**
+forged and edited capability tokens, HTTP verbs the API does not answer,
+provenance stripping, aiming the embedder off-box, and budget exhaustion.
+**48 of 48 held.**
 
 | Control | Attempts | Held |
 |---|---|---|
@@ -182,9 +183,9 @@ and budget exhaustion. **36 of 37 held.**
 | ASI-06 | 5 | 5 |
 | ASI-07 | 2 | 2 |
 | ASI-08 | 1 | 1 |
-| ASI-09 | 6 | 5 |
+| ASI-09 | 17 | 17 |
 
-One case is recorded as a break on purpose. RT-AUT-06 BREAKS, and the scoreboard says so. The Admin role is an unauthenticated request header, so 'ADMIN ' is normalised, accepted, and sendable by anyone; the attacker engages the kill switch without holding the scope. The project accepts that risk — the header is a coursework stand-in for identity and /admin/roles states it in the UI — but an accepted risk is still a break. Scoring it as held would have made the harness report 34/34 while a forged header worked, which is precisely the reassurance it exists to withhold. Binding roles to identity is the fix, and it is listed under limitations rather than claimed.
+Every case held, which is a smaller claim than it looks. Until this commit RT-AUT-06 broke on purpose: the Admin role was a request header, so 'ADMIN ' engaged the kill switch and the honest thing to do was score it as a break rather than as an expected result. It is now a token signed with HMAC-SHA256 under a secret only the operator holds, and the eleven RT-TOK cases attack that instead — rewriting the role, extending the expiry, truncating and stripping the signature, swapping the algorithm marker, replaying after expiry and after revocation. RT-TOK-10 deliberately SUCCEEDS with a real token, because a gate that refuses everyone scores perfectly and is broken. What remains true of any bearer credential is that whoever holds it can use it until it expires; lifetimes are short and revocation is immediate, but the revocation set is process memory and clears on restart.
 
 A pass here is narrow, and the file says so in its own words:
 The attack did not achieve its objective. It does not mean the system is secure — no harness can say that. It means these specific attempts, the ones a marketing-compliance tool actually invites, were tried and recorded, and the result is a number rather than an assurance.
@@ -201,11 +202,14 @@ The attack did not achieve its objective. It does not mean the system is secure 
 - **Most compliance clauses are unread.** Source documents are verified; the
   clauses are quoted verbatim during corpus ingestion, and until then the brand
   PDF prints "clause unverified".
-- **Roles are a request header, not an identity.** `X-Mawsim-Role: admin` is
-  unauthenticated and therefore forgeable, and the red team scores that as a
-  break rather than an expected result. Binding roles to a signed session is the
-  fix; the application states the gap at `/admin/roles` instead of implying a
-  control it does not have.
+- **A bearer token is usable by whoever holds it.** Admin is proved by a signed
+  token rather than claimed in a header, but a stateless credential cannot tell
+  its holder from its owner. Lifetimes default to eight hours and an id can be
+  refused immediately, though the revocation set is process memory and clears on
+  restart.
+- **The public deployment has no Admin at all.** No signing secret is set there,
+  so the capability is absent rather than open — which also means the kill
+  switch cannot be demonstrated against the live URL.
 - **The persona panel is not customer research.** It applies a rubric; it does
   not observe a reaction.
 - **Synthetic control cannot fully control for weather here.** With four sites

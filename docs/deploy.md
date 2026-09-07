@@ -76,3 +76,50 @@ the API's `/healthz` a minute before you start.
 Deployment is not triggered from this repository beyond CI. Publishing anything
 — a campaign, a creative, a report — is a human action taken outside the
 application, and no agent in the crew has a tool that reaches the outside world.
+
+## Enabling Admin on a deployed instance
+
+The live instance has **no signing secret**, so it has no Admin role. That is the
+intended state for a public URL: the capability is absent rather than open, and
+`/admin/roles` says so rather than implying a control that is not there.
+
+Two commands enable it, and neither puts the secret in this repository.
+
+Generate one — 64 hex characters from the OS CSPRNG, printed once and stored
+nowhere by this project:
+
+```bash
+uv run python scripts/mint_token.py --new-secret
+```
+
+Set it as `UPLIFT_SIGNING_SECRET` in the Render dashboard (Environment → Add
+Environment Variable), which restarts the service. Then mint a token locally
+with the *same* secret exported, and use it:
+
+```bash
+export UPLIFT_SIGNING_SECRET=<the value you just set on Render>
+uv run python scripts/mint_token.py --role admin --hours 8 --subject you@laptop
+```
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" "https://mawsim-api.onrender.com/admin/roles"
+```
+
+Three things worth knowing before you do it:
+
+**The secret is the whole of the access control.** There is no account to
+compromise and no password to reset, so anyone holding it can mint any role.
+Treat it the way you would an SSH key.
+
+**Tokens are bearer credentials.** Whoever holds one can use it until it
+expires, which is why the default lifetime is eight hours rather than a year. If
+one leaks, mint a fresh one and refuse the old id:
+
+```bash
+curl -H "Authorization: Bearer $NEW" "$API/admin/tokens/revoke?jti=<id>"
+```
+
+**Revocations clear on restart**, because they live in process memory — the same
+semantics as the kill switch, and for the same reason: a free instance has no
+durable store worth adding for this. The short lifetime is the control that
+survives a restart; revocation is the fast one.

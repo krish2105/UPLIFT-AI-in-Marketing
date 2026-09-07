@@ -1,25 +1,29 @@
-"""Roles, scopes, and one honest limitation stated rather than hidden.
+"""Roles, scopes, and where a role now comes from.
 
 UPLIFT has three roles because it has three genuinely different relationships to
 the work:
 
   VIEWER   reads the plan, the creatives and the results. A colleague you sent
-           the link to.
-  ANALYST  additionally runs a check and asks the corpus. The person planning.
+           the link to. This is what an unauthenticated caller gets.
+  ANALYST  additionally runs a check and asks the corpus.
   ADMIN    additionally pulls the kill switch and resets budgets.
 
-WHAT THIS IS NOT
-----------------
-This is AUTHORISATION, not authentication. The caller's role is resolved from a
-request header, which is a claim the caller makes about itself and trivially
-forgeable. That is adequate for a single-operator coursework tool whose entire
-API is read-only and which cannot take an action in the world — the worst a
-forged Admin header achieves is stopping the demo — and it is written here
-rather than left for a reviewer to discover.
+AUTHENTICATION, NOT JUST AUTHORISATION
+--------------------------------------
+This module used to read the role from `X-Mawsim-Role`, a header the caller sets
+about itself. The project said so plainly and the red-team harness scored it as
+a break, because it was one: `X-Mawsim-Role: ADMIN ` engaged the kill switch,
+and "we documented it" is not a control.
 
-Binding roles to real identity is the change that would be needed before this
-held anything private. The scope checks below do not change when that lands;
-only `current_role` does.
+A role now comes from a signed capability token in the Authorization header, and
+the header is gone rather than kept for compatibility — a vestigial input that
+once granted privilege is exactly what gets re-enabled by accident. See
+`identity.py` for the token and why it is not a login.
+
+Least privilege remains the default in both directions: no token is a Viewer, and
+so is an unreadable, expired, revoked or unsigned one. There is no path from a
+bad credential to anything above Viewer, and no error either — a caller who
+sends nonsense is simply a Viewer, which is what they would have been in silence.
 """
 
 from __future__ import annotations
@@ -27,6 +31,8 @@ from __future__ import annotations
 from enum import StrEnum
 
 from fastapi import Header, HTTPException, status
+
+from services.api.core import identity
 
 
 class Role(StrEnum):
@@ -47,17 +53,39 @@ ROLE_SCOPES: dict[Role, frozenset[Scope]] = {
     Role.ADMIN: frozenset({Scope.READ, Scope.ANALYSE, Scope.ADMIN_WRITE}),
 }
 
-ROLE_HEADER = "X-Mawsim-Role"
+AUTH_HEADER = "Authorization"
+SCHEME = "Bearer"
 
 
-def current_role(x_mawsim_role: str | None = Header(default=None)) -> Role:
-    """Least privilege by default: an absent or unrecognised role is a Viewer."""
-    if not x_mawsim_role:
-        return Role.VIEWER
+def current_role(authorization: str | None = Header(default=None)) -> Role:
+    """Least privilege by default, and by failure.
+
+    Every way of getting this wrong lands on Viewer: no header, the wrong
+    scheme, a forged signature, an expired or revoked token, a role the enum
+    does not know, or a deployment with no secret configured at all.
+    """
+    return current_identity(authorization)[0]
+
+
+def current_identity(
+    authorization: str | None = Header(default=None),
+) -> tuple[Role, identity.Claims | None]:
+    """The role and, when there is one, the token that proved it.
+
+    Returned together because an endpoint that reports WHO acted needs the
+    subject and the token id, and re-verifying to get them would mean verifying
+    twice per request.
+    """
+    if not authorization:
+        return Role.VIEWER, None
+    scheme, _, token = authorization.partition(" ")
+    if scheme.strip().lower() != SCHEME.lower() or not token.strip():
+        return Role.VIEWER, None
     try:
-        return Role(x_mawsim_role.strip().lower())
-    except ValueError:
-        return Role.VIEWER
+        claims = identity.verify(token.strip())
+        return Role(claims.role.strip().lower()), claims
+    except (identity.IdentityError, ValueError):
+        return Role.VIEWER, None
 
 
 def scopes_for(role: Role) -> frozenset[Scope]:
@@ -74,7 +102,7 @@ def require(scope: Scope):
         if scope not in scopes_for(role):
             raise HTTPException(
                 status.HTTP_403_FORBIDDEN,
-                f"{role} does not have {scope}. Send {ROLE_HEADER} with a role that does.",
+                f"{role} does not have {scope}. Send {AUTH_HEADER}: {SCHEME} <token>.",
             )
         return role
 

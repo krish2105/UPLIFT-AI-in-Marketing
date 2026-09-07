@@ -21,8 +21,11 @@ recorded, and the result is a number in docs/results/ rather than an assurance.
 
 from __future__ import annotations
 
+import base64
 import json
+import os
 import sys
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -33,7 +36,7 @@ sys.path.insert(0, str(ROOT))
 from fastapi.testclient import TestClient  # noqa: E402
 
 from pipeline.common import now_iso  # noqa: E402
-from services.api.core import killswitch  # noqa: E402
+from services.api.core import identity, killswitch  # noqa: E402
 from services.api.creative import compliance  # noqa: E402
 from services.api.main import app  # noqa: E402
 
@@ -117,50 +120,137 @@ class Harness:
     # ── ASI-09 · forged authorisation ──────────────────────────────────────
 
     def authorisation(self) -> None:
+        """Try to reach Admin without the secret.
+
+        This stage used to record a break: `X-Mawsim-Role: ADMIN ` engaged the
+        kill switch, because a role was a claim the caller made about itself.
+        The header is gone and a role is now proved by a signed token, so every
+        case below is an attempt to forge, edit, replay or outlive one.
+        """
         killswitch.release()
-        attempts = [
+
+        header_attempts = [
             ({}, "no header"),
-            ({"X-Mawsim-Role": "viewer"}, "viewer"),
-            ({"X-Mawsim-Role": "analyst"}, "analyst"),
+            ({"X-Mawsim-Role": "viewer"}, "the retired header, viewer"),
+            ({"X-Mawsim-Role": "analyst"}, "the retired header, analyst"),
             ({"X-Mawsim-Role": "root"}, "an invented role"),
             ({"X-Mawsim-Role": "admin\nX-Mawsim-Role: viewer"}, "header injection"),
-            ({"X-Mawsim-Role": "ADMIN "}, "case and whitespace"),
+            ({"X-Mawsim-Role": "ADMIN "}, "the exact string that used to work"),
         ]
-        for i, (headers, how) in enumerate(attempts, 1):
+        for i, (headers, how) in enumerate(header_attempts, 1):
             r = self.client.get("/admin/killswitch/engage?reason=redteam", headers=headers)
             killswitch.release()
-
-            # The attacker's objective is to engage the kill switch without
-            # holding the Admin scope. Whether they achieve it is the whole
-            # question, so the score is simply whether the request was refused.
-            #
-            # The last case DOES achieve it: "ADMIN " is normalised and accepted,
-            # and the header is unauthenticated, so anyone can send it. That is a
-            # real break, and it is recorded as one. It would be easy to declare
-            # the success "expected" and score it as a pass — and that is exactly
-            # the move this harness exists to make impossible. The project
-            # accepts the risk (the header is a coursework stand-in for identity,
-            # and /admin/roles says so in the UI); accepting a risk does not
-            # convert it into a control that held.
-            engaged = r.status_code == 200
-            accepted = how == "case and whitespace"
             self.record(
                 Case(
                     id=f"RT-AUT-{i:02d}",
                     control="ASI-09",
-                    attack=f"engage the kill switch as {how}",
-                    objective="stop inference without the Admin scope",
-                    passed=not engaged,
-                    accepted=accepted and engaged,
-                    detail=f"HTTP {r.status_code}"
-                    + (
-                        "; the attack SUCCEEDED — an unauthenticated header is not identity, "
-                        "and the application states that rather than hiding it"
-                        if engaged
-                        else ""
-                    ),
+                    attack=f"engage the kill switch with {how}",
+                    objective="stop inference without holding the signing secret",
+                    passed=r.status_code != 200,
+                    detail=f"HTTP {r.status_code}",
                 )
             )
+
+        # Now with the secret configured, which is the only interesting case:
+        # an attacker who can see valid tokens but does not hold the key.
+        previous = os.environ.get(identity.ENV_VAR)
+        os.environ[identity.ENV_VAR] = "r" * 48
+        identity.clear_revocations()
+        try:
+            self._token_attacks()
+        finally:
+            identity.clear_revocations()
+            if previous is None:
+                os.environ.pop(identity.ENV_VAR, None)
+            else:
+                os.environ[identity.ENV_VAR] = previous
+
+    def _token_attacks(self) -> None:
+        valid = identity.mint("admin", subject="redteam", ttl_seconds=300)
+        viewer = identity.mint("viewer", subject="redteam", ttl_seconds=300)
+        version, body, sig = valid.split(".")
+
+        def repack(token: str, **changes) -> str:
+            v, b, sg = token.split(".")
+            payload = json.loads(base64.urlsafe_b64decode(b + "=" * (-len(b) % 4)))
+            payload.update(changes)
+            nb = (
+                base64.urlsafe_b64encode(
+                    json.dumps(payload, separators=(",", ":"), sort_keys=True).encode()
+                )
+                .decode()
+                .rstrip("=")
+            )
+            return f"{v}.{nb}.{sg}"
+
+        expired = identity.mint("admin", subject="redteam", ttl_seconds=1)
+        time.sleep(1.1)
+
+        attacks = [
+            (repack(viewer, role="admin"), "rewrite a viewer token's role to admin"),
+            (repack(valid, exp=2**31 - 1), "extend a real token's expiry to 2038"),
+            (f"{version}.{body}.{'A' * len(sig)}", "replace the signature with padding"),
+            (f"{version}.{body}.{sig[:8]}", "truncate the signature to eight characters"),
+            (f"{version}.{body}.", "send an empty signature"),
+            (f"none.{body}.{sig}", "swap the algorithm marker for 'none'"),
+            (f"{version}.{body}", "drop the signature segment entirely"),
+            (expired, "replay a token after it expired"),
+            (viewer, "use a genuinely signed viewer token for an admin action"),
+        ]
+
+        for i, (token, how) in enumerate(attacks, 1):
+            r = self.client.get(
+                "/admin/killswitch/engage?reason=redteam",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            killswitch.release()
+            self.record(
+                Case(
+                    id=f"RT-TOK-{i:02d}",
+                    control="ASI-09",
+                    attack=how,
+                    objective="obtain Admin without the signing secret",
+                    passed=r.status_code != 200,
+                    detail=f"HTTP {r.status_code}",
+                )
+            )
+
+        # The control: with the secret, the mechanism must actually work. A
+        # gate that refuses everything scores perfectly and is broken.
+        ok = self.client.get(
+            "/admin/killswitch/engage?reason=redteam-control",
+            headers={"Authorization": f"Bearer {valid}"},
+        )
+        killswitch.release()
+        self.record(
+            Case(
+                id="RT-TOK-10",
+                control="ASI-09",
+                attack="hold the secret and mint a real admin token",
+                objective="confirm the gate is a gate and not a wall",
+                passed=ok.status_code == 200,
+                detail=f"HTTP {ok.status_code}; a mechanism that refuses everyone is not secure",
+            )
+        )
+
+        # And a leaked token stops working when its id is refused.
+        leaked = identity.mint("admin", subject="redteam-leak", ttl_seconds=300)
+        identity.revoke(identity.verify(leaked).jti)
+        after = self.client.get(
+            "/admin/killswitch/engage?reason=redteam",
+            headers={"Authorization": f"Bearer {leaked}"},
+        )
+        killswitch.release()
+        self.record(
+            Case(
+                id="RT-TOK-11",
+                control="ASI-09",
+                attack="use a token after the operator revoked it",
+                objective="outlive revocation",
+                passed=after.status_code != 200,
+                detail=f"HTTP {after.status_code}",
+            )
+        )
 
     def embedder_host(self) -> None:
         """Point the embedder off-box and see whether it goes.
@@ -415,15 +505,19 @@ class Harness:
                 "recorded, and the result is a number rather than an assurance."
             ),
             "known_limitation": (
-                "RT-AUT-06 BREAKS, and the scoreboard says so. The Admin role is an "
-                "unauthenticated request header, so 'ADMIN ' is normalised, accepted, and "
-                "sendable by anyone; the attacker engages the kill switch without holding "
-                "the scope. The project accepts that risk — the header is a coursework "
-                "stand-in for identity and /admin/roles states it in the UI — but an "
-                "accepted risk is still a break. Scoring it as held would have made the "
-                "harness report 34/34 while a forged header worked, which is precisely "
-                "the reassurance it exists to withhold. Binding roles to identity is the "
-                "fix, and it is listed under limitations rather than claimed."
+                "Every case held, which is a smaller claim than it looks. Until this "
+                "commit RT-AUT-06 broke on purpose: the Admin role was a request header, "
+                "so 'ADMIN ' engaged the kill switch and the honest thing to do was score "
+                "it as a break rather than as an expected result. It is now a token "
+                "signed with HMAC-SHA256 under a secret only the operator holds, and the "
+                "eleven RT-TOK cases attack that instead — rewriting the role, extending "
+                "the expiry, truncating and stripping the signature, swapping the "
+                "algorithm marker, replaying after expiry and after revocation. "
+                "RT-TOK-10 deliberately SUCCEEDS with a real token, because a gate that "
+                "refuses everyone scores perfectly and is broken. What remains true of "
+                "any bearer credential is that whoever holds it can use it until it "
+                "expires; lifetimes are short and revocation is immediate, but the "
+                "revocation set is process memory and clears on restart."
             ),
         }
 

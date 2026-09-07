@@ -108,8 +108,8 @@ estimate. The daily interval combines in quadrature rather than summing, because
 adding 24 hourly bands would assume every hour misses in the same direction.
 
 **15 · What would this need to become a product?**
-A real POS or footfall export in place of the generated series. Roles bound to
-identity rather than to a forgeable header. A donor pool large enough that the
-treated site is inside its hull on elasticity, not only on level. The clauses
+A real POS or footfall export in place of the generated series. A donor pool
+large enough that the treated site is inside its hull on elasticity, not only on
+level. The clauses
 read verbatim so no rule cites something nobody has opened. And a pilot, because
 every elasticity in the allocator is currently an assumption.

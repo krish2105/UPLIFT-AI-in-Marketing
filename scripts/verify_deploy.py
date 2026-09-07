@@ -82,6 +82,22 @@ def main() -> int:
         else "absent — the section would vanish silently",
     )
 
+    status, body = get(f"{API}/admin/roles")
+    roles = json.loads(body) if status == 200 and body else {}
+    record(
+        "the deployed instance grants no Admin",
+        roles.get("admin_available_on_this_instance") is False and roles.get("you_are") == "viewer",
+        f"admin available: {roles.get('admin_available_on_this_instance')}",
+    )
+
+    # The string that used to engage the kill switch on this very URL.
+    status, _ = get(f"{API}/admin/killswitch/engage?reason=deploy+probe")
+    record(
+        "the retired role header grants nothing",
+        status == 403,
+        f"HTTP {status}",
+    )
+
     status, _ = get(WEB)
     record("the web app answers", status == 200, f"HTTP {status}")
 

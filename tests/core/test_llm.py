@@ -220,8 +220,16 @@ class TestRoles:
         assert Scope.ADMIN_WRITE in ROLE_SCOPES[Role.ADMIN]
         assert Scope.ADMIN_WRITE not in ROLE_SCOPES[Role.ANALYST]
 
-    def test_the_header_is_case_insensitive(self):
-        assert current_role("  ADMIN ") is Role.ADMIN
+    def test_a_role_cannot_be_claimed_in_a_header_any_more(self):
+        """This assertion used to read `current_role("  ADMIN ") is Role.ADMIN`.
+
+        It passed, the mechanism worked as designed, and the design was the
+        vulnerability — the red-team harness engaged the kill switch with that
+        exact string. Roles are proved by a signed token now; the attacks on it
+        live in tests/security/test_identity.py.
+        """
+        for claim in ("admin", "  ADMIN ", "analyst"):
+            assert current_role(claim) is Role.VIEWER
 
 
 class TestProviderConstructionIsSideEffectFree:

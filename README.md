@@ -164,7 +164,8 @@ the rules on purpose.</td>
 | Retrieval answers what it can and refuses what it cannot | `python scripts/spike_retrieval.py` | **6/8** in-domain answered, **10/10** out-of-domain refused — [`C2`](docs/results/C2-retrieval.json) |
 | The 3D scene holds its frame budget | `npx playwright test frames.spec.ts` | median **60 fps**, 95th percentile 30 — [`D1`](docs/results/D1-frames.json) |
 | The deployed pair is what it claims to be | `python scripts/verify_deploy.py` | 6/6 checks — [`A12`](docs/results/A12-deploy.json) |
-| The safety claims survive being attacked | `python scripts/red_team.py` | 34 attacks, 7 controls, **33 held** — and the one that works is scored as a break — [`E1`](docs/results/E1-red-team.json) |
+| The safety claims survive being attacked | `python scripts/red_team.py` | 48 attacks, 7 controls, **48 held** — including 11 against the capability token that replaced the forgeable header — [`E1`](docs/results/E1-red-team.json) |
+| A privileged role is proved, not claimed | `pytest tests/security` | signed tokens; role, expiry, signature and revocation all attacked — 26 cases |
 | Provider spend stays at zero | `pytest tests/core/test_llm.py` | Anthropic reports itself unavailable with a key set; the chain ends in a deterministic stub |
 | Every artefact still matches its builder | `pytest tests/test_artefacts_are_current.py` | report, deck, viva, demo and notebook regenerate byte-identically from `docs/results/` |
 
@@ -229,11 +230,15 @@ Stated here rather than discovered by a reader.
   and one uniquely weather-elastic, the treated unit is inside the donors' hull
   on level and outside it on elasticity. The residual bias is measured on a
   placebo-in-time window and reported rather than absorbed.
-- **Roles are a request header, not an identity.** `X-Mawsim-Role` is
-  unauthenticated, so anyone can send `admin`. The red-team harness scores that
-  as a break rather than as an expected result, and the Security tab shows the
-  row. It is adequate here only because the entire API is read-only: the worst a
-  forged header achieves is stopping a demo.
+- **A bearer token is usable by whoever holds it.** Admin is proved by a signed
+  token now rather than claimed in a header, but a stateless credential cannot
+  tell its holder from its owner. Lifetimes default to eight hours and
+  `/admin/tokens/revoke` refuses an id immediately, though that set is process
+  memory and clears on restart.
+- **The live instance has no Admin.** No signing secret is set there, so the
+  capability is absent rather than open — which also means the kill switch
+  cannot be demonstrated against the public URL. Enabling it is two commands in
+  [`docs/deploy.md`](docs/deploy.md).
 - **The persona panel is not customer research.** It applies a rubric; it does
   not observe a reaction.
 - **Ask retrieves, it does not generate.** BM25 over the project's own corpus,

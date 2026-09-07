@@ -257,14 +257,15 @@ claim is worth what the attempt to break it is worth.
 `scripts/red_team.py` makes {red["cases"]} attempts across
 {len(red["by_control"])} OWASP ASI controls — prompt injection into the
 compliance checker, script-mixing and zero-width evasion of the claim rules,
-forged Admin headers, HTTP verbs the API does not answer, provenance stripping,
-and budget exhaustion. **{red["held"]} of {red["cases"]} held.**
+forged and edited capability tokens, HTTP verbs the API does not answer,
+provenance stripping, aiming the embedder off-box, and budget exhaustion.
+**{red["held"]} of {red["cases"]} held.**
 
 | Control | Attempts | Held |
 |---|---|---|
 {chr(10).join(f"| {k} | {v['cases']} | {v['held']} |" for k, v in sorted(red["by_control"].items()))}
 
-One case is recorded as a break on purpose. {red["known_limitation"]}
+{red["known_limitation"]}
 
 A pass here is narrow, and the file says so in its own words:
 {red["what_a_pass_means"]}
@@ -281,11 +282,14 @@ A pass here is narrow, and the file says so in its own words:
 - **Most compliance clauses are unread.** Source documents are verified; the
   clauses are quoted verbatim during corpus ingestion, and until then the brand
   PDF prints "clause unverified".
-- **Roles are a request header, not an identity.** `X-Mawsim-Role: admin` is
-  unauthenticated and therefore forgeable, and the red team scores that as a
-  break rather than an expected result. Binding roles to a signed session is the
-  fix; the application states the gap at `/admin/roles` instead of implying a
-  control it does not have.
+- **A bearer token is usable by whoever holds it.** Admin is proved by a signed
+  token rather than claimed in a header, but a stateless credential cannot tell
+  its holder from its owner. Lifetimes default to eight hours and an id can be
+  refused immediately, though the revocation set is process memory and clears on
+  restart.
+- **The public deployment has no Admin at all.** No signing secret is set there,
+  so the capability is absent rather than open — which also means the kill
+  switch cannot be demonstrated against the live URL.
 - **The persona panel is not customer research.** It applies a rubric; it does
   not observe a reaction.
 - **Synthetic control cannot fully control for weather here.** With four sites
@@ -380,13 +384,14 @@ weather-flat and the treated site is not. Measured on a placebo window and
 subtracted, with both numbers reported.
 **The second slide that earns the rest.**
 
-## 11 · Safety, and the one attack that worked
+## 11 · Safety, and the attack that used to work
 No agent has a tool that reaches the outside world; the whole API is GET.
 **{red["held"]}/{red["cases"]}** red-team attacks held across {len(red["by_control"])}
-controls. The one that broke is the forged Admin header, and it is on the slide:
-a role carried in an unauthenticated header is not an identity, and scoring it as
-a pass would have made the number meaningless.
-**Visual:** the attack table, with that row reading "broke · accepted".
+controls. Until recently one did not: `X-Mawsim-Role: ADMIN ` engaged the kill
+switch, and the harness scored it as a break rather than as an expected result —
+which is what made it worth fixing rather than worth explaining. A role is now a
+signed token, and eleven cases attack that instead.
+**Visual:** the attack table, with the RT-TOK rows.
 
 ## 12 · Limitations
 Footfall is generated. Event dates are placed, not confirmed. Islamic holidays
@@ -513,9 +518,9 @@ estimate. The daily interval combines in quadrature rather than summing, because
 adding 24 hourly bands would assume every hour misses in the same direction.
 
 **15 · What would this need to become a product?**
-A real POS or footfall export in place of the generated series. Roles bound to
-identity rather than to a forgeable header. A donor pool large enough that the
-treated site is inside its hull on elasticity, not only on level. The clauses
+A real POS or footfall export in place of the generated series. A donor pool
+large enough that the treated site is inside its hull on elasticity, not only on
+level. The clauses
 read verbatim so no rule cites something nobody has opened. And a pilot, because
 every elasticity in the allocator is currently an assumption.
 """

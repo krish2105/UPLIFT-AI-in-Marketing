@@ -87,13 +87,18 @@ test.describe("the safety claim is on screen", () => {
     const injected = rows.filter({ hasText: "Ignore all previous instructions" }).first();
     await expect(injected.locator(".badge-pass")).toHaveText("held");
 
-    // And the attack that WORKED is shown as a break, not as an expected pass.
-    // Reporting every case as held while a forged header still engages the kill
-    // switch is the reassurance this whole section exists to withhold, so the
-    // test asserts the badge rather than the prose around it.
-    const forged = rows.filter({ hasText: "case and whitespace" }).first();
-    await expect(forged.locator(".badge-warn")).toHaveText(/broke/);
-    await expect(forged.locator(".badge-pass")).toHaveCount(0);
+    // The string that used to work. `X-Mawsim-Role: ADMIN ` engaged the kill
+    // switch and this row read "broke · accepted"; a role is a signed token now,
+    // so it holds. The row is asserted by NAME rather than by count, because
+    // "48 of 48 held" would still pass if this particular case quietly stopped
+    // being run.
+    const retired = rows.filter({ hasText: "the exact string that used to work" }).first();
+    await expect(retired.locator(".badge-pass")).toHaveText("held");
+
+    // And a token attack, so the table is shown to cover the mechanism that
+    // replaced it rather than only the one it retired.
+    const forged = rows.filter({ hasText: "rewrite a viewer token's role to admin" }).first();
+    await expect(forged.locator(".badge-pass")).toHaveText("held");
   });
 });
 

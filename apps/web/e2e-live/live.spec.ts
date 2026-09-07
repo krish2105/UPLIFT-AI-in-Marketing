@@ -70,3 +70,25 @@ test("the deployed instance carries the red-team result, not just the scorecard"
     page.locator("table.data tbody tr").filter({ hasText: "case and whitespace" }).first(),
   ).toContainText(/broke/i);
 });
+
+test("the deployed instance has no Admin, and says so", async ({ request }) => {
+  /* Fail-closed, checked in production rather than assumed from the code.
+     No signing secret is set on the public instance, so the capability is
+     ABSENT rather than open — and the endpoint that used to grant it with a
+     header now refuses. A deployment that quietly acquired a secret, or one
+     where the header still worked, both show up here. */
+  const roles = await request.get(`${API}/admin/roles`, { timeout: 120_000 });
+  expect(roles.status()).toBe(200);
+  const body = await roles.json();
+  expect(body.you_are).toBe("viewer");
+  expect(body.admin_available_on_this_instance).toBe(false);
+
+  const forged = await request.get(`${API}/admin/killswitch/engage?reason=live+probe`, {
+    headers: { "X-Mawsim-Role": "ADMIN " },
+    timeout: 120_000,
+  });
+  expect(forged.status()).toBe(403);
+  expect((await request.get(`${API}/admin/killswitch`)).json()).resolves.toMatchObject({
+    engaged: false,
+  });
+});

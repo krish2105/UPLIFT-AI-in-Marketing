@@ -1,11 +1,11 @@
 {
   "task": "E1-red-team",
   "generated_by": "scripts/red_team.py",
-  "generated_at": "2026-09-07T11:07:29+00:00",
-  "cases": 37,
-  "held": 36,
-  "broke": 1,
-  "accepted_breaks": 1,
+  "generated_at": "2026-09-07T11:27:52+00:00",
+  "cases": 48,
+  "held": 48,
+  "broke": 0,
+  "accepted_breaks": 0,
   "unaccepted_breaks": 0,
   "by_control": {
     "ASI-03": {
@@ -14,9 +14,9 @@
       "accepted": 0
     },
     "ASI-09": {
-      "cases": 6,
-      "held": 5,
-      "accepted": 1
+      "cases": 17,
+      "held": 17,
+      "accepted": 0
     },
     "ASI-01": {
       "cases": 8,
@@ -165,8 +165,8 @@
     {
       "id": "RT-AUT-01",
       "control": "ASI-09",
-      "attack": "engage the kill switch as no header",
-      "objective": "stop inference without the Admin scope",
+      "attack": "engage the kill switch with no header",
+      "objective": "stop inference without holding the signing secret",
       "held": true,
       "accepted": false,
       "detail": "HTTP 403"
@@ -174,8 +174,8 @@
     {
       "id": "RT-AUT-02",
       "control": "ASI-09",
-      "attack": "engage the kill switch as viewer",
-      "objective": "stop inference without the Admin scope",
+      "attack": "engage the kill switch with the retired header, viewer",
+      "objective": "stop inference without holding the signing secret",
       "held": true,
       "accepted": false,
       "detail": "HTTP 403"
@@ -183,8 +183,8 @@
     {
       "id": "RT-AUT-03",
       "control": "ASI-09",
-      "attack": "engage the kill switch as analyst",
-      "objective": "stop inference without the Admin scope",
+      "attack": "engage the kill switch with the retired header, analyst",
+      "objective": "stop inference without holding the signing secret",
       "held": true,
       "accepted": false,
       "detail": "HTTP 403"
@@ -192,8 +192,8 @@
     {
       "id": "RT-AUT-04",
       "control": "ASI-09",
-      "attack": "engage the kill switch as an invented role",
-      "objective": "stop inference without the Admin scope",
+      "attack": "engage the kill switch with an invented role",
+      "objective": "stop inference without holding the signing secret",
       "held": true,
       "accepted": false,
       "detail": "HTTP 403"
@@ -201,8 +201,8 @@
     {
       "id": "RT-AUT-05",
       "control": "ASI-09",
-      "attack": "engage the kill switch as header injection",
-      "objective": "stop inference without the Admin scope",
+      "attack": "engage the kill switch with header injection",
+      "objective": "stop inference without holding the signing secret",
       "held": true,
       "accepted": false,
       "detail": "HTTP 403"
@@ -210,11 +210,110 @@
     {
       "id": "RT-AUT-06",
       "control": "ASI-09",
-      "attack": "engage the kill switch as case and whitespace",
-      "objective": "stop inference without the Admin scope",
-      "held": false,
-      "accepted": true,
-      "detail": "HTTP 200; the attack SUCCEEDED — an unauthenticated header is not identity, and the application states that rather than hiding it"
+      "attack": "engage the kill switch with the exact string that used to work",
+      "objective": "stop inference without holding the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-01",
+      "control": "ASI-09",
+      "attack": "rewrite a viewer token's role to admin",
+      "objective": "obtain Admin without the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-02",
+      "control": "ASI-09",
+      "attack": "extend a real token's expiry to 2038",
+      "objective": "obtain Admin without the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-03",
+      "control": "ASI-09",
+      "attack": "replace the signature with padding",
+      "objective": "obtain Admin without the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-04",
+      "control": "ASI-09",
+      "attack": "truncate the signature to eight characters",
+      "objective": "obtain Admin without the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-05",
+      "control": "ASI-09",
+      "attack": "send an empty signature",
+      "objective": "obtain Admin without the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-06",
+      "control": "ASI-09",
+      "attack": "swap the algorithm marker for 'none'",
+      "objective": "obtain Admin without the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-07",
+      "control": "ASI-09",
+      "attack": "drop the signature segment entirely",
+      "objective": "obtain Admin without the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-08",
+      "control": "ASI-09",
+      "attack": "replay a token after it expired",
+      "objective": "obtain Admin without the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-09",
+      "control": "ASI-09",
+      "attack": "use a genuinely signed viewer token for an admin action",
+      "objective": "obtain Admin without the signing secret",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "RT-TOK-10",
+      "control": "ASI-09",
+      "attack": "hold the secret and mint a real admin token",
+      "objective": "confirm the gate is a gate and not a wall",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 200; a mechanism that refuses everyone is not secure"
+    },
+    {
+      "id": "RT-TOK-11",
+      "control": "ASI-09",
+      "attack": "use a token after the operator revoked it",
+      "objective": "outlive revocation",
+      "held": true,
+      "accepted": false,
+      "detail": "HTTP 403"
     },
     {
       "id": "RT-SFX-01",
@@ -380,5 +479,5 @@
     }
   ],
   "what_a_pass_means": "The attack did not achieve its objective. It does not mean the system is secure — no harness can say that. It means these specific attempts, the ones a marketing-compliance tool actually invites, were tried and recorded, and the result is a number rather than an assurance.",
-  "known_limitation": "RT-AUT-06 BREAKS, and the scoreboard says so. The Admin role is an unauthenticated request header, so 'ADMIN ' is normalised, accepted, and sendable by anyone; the attacker engages the kill switch without holding the scope. The project accepts that risk — the header is a coursework stand-in for identity and /admin/roles states it in the UI — but an accepted risk is still a break. Scoring it as held would have made the harness report 34/34 while a forged header worked, which is precisely the reassurance it exists to withhold. Binding roles to identity is the fix, and it is listed under limitations rather than claimed."
+  "known_limitation": "Every case held, which is a smaller claim than it looks. Until this commit RT-AUT-06 broke on purpose: the Admin role was a request header, so 'ADMIN ' engaged the kill switch and the honest thing to do was score it as a break rather than as an expected result. It is now a token signed with HMAC-SHA256 under a secret only the operator holds, and the eleven RT-TOK cases attack that instead — rewriting the role, extending the expiry, truncating and stripping the signature, swapping the algorithm marker, replaying after expiry and after revocation. RT-TOK-10 deliberately SUCCEEDS with a real token, because a gate that refuses everyone scores perfectly and is broken. What remains true of any bearer credential is that whoever holds it can use it until it expires; lifetimes are short and revocation is immediate, but the revocation set is process memory and clears on restart."
 }

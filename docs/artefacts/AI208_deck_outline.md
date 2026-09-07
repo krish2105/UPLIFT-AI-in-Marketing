@@ -62,13 +62,14 @@ weather-flat and the treated site is not. Measured on a placebo window and
 subtracted, with both numbers reported.
 **The second slide that earns the rest.**
 
-## 11 · Safety, and the one attack that worked
+## 11 · Safety, and the attack that used to work
 No agent has a tool that reaches the outside world; the whole API is GET.
-**36/37** red-team attacks held across 7
-controls. The one that broke is the forged Admin header, and it is on the slide:
-a role carried in an unauthenticated header is not an identity, and scoring it as
-a pass would have made the number meaningless.
-**Visual:** the attack table, with that row reading "broke · accepted".
+**48/48** red-team attacks held across 7
+controls. Until recently one did not: `X-Mawsim-Role: ADMIN ` engaged the kill
+switch, and the harness scored it as a break rather than as an expected result —
+which is what made it worth fixing rather than worth explaining. A role is now a
+signed token, and eleven cases attack that instead.
+**Visual:** the attack table, with the RT-TOK rows.
 
 ## 12 · Limitations
 Footfall is generated. Event dates are placed, not confirmed. Islamic holidays
