@@ -9,8 +9,16 @@
 # That is fine here, because this application's database is a CACHE of the
 # pipelines rather than a system of record. Nothing a visitor does writes to it:
 # the API is read-only, and every row comes from a pipeline run. So the build
-# step runs the pipelines and bakes the database into the image. It is rebuilt
-# on every deploy, which is also how the deployed data stays current.
+# step runs the pipelines and bakes the database into the deployed filesystem.
+#
+# UPLIFT_DB MUST BE A REPO-RELATIVE PATH, NOT /tmp.
+# The first deploy set it to /tmp/mawsim-ephemeral.db and came up with every
+# dataset empty. Render's build and its runtime are DIFFERENT CONTAINERS: what
+# the build writes to /tmp is gone by the time the service starts, while the
+# build's working directory is carried forward as the runtime filesystem. So
+# the database is written inside the project. /healthz caught this immediately
+# by reporting "degraded" and naming the empty datasets, which is the entire
+# reason it reports what is loaded rather than only that the process is up.
 #
 # The cost is build time — the weather ETL fetches 24 months of hourly history —
 # and it is paid once per deploy rather than once per request.
@@ -38,9 +46,10 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.13"
-      # Named so it is obvious in a shell that this is not durable.
+      # Repo-relative on purpose. See the header: /tmp does not survive from
+      # the build container to the runtime one, and the service comes up empty.
       - key: UPLIFT_DB
-        value: /tmp/mawsim-ephemeral.db
+        value: data/processed/uplift.db
       # Ollama does not exist here. Phase C's provider chain resolves to Gemini,
       # then Groq, then the deterministic stub. Without a key it runs on the
       # stub, which is a supported state and /healthz says so.
