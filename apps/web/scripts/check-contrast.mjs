@@ -88,6 +88,13 @@ const PAIRS = [
   ["--pass-text", "--bg", 4.5, "compliance PASS wording"],
   ["--fail-text", "--bg", 4.5, "compliance FAIL wording"],
   ["--warn-text", "--bg", 4.5, "accepted-break wording"],
+  // A COMPOSITE, not a token pair. `.btn[aria-pressed="true"]` inverts — the
+  // label takes --bg on a --text ground — and the gate had no entry for it
+  // because it only ever checked colours against their own register's surface.
+  // An e2e accessibility scan flagged the theme toggle, wrongly as it turned
+  // out, and finding out why exposed that this pair had never been measured at
+  // all. It passes comfortably; it is here so it stays that way.
+  ["--bg", "--text", 4.5, "pressed toggle label on its inverted ground"],
   ["--sig-forecast", "--bg", 3.0, "forecast line against the plot ground"],
   ["--sig-actual", "--bg", 3.0, "measured line against the plot ground"],
 ];

@@ -22,6 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "services"))
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # build_docx, beside this file
 
 from api.brand import load_brand  # noqa: E402  (after the sys.path insert above)
 from api.creative.compliance import check as check_copy  # noqa: E402
@@ -42,6 +43,8 @@ REQUIRED = (
     "B3-allocator",
     "B4-uplift",
     "C1-compliance",
+    "C2-retrieval",
+    "D1-frames",
     "E1-red-team",
 )
 
@@ -92,6 +95,34 @@ Generated {date.today().isoformat()} from `docs/results/` by `scripts/build_repo
 Every figure below was read out of a results file. None was typed.
 
 ---
+
+## Executive summary
+
+MAWSIM forecasts hourly footfall for four SIDRA sites in Dubai from exogenous
+drivers — weather, events, public holidays and school terms — plans promotions
+against that forecast, checks every creative claim against cited food-advertising
+rules, and measures incremental lift rather than clicks.
+
+| What was claimed | What was measured |
+|---|---|
+| The forecast beats a seasonal-naive baseline | **{f["weeks_won"]} of {f["weeks_total"]} site-weeks**, MAE {min(z["improvement"] for z in f["zones"].values()):.0%}–{max(z["improvement"] for z in f["zones"].values()):.0%} lower |
+| Lift estimates recover a known effect | five injections recovered within **{u["worst_error_points"]:.2f} points** of a five-point tolerance |
+| Segments are stable | **{s["bootstrap_stability"]:.1%}** keep their segment across resamples |
+| Compliance catches violations in three languages | recall and precision **{c["worst_recall"]:.0%}** in the worst language |
+| Retrieval refuses what it cannot cite | **{r["C2-retrieval"]["end_to_end"]["out_of_domain_refused"]}/{r["C2-retrieval"]["end_to_end"]["out_of_domain_total"]}** out-of-domain questions refused |
+| The safety claims survive attack | **{red["held"]}/{red["cases"]}** red-team attempts held |
+
+Three findings are worth more than the table. The forecast is **worse than the
+baseline on sMAPE** and that is reported rather than dropped. The lift estimator
+carries a **{u["recovery"][0]["bias"]:+.1%} bias** on a window where nothing
+happened, measured on a placebo and subtracted. And the retrieval layer's
+embeddings were **denied the power to answer on their own**, because the
+similarity bar that would admit a genuine Arabic question also admits "send me
+the invoice".
+
+The brand is fictional and the footfall is generated. What is not generated is
+the evaluation: every model is scored against a baseline on held-out time, and
+every number in this document is read from `docs/results/` rather than typed.
 
 ## 1. The problem
 
@@ -295,6 +326,48 @@ A pass here is narrow, and the file says so in its own words:
 - **Synthetic control cannot fully control for weather here.** With four sites
   and one uniquely weather-elastic, the treated unit is inside the donors' hull
   on level and outside it on elasticity.
+
+## 12. Business case
+
+Stated as arithmetic with its assumptions visible, because no promotion has run
+and therefore nothing here is a measured return.
+
+What the system changes is not the size of a promotion budget but where it
+lands. The allocator distributes a fixed spend across fifteen channel × daypart
+cells rather than five channels, and the daypart split is where the money
+actually moves: aggregator spend pays back at midday and is wasted at 07:00, and
+near-store outdoor advertising only works within walking distance of a site.
+
+| Lever | Mechanism | Status |
+|---|---|---|
+| Staffing to the forecast | MAE {min(z["improvement"] for z in f["zones"].values()):.0%}–{max(z["improvement"] for z in f["zones"].values()):.0%} below "same hour last week" | **measured** |
+| Promotion sized to the interval | plans against the 80% lower bound, not the point estimate | **implemented** |
+| Spend moved between dayparts | concave allocator, optimum verified by equal marginal return | **implemented, elasticities assumed** |
+| Copy cleared before it runs | {c["by_language"]["en"]["cases"]}-case gold set, {c["worst_recall"]:.0%} recall in the worst of three languages | **measured** |
+| Lift measured instead of clicks | synthetic control + CUPED, recovery within {u["worst_error_points"]:.2f} points | **measured** |
+
+The honest summary: **four of five levers are demonstrated, and the one that
+would produce a currency figure is the one whose parameters are assumed.** A
+pilot replaces the assumed elasticities with measured lift, at which point the
+allocator's output becomes a forecast of return rather than a demonstration of
+method. Quoting a dirham figure before that would be inventing the only number
+anybody would actually act on.
+
+## 13. Conclusion
+
+The method holds on invented data because it is judged against a baseline that
+sees the same invented data. Replace the footfall series with a real POS export
+and nothing in the pipeline changes — that is the point of scoring against
+seasonal naive on held-out time rather than reporting a fit.
+
+What this project demonstrates is not that demand can be forecast, which is
+uncontroversial, but that a marketing system can be built so that **every figure
+it shows can be traced to the script that produced it, and every claim it makes
+about its own safety has been attacked on purpose.** The gates that disagreed
+with each other found real defects: a metric that got worse, an estimator biased
+where nothing happened, a colour indistinguishable under deuteranopia, a forged
+header that engaged the kill switch. Each was fixed rather than tuned away, and
+the residuals that could not be fixed are stated here rather than omitted.
 
 ## Not advice
 
@@ -825,38 +898,40 @@ def main() -> int:
 
     # A .docx is a zip, and python-docx stamps each entry with the moment it was
     # written, so rebuilding an unchanged report produces 42 KB of different
-    # bytes and an unreadable binary diff. Rebuild it only when the prose moved.
-    if unchanged and (ARTEFACTS / "AI208_MAWSIM_report.docx").exists():
+    # bytes and an unreadable binary diff. Rebuild it only when something moved.
+    #
+    # "Something" is the prose OR THE RENDERER. The first version of this guard
+    # watched only the markdown, so rewriting build_docx.py from a flat
+    # paragraph loop into a laid-out document changed nothing on disk and said
+    # "unchanged" — a cache that outlived the thing it was caching.
+    docx_out = ARTEFACTS / "AI208_MAWSIM_report.docx"
+    renderer = Path(__file__).resolve().parent / "build_docx.py"
+    renderer_is_newer = docx_out.exists() and renderer.stat().st_mtime > docx_out.stat().st_mtime
+    if unchanged and docx_out.exists() and not renderer_is_newer:
         print("  docx unchanged; not rewritten")
         return _write_side_artefacts()
 
     try:
-        from docx import Document
-        from docx.shared import Pt
+        from build_docx import render
 
-        doc = Document()
-        doc.core_properties.title = "UPLIFT / MAWSIM — AI 208 report"
-        doc.core_properties.author = "Krishna Mathur"
-        for line in md.splitlines():
-            if line.startswith("# "):
-                doc.add_heading(line[2:], 0)
-            elif line.startswith("## "):
-                doc.add_heading(line[3:], 1)
-            elif line.startswith("### "):
-                doc.add_heading(line[4:], 2)
-            elif line.startswith("|") or line.startswith(">"):
-                # A separator row like |---|---| strips to nothing, and an empty
-                # paragraph has no runs to style.
-                text = line.strip("|> ").strip()
-                if not text or set(text) <= set("-|: "):
-                    continue
-                para = doc.add_paragraph(text)
-                if para.runs:
-                    para.runs[0].font.size = Pt(9)
-            elif line.strip():
-                doc.add_paragraph(line)
         docx_path = ARTEFACTS / "AI208_MAWSIM_report.docx"
-        doc.save(docx_path)
+        render(
+            md,
+            docx_path,
+            {
+                "title": "UPLIFT / MAWSIM",
+                "tagline": "Demand-aware promo planning for Dubai retail",
+                "subject": "AI 208 — AI in Marketing",
+                "author": "Krishna Mathur",
+                "school": "SP Jain School of Global Management — MAIB, Term 4",
+                "date": date.today().strftime("%d %B %Y"),
+                "disclaimer": (
+                    "SIDRA is a fictional brand invented for this coursework, and its "
+                    "footfall series is generated. Every figure in this document is read "
+                    "from docs/results/ by scripts/build_report.py rather than typed."
+                ),
+            },
+        )
         print(f"wrote {docx_path.relative_to(ROOT)}")
     except ImportError:
         print("python-docx not installed; the markdown report is the artefact")
@@ -865,6 +940,17 @@ def main() -> int:
 
 
 def _write_side_artefacts() -> int:
+    # Imported under a distinct name: `build_deck` is already this module's
+    # markdown outline builder, and importing over it made the outline builder
+    # the .pptx builder — which failed loudly, but would not have to.
+    try:
+        from build_deck import build as build_pptx
+
+        out = build_pptx(ARTEFACTS / "AI208_MAWSIM_deck.pptx")
+        print(f"wrote {out.relative_to(ROOT)}")
+    except ImportError:
+        print("python-pptx not installed; the deck outline is the artefact")
+
     for name, builder in (
         ("AI208_deck_outline.md", build_deck),
         ("AI208_viva_15.md", build_viva),

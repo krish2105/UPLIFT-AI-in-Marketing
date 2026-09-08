@@ -147,6 +147,15 @@
         "why": "accepted-break wording"
       },
       {
+        "foreground": "--bg",
+        "background": "--text",
+        "ratio": 14.86,
+        "floor": 4.5,
+        "pass": true,
+        "out_of_gamut": false,
+        "why": "pressed toggle label on its inverted ground"
+      },
+      {
         "foreground": "--sig-forecast",
         "background": "--bg",
         "ratio": 3.27,
@@ -311,6 +320,15 @@
         "why": "accepted-break wording"
       },
       {
+        "foreground": "--bg",
+        "background": "--text",
+        "ratio": 17,
+        "floor": 4.5,
+        "pass": true,
+        "out_of_gamut": false,
+        "why": "pressed toggle label on its inverted ground"
+      },
+      {
         "foreground": "--sig-forecast",
         "background": "--bg",
         "ratio": 5.84,
@@ -330,7 +348,7 @@
       }
     ]
   },
-  "pairs_measured": 36,
+  "pairs_measured": 38,
   "failures": [],
   "pass": true
 }

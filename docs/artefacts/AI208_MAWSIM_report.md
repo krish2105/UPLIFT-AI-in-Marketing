@@ -2,7 +2,7 @@
 
 **Demand-aware promo planning for Dubai retail.**
 SP Jain MAIB Term 4 · AI 208 AI in Marketing · Krishna Mathur
-Generated 2026-09-07 from `docs/results/` by `scripts/build_report.py`.
+Generated 2026-09-08 from `docs/results/` by `scripts/build_report.py`.
 
 > **SIDRA is a fictional Dubai speciality coffee and bakery chain**, invented for
 > this demonstration. It is not a real company. The footfall and point-of-sale
@@ -12,6 +12,34 @@ Generated 2026-09-07 from `docs/results/` by `scripts/build_report.py`.
 Every figure below was read out of a results file. None was typed.
 
 ---
+
+## Executive summary
+
+MAWSIM forecasts hourly footfall for four SIDRA sites in Dubai from exogenous
+drivers — weather, events, public holidays and school terms — plans promotions
+against that forecast, checks every creative claim against cited food-advertising
+rules, and measures incremental lift rather than clicks.
+
+| What was claimed | What was measured |
+|---|---|
+| The forecast beats a seasonal-naive baseline | **36 of 36 site-weeks**, MAE 28%–34% lower |
+| Lift estimates recover a known effect | five injections recovered within **2.61 points** of a five-point tolerance |
+| Segments are stable | **91.8%** keep their segment across resamples |
+| Compliance catches violations in three languages | recall and precision **100%** in the worst language |
+| Retrieval refuses what it cannot cite | **10/10** out-of-domain questions refused |
+| The safety claims survive attack | **48/48** red-team attempts held |
+
+Three findings are worth more than the table. The forecast is **worse than the
+baseline on sMAPE** and that is reported rather than dropped. The lift estimator
+carries a **-3.5% bias** on a window where nothing
+happened, measured on a placebo and subtracted. And the retrieval layer's
+embeddings were **denied the power to answer on their own**, because the
+similarity bar that would admit a genuine Arabic question also admits "send me
+the invoice".
+
+The brand is fictional and the footfall is generated. What is not generated is
+the evaluation: every model is scored against a baseline on held-out time, and
+every number in this document is read from `docs/results/` rather than typed.
 
 ## 1. The problem
 
@@ -146,7 +174,7 @@ accounting sentence with a citation attached.
 
 | | |
 |---|---|
-| Contrast pairs measured | 36, both registers |
+| Contrast pairs measured | 38, both registers |
 | Palette checks | seven, both registers |
 
 The palette was rejected twice by its own gate before passing: a saturated
@@ -215,6 +243,48 @@ The attack did not achieve its objective. It does not mean the system is secure 
 - **Synthetic control cannot fully control for weather here.** With four sites
   and one uniquely weather-elastic, the treated unit is inside the donors' hull
   on level and outside it on elasticity.
+
+## 12. Business case
+
+Stated as arithmetic with its assumptions visible, because no promotion has run
+and therefore nothing here is a measured return.
+
+What the system changes is not the size of a promotion budget but where it
+lands. The allocator distributes a fixed spend across fifteen channel × daypart
+cells rather than five channels, and the daypart split is where the money
+actually moves: aggregator spend pays back at midday and is wasted at 07:00, and
+near-store outdoor advertising only works within walking distance of a site.
+
+| Lever | Mechanism | Status |
+|---|---|---|
+| Staffing to the forecast | MAE 28%–34% below "same hour last week" | **measured** |
+| Promotion sized to the interval | plans against the 80% lower bound, not the point estimate | **implemented** |
+| Spend moved between dayparts | concave allocator, optimum verified by equal marginal return | **implemented, elasticities assumed** |
+| Copy cleared before it runs | 40-case gold set, 100% recall in the worst of three languages | **measured** |
+| Lift measured instead of clicks | synthetic control + CUPED, recovery within 2.61 points | **measured** |
+
+The honest summary: **four of five levers are demonstrated, and the one that
+would produce a currency figure is the one whose parameters are assumed.** A
+pilot replaces the assumed elasticities with measured lift, at which point the
+allocator's output becomes a forecast of return rather than a demonstration of
+method. Quoting a dirham figure before that would be inventing the only number
+anybody would actually act on.
+
+## 13. Conclusion
+
+The method holds on invented data because it is judged against a baseline that
+sees the same invented data. Replace the footfall series with a real POS export
+and nothing in the pipeline changes — that is the point of scoring against
+seasonal naive on held-out time rather than reporting a fit.
+
+What this project demonstrates is not that demand can be forecast, which is
+uncontroversial, but that a marketing system can be built so that **every figure
+it shows can be traced to the script that produced it, and every claim it makes
+about its own safety has been attacked on purpose.** The gates that disagreed
+with each other found real defects: a metric that got worse, an estimator biased
+where nothing happened, a colour indistinguishable under deuteranopia, a forged
+header that engaged the kill switch. Each was fixed rather than tuned away, and
+the residuals that could not be fixed are stated here rather than omitted.
 
 ## Not advice
 

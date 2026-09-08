@@ -159,13 +159,13 @@ the rules on purpose.</td>
 | Events are curated and say so | `python -m pipeline.events --verify` | 245 instances, no row claiming a verified date — [`A6`](docs/results/A6-events.json) |
 | Sites respond differently to weather | `python -m pipeline.footfall --verify` | slope ordering matches outdoor-share ordering — [`A7`](docs/results/A7-footfall.json) |
 | The embedding model is fit for trilingual retrieval | `python scripts/spike_embeddings.py` | bge-m3 +0.447/+0.318 margin; nomic-embed-text disqualified — [`A9`](docs/results/A9-embedding-spike.json) |
-| Text and UI meet WCAG in both registers | `node apps/web/scripts/check-contrast.mjs` | 36 pairs measured — [`A2`](docs/results/A2-contrast.json) |
+| Text and UI meet WCAG in both registers | `node apps/web/scripts/check-contrast.mjs` | 38 pairs measured, including the inverted pressed-toggle composite — [`A2`](docs/results/A2-contrast.json) |
 | Chart series and verdicts are distinguishable | `node apps/web/scripts/check-palette.mjs` | six checks per register plus the zone rule, deuteranopia included — [`A10`](docs/results/A10-palette.json) |
 | The shell is responsive, accessible and RTL-correct | `make e2e` | **78 Playwright tests**, no serious axe violation on any tab in either register |
 | No agent can reach the outside world | `pytest tests/invariants` | every route is a GET; the crew's side-effects column is `none` on every row |
 | Retrieval answers what it can and refuses what it cannot | `python scripts/spike_retrieval.py` | **6/8** in-domain answered, **10/10** out-of-domain refused — [`C2`](docs/results/C2-retrieval.json) |
 | The 3D scene holds its frame budget | `npx playwright test frames.spec.ts` | median **60 fps**, 95th percentile 30 — [`D1`](docs/results/D1-frames.json) |
-| The deployed pair is what it claims to be | `python scripts/verify_deploy.py` | 8/8 checks, including that the live instance grants no Admin — [`A12`](docs/results/A12-deploy.json) |
+| The deployed pair is what it claims to be | `python scripts/verify_deploy.py` | 10/10 checks, including that no anonymous caller reaches Admin — [`A12`](docs/results/A12-deploy.json) |
 | The safety claims survive being attacked | `python scripts/red_team.py` | 48 attacks, 7 controls, **48 held** — including 11 against the capability token that replaced the forgeable header — [`E1`](docs/results/E1-red-team.json) |
 | A privileged role is proved, not claimed | `pytest tests/security` | signed tokens; role, expiry, signature and revocation all attacked — 26 cases |
 | Provider spend stays at zero | `pytest tests/core/test_llm.py` | Anthropic reports itself unavailable with a key set; the chain ends in a deterministic stub |

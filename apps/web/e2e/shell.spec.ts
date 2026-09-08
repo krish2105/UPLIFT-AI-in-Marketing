@@ -156,8 +156,26 @@ test.describe("responsive", () => {
 test.describe("accessibility", () => {
   async function scan(page: Page, route: string) {
     await page.goto(route);
+    /* color-contrast is disabled here, and measured properly elsewhere.
+     *
+     * axe reported the theme toggle's pressed label at 3.04:1, intermittently —
+     * only when that button sits in one register. The computed styles are
+     * L*96.7 on L*12.6, and this project's own gate measures the pair at
+     * 14.86:1 (docs/results/A2-contrast.json). axe read the foreground
+     * correctly and the background wrongly: it reported #858f92, which is the
+     * BORDER token, because these tokens resolve to CSS Color 4 `lab()` values
+     * its parser does not handle.
+     *
+     * Suppressing a failing accessibility rule is normally how a suite starts
+     * lying, so to be explicit: contrast is not going unchecked. It is measured
+     * in OKLCH by apps/web/scripts/check-contrast.mjs across 38 pairs in both
+     * registers, which is stricter than axe and does not guess. Chasing this
+     * added the pressed-toggle composite to that gate, where it had never been
+     * measured at all. Every other axe rule still runs here.
+     */
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .disableRules(["color-contrast"])
       .analyze();
     const serious = results.violations.filter(
       (v) => v.impact === "serious" || v.impact === "critical",
